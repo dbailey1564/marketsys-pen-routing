@@ -1,0 +1,11 @@
+{
+  "arduino_cli_version": "1.5.1",
+  "arduino_cli_linux_x64_sha256": "28a8e119c498a25607821c36cb2dc49e8463941b261a0d99091baa7bc692dd2b",
+  "package_index_url": "https://raw.githubusercontent.com/RAKWireless/RAKwireless-Arduino-BSP-Index/main/package_rakwireless_com_rui_index.json",
+  "core": "rak_rui:stm32",
+  "core_version": "4.2.4",
+  "fqbn": "rak_rui:stm32:WisDuoRAK3272SiPBoard",
+  "reference_fqbn": "rak_rui:stm32:WisDuoRAK3172EvaluationBoard",
+  "reference_url": "https://github.com/RAKWireless/RUI3-Best-Practice.git",
+  "reference_commit": "3460377f44fe17885397335027d2fa8eb66dc11b"
+}

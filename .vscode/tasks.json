@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "MarketSys: build environment check",
+      "type": "process",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/dev.py", "build-check"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": {"kind": "build", "isDefault": true},
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "MarketSys: compile RAK P2P receive reference",
+      "type": "process",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/dev.py", "reference-rx"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "MarketSys: compile RAK P2P transmit reference",
+      "type": "process",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/dev.py", "reference-tx"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "MarketSys: install pinned build tools",
+      "type": "process",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/dev.py", "setup"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": []
+    }
+  ]
+}
