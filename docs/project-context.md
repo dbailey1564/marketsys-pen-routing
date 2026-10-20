@@ -49,6 +49,15 @@ Flash periods and transition timing are not fixed by this table.
   three color switches and one unused MOSFET.
 - Power and recharge remain unresolved and precede full-node LoRa system tests.
 
+Power requirements clarified by the user after first bring-up: solar remains
+connected for recharge; target one eight-hour session per week (auction-house
+confirmation pending); support inter-session sleep; allow at most five minutes
+for central wake activation. The proposed initial sleep/RX cadence is five
+seconds of usable RX every two minutes, pending hardware validation. This is a
+power/session mode separate from indicator STANDBY (solid blue). See
+power-planning.md and standby-wake-design.md. Battery, charger, solar panel, and
+regulator hardware are still unselected.
+
 ## Host protocol work carried forward
 
 - Distinguish commanded state from last node-confirmed state.
