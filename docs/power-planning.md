@@ -5,8 +5,10 @@ regulator topology, and connectors have not been selected.
 
 ## User requirements now established
 
-- Solar remains connected for continuous recharging (available energy still
-  depends on sunlight; continuous charging current is not assumed).
+- Photovoltaic panels remain connected for recharging from barn house lighting,
+  not outdoor sun. Continuous charging current is not assumed. See indoor-light-charging.md
+  for the revised feasibility gate; available energy depends on local lighting
+  intensity, spectrum, schedule and panel area.
 - Provisional operating duty: one **8-hour auction session per week**. The
   auction house has not yet confirmed actual operating hours.
 - Support sleep with the indicator off between sessions.

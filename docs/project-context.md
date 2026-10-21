@@ -58,6 +58,16 @@ power/session mode separate from indicator STANDBY (solid blue). See
 power-planning.md and standby-wake-design.md. Battery, charger, solar panel, and
 regulator hardware are still unselected.
 
+Charging-source clarification: panels are intended to harvest the penning barn's
+house lighting. Do not assume outdoor sunlight or outdoor-rated panel output.
+Lighting schedule and panel area are pending; see indoor-light-charging.md.
+
+October 21 deadline decision: for the October 22 presentation, prioritize a
+USB-rechargeable prototype and defer indoor harvesting. The proposed build uses
+an enclosed 10,000 mAh USB power bank, 5 V LED-driver rail and separate regulated
+3.3 V logic rail. See thursday-usb-prototype.md for selection, wiring, runtime
+assumptions and remaining hardware checks. This is not yet an assembled system.
+
 ## Host protocol work carried forward
 
 - Distinguish commanded state from last node-confirmed state.

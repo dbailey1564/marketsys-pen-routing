@@ -88,6 +88,8 @@ describes the standalone builder.
 
 ## Application planning
 
+For the October 22 presentation, see [USB prototype power and wiring](docs/thursday-usb-prototype.md).
+
 See [docs/first-upload.md](docs/first-upload.md) for the first programming result.
 See [docs/sleep-timer-test.md](docs/sleep-timer-test.md) for the separate finite
 timer/sleep harness, its failed radio-disabled build, and verified recovery.
