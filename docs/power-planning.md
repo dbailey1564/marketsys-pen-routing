@@ -73,12 +73,13 @@ step; its current wiring is a debugger-powered bare-board bring-up arrangement.
 
 ## Planned bench measurements
 
-- Actual RAK module current during idle, RX, TX, and any proposed listen/sleep
-  schedule; no such schedule has been selected yet.
+- Actual RAK module current during idle, RX, TX, and the proposed listen/sleep
+  schedule; the timer-only harness has passed, but no current was measured.
 - LED driver input current, dropout behavior, and disabled-state current at
   the measured RGB operating points and proposed supply voltages.
 - Regulated logic-rail behavior under LED switching and radio current peaks.
 
-These measurements follow a reviewed power arrangement; this document does not
+See current-measurement-plan.md for the next measurement sequence and pending
+instrument details. These measurements follow a reviewed power arrangement; this document does not
 authorize connecting an unspecified battery or assuming the programmer powers
 the final LED circuit.
