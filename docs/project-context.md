@@ -70,13 +70,16 @@ regulator hardware are still unselected.
 ## Current implementation boundary
 
 RUI3 is the selected initial development path. At this milestone the repository
-contains a minimal serial build check and development tooling. The official P2P
+contains a minimal serial build check, a separate finite timer/sleep harness,
+and development tooling. The official P2P
 examples are maintained separately as references. No MarketSys command parser,
-radio state machine, indicator driver, or power management has been implemented.
+radio state machine, indicator driver, or production power management has been implemented.
 Prototype-01 has now been programmed with the minimal SiP bring-up sketch after
 its original flash was backed up. AT queries and its repeating UART heartbeat
-confirm execution; see first-upload.md. No indicator or radio tests have run.
+confirm execution; see first-upload.md. Timer/sleep test work and a verified
+recovery to the bring-up application are recorded in sleep-timer-test.md.
+No indicator or application radio tests have run.
 
-Next engineering questions: confirm the exact module/oscillator variant and
-programming connection; resolve node power/recharge; inspect the host framing;
+Next engineering questions: resolve node power/recharge and measured sleep
+current; inspect the host framing;
 then implement and test indicator behavior and the radio protocol in stages.

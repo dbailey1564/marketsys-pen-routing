@@ -1,7 +1,7 @@
 # Solar node standby and central activation
 
-Status: **proposed timing design**, 2026-10-20. No sleep firmware or radio
-configuration has been uploaded. Numbers below are candidate budgets, not
+Status: **proposed RF timing design**, 2026-10-20. A separate timer/sleep harness
+has been uploaded; see sleep-timer-test.md. Numbers below are candidate budgets, not
 measured performance or a guarantee under arbitrary RF loss.
 
 ## Accepted requirements versus proposed implementation
@@ -125,9 +125,8 @@ under the stated 250-ms envelope. These are deterministic model checks, not
 statistical reliability estimates. The more conservative 140/260-second design
 bounds above remain the budgets. Output: build/wake-timing-analysis.json.
 
-- First create a compile-only sleep/timer harness, without assigning radio PHY
-  or changing the prototype's current verified image. Prove timer behavior and
-  recovery before adding RF traffic.
+- Validate the separate timer/sleep harness and recovery before adding RF traffic;
+  see sleep-timer-test.md for observed results and limitations.
 - Measure sleep, wake, finite RX, TX/ACK, and LED-driver disabled currents using
   a reviewed standalone supply arrangement.
 - Bench-test activation at arbitrary phases, a deliberately lost window,

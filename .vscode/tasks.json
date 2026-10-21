@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "MarketSys: compile timer sleep test",
+      "type": "process",
+      "command": "python3",
+      "args": ["${workspaceFolder}/scripts/dev.py", "sleep-test"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "group": "build",
+      "problemMatcher": ["$gcc"]
+    },
+    {
       "label": "MarketSys: build environment check",
       "type": "process",
       "command": "python3",

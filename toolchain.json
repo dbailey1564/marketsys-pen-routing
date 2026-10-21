@@ -6,6 +6,7 @@
   "core_version": "4.2.4",
   "fqbn": "rak_rui:stm32:WisDuoRAK3272SiPBoard",
   "reference_fqbn": "rak_rui:stm32:WisDuoRAK3172EvaluationBoard",
+  "sleep_test_fqbn": "rak_rui:stm32:WisDuoRAK3272SiPBoard",
   "reference_url": "https://github.com/RAKWireless/RUI3-Best-Practice.git",
   "reference_commit": "3460377f44fe17885397335027d2fa8eb66dc11b"
 }

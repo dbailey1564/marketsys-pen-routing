@@ -89,6 +89,8 @@ describes the standalone builder.
 ## Application planning
 
 See [docs/first-upload.md](docs/first-upload.md) for the first programming result.
+See [docs/sleep-timer-test.md](docs/sleep-timer-test.md) for the separate finite
+timer/sleep harness, its failed radio-disabled build, and verified recovery.
 See [docs/project-context.md](docs/project-context.md) for carried-forward
 hardware, state, and protocol decisions. Application implementation and physical
 testing remain subsequent work.
