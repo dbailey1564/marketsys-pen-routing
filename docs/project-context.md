@@ -34,8 +34,9 @@ Private flash backups and credential-bearing files remain outside Git.
   should not have to issue separate ACTIVE and NEXT indicator commands.
   A different pen assignment activates immediately and moves the previous
   ACTIVE pen to NEXT. NEXT therefore denotes the previous active pen, not
-  a future queued pen. The disposition of an older NEXT pen on a subsequent
-  advance is pending; see pen-flow-logic.md. Cattle, buyer, and routing metadata
+  a future queued pen. On the next different-pen advance, the older NEXT pen
+  becomes OFF. Same-pen assignments produce HOLD_OPEN without advancing the
+  two positions. See pen-flow-logic.md. Cattle, buyer, and routing metadata
   remain outside the node protocol.
 - The host interface is intended to be binary and host-agnostic over a USB
   virtual COM connection. The physical serial/USB arrangement still needs to be

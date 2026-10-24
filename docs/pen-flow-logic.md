@@ -14,6 +14,9 @@ contract; no new flow firmware or host packet format is implemented yet.
   NEXT (solid blue), not automatically FULL or OFF.
 - A new assignment for the same active pen produces HOLD_OPEN (flashing green).
   The controller retains that pen's active identity while showing HOLD_OPEN.
+- When a different-pen assignment advances the positions, the older NEXT pen
+  becomes OFF. Thus there is one active identity and at most one previous/NEXT
+  identity in this basic flow.
 - Pen nodes continue to apply central's commands and acknowledge application.
   Nodes do not receive cattle, buyer, or routing metadata or decide the flow.
 - Current indications remain OFF, ACTIVE solid green, NEXT solid blue,
@@ -43,21 +46,38 @@ application-level event identity. Host-event deduplication is not implemented.
 | --- | --- | --- |
 | Pen 12 ACTIVE | Pen 14 | Pen 14 ACTIVE; pen 12 NEXT |
 | Pen 14 ACTIVE | New assignment to pen 14 | Pen 14 HOLD_OPEN; pen 12 remains NEXT |
+| Pen 12 NEXT; pen 14 ACTIVE | Pen 16 | Pen 12 OFF; pen 14 NEXT; pen 16 ACTIVE |
+| Pen 12 NEXT; pen 14 HOLD_OPEN | Pen 16 | Pen 12 OFF; pen 14 NEXT; pen 16 ACTIVE |
 
 NEXT therefore identifies the previous active pen in this flow; do not assume
 it means a future queued assignment. The app still supplies the incoming
 assignment only; central derives the related indications.
 
-## Remaining business-rule question
+## Derived controller update rules
 
-With 12 NEXT and 14 ACTIVE, a new assignment to 16 makes 16 ACTIVE and
-14 NEXT. The disposition of the older NEXT pen 12 is not yet specified:
-OFF, FULL, or still NEXT are pending the user's answer. Do not silently
-choose an older-pen state or assume at most one NEXT pen until resolved.
+For each genuinely new assignment to pen P, let A be the current active pen
+identity (whether displaying ACTIVE or HOLD_OPEN) and N the previous/NEXT pen.
 
-Then define initialization and return from HOLD_OPEN, plus cancellation/
-correction, reset/resynchronization and node-ACK failure effects before
-claiming production flow behavior. No automatic FULL event is established.
+1. If P equals A, display HOLD_OPEN on A and leave N and the positions alone.
+2. Otherwise, set the older N to OFF unless N is also the newly selected P.
+   Set the old A to NEXT, and set P to ACTIVE. Store N=old A and A=P.
+3. If no active pen exists yet, the natural initialization is P ACTIVE with
+   no NEXT pen. This is a derived initialization proposal, not a separately
+   confirmed restart/resynchronization policy.
+
+When a previously NEXT pen is selected again, compute the final desired
+states by identity: do not issue a stale OFF after making that same pen ACTIVE.
+For example 12 NEXT/14 ACTIVE plus assignment 12 yields 12 ACTIVE/14 NEXT.
+These edge cases are derived from the confirmed rules and are not yet coded.
+Repeated delivery of an existing event does not execute these rules again.
+
+## Remaining flow details
+
+Cancellation/correction, reset/resynchronization, node-ACK failure effects,
+and persistence beyond the bench timeout still need decisions before claiming
+production flow behavior. No automatic FULL event is established by the
+confirmed advancement rules; FULL and FAULT remain separately available
+indicator states with their triggering events not yet defined here.
 
 ## Current implementation boundary
 
