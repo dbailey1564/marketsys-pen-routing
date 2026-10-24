@@ -6,6 +6,18 @@ It is not a manufacturer specification or a newly verified bench report.
 
 ## Agreed architecture
 
+## Standing version-control workflow
+
+User instruction, October 24, 2026: all future iterations saved to the Lin
+development repository are to be committed and pushed to GitHub without
+requesting push approval again. Include source, tooling, documentation and
+iteration/test records. Verify the remote branch matches the local commit
+after pushing. If authentication or another error prevents a push, report
+the unsynced status explicitly and resolve it before claiming synchronization.
+Private flash backups and credential-bearing files remain outside Git.
+
+## Agreed architecture (continued)
+
 - Prototype hardware plan: one central controller and three pen nodes. Earlier
   discussions called the hardware RAK3272S/RAK3172. The photo supplied on
   2026-10-20 identifies the pictured module as **RAK3172-SiP** and breakout as
