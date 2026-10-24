@@ -32,6 +32,13 @@ Controller image SHA256:
 `daa355302123ccb06d87539379c8ceddf27747442de6d7da45c4bf2734a5593c`.
 Custom application versions are MS-Node1-RF-0.3.0 and MS-Central-RF-0.3.0.
 
+Deployment requirement: after the first startup changes saved mode from
+LoRaWAN to P2P, restart once with `scripts/restart_radio.py` (ATZ) or a power
+cycle. Installed service_lora.c initializes service_lora_p2p_init at SDK
+startup, whereas RAKLoRa.cpp nwm.set only changes the saved mode. READY=1
+alone is not an end-to-end radio test. Node1 received this restart during
+its power-source transfer. The controller required the explicit ATZ below.
+
 ## Prototype radio frame (not the host binary protocol)
 
 The frame is exactly 14 bytes, serialized explicitly without struct padding:
@@ -119,6 +126,54 @@ update-record range. Readback SHA256:
 Settings changed from the factory backup as expected for radio configuration;
 settings preservation is not claimed. Restore remains untested.
 
-Pending physical transfer: controller upload/identification, first over-air SET
-and ACK, optical confirmation, and lost-ACK/retry and unavailable-node tests.
-Do not claim the radio link itself has passed until these have run.
+## Controller transfer and installation
+
+The user confirmed the programmer was transferred and separately powered
+Node1 remained dark. UART answered from the controller, but initial SWD access
+failed. AT queries found LPM=1, LPMLVL=2 from the prior sleep harness. Setting
+LPM=0 alone did not restore SWD. Entering the existing RUI bootloader with
+AT+BOOT restored debug access without rewiring or replacement firmware.
+This supports the sleep harness as the cause; it is not a general SWD fault
+diagnosis. Bootloader entry changes the boot state, and LPM was deliberately
+changed before the fresh backup; the original factory backup remains intact.
+
+A fresh pre-radio backup on Lin is
+`/home/dbailey1564/Development/Backups/marketsys/prototype-01/20261024T205854.538791Z/`.
+Both 262144-byte reads matched, SHA256
+`7249865b1b1f607440db52952a3378b7e991583ac39f6cd4221a64fbff4f846d`.
+The read UID matched the original controller's recorded UID; protection
+remained level 0. The controller image was installed through RAK's official
+UART uploader. Helpers prepare_controller_radio.py and
+enter_controller_bootloader.py document the preparation; neither uploads an
+image. verify_controller_upload.py checks the installed image and UID.
+
+Controller readback record:
+`20261024T210129.913260Z-post-radio-central-upload/verification.json` under
+its private backup area. UID matched, all 175168 application bytes matched
+the prepared image, and bootloader code/activation marker were unchanged
+outside the reviewed update-record range. Full readback SHA256:
+`4c50119d5c056213fd7c623868b7a657afffe22a7c31dc7329892fba2f7e2d66`.
+Settings differed from the factory backup; preservation is not claimed.
+
+## First over-air results
+
+The first OFF request (token 1024202601) exhausted three queued attempts with
+no P2P TX callback or ACK. The controller reported FAILED/CONFIRMED=UNKNOWN,
+not success. SDK startup inspection identified the saved-mode transition
+requirement above. ATZ restarted central in LoRa P2P mode. The repeated OFF
+test with fresh token 1024202602 received APPLIED/OFF on attempt 1, RSSI -19,
+SNR 13. The matching address/token and frame CRC were validated by firmware.
+These are one bench exchange's reported signal values, not range results.
+
+Repeating token 1024202602 with OFF received DUPLICATE/OFF on attempt 1.
+Reusing that token for FULL received CONFLICT/OFF and central reported
+REJECTED rather than ACK. The helper's exception in this deliberately
+rejected test was expected. Logs are build/radio-first-off.log,
+radio-central-restart.log, radio-first-off-after-restart.log,
+radio-duplicate-off.log, and radio-token-conflict.log.
+
+The basic bidirectional radio path and duplicate/conflict handling passed.
+Pending: optical confirmation of radio-commanded patterns, expired-duplicate
+behavior over air, deliberate lost-ACK/retry, and unavailable-node tests.
+The initial three-attempt failure exercised the bounded watchdog path but
+does not establish a controlled lost-ACK test.

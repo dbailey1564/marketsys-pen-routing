@@ -100,17 +100,20 @@ passed. The user then visually confirmed all seven states, with expected
 colors/patterns, unselected dies dark, and automatic OFF after each test.
 Final state was OFF. See node1-indicator-test.md for exact behavior and verification.
 
-Node1 now runs radio receiver/indicator firmware 0.3.0. Matching controller
-firmware is compiled but not installed yet; the DAPLink must be moved back to
-the controller, with Node1 transferred to breadboard 3.3 V power. The prototype
-transport has explicit frames/CRC, acknowledgements and bounded retries. Node1
-radio initialization and OFF GPIO status passed; end-to-end radio operation
-awaits the physical transfer and controller upload. See radio-bench-link.md.
+Node1 and controller now both run radio bench firmware 0.3.0. The DAPLink is
+back on the controller; Node1 is powered from breadboard 3.3 V, with its driver
+on 5 V. Both uploads have matching flash readbacks and preserved bootloader
+code. The prototype transport has explicit frames/CRC, acknowledgements and
+bounded retries. After the first mode-change restart, wireless OFF received
+an APPLIED ACK on the first attempt. Duplicate OFF and conflicting-token
+rejection also passed over air. Optical radio-pattern checks are next.
+See radio-bench-link.md for backups, SDK restart requirement and limitations.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: transfer programmer/power and verify staged radio transport, then the host interface.
+Next: visually confirm radio-commanded patterns and verify transport failures,
+then implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.

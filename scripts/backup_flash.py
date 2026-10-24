@@ -4,13 +4,17 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--board', default='prototype-01', choices=['prototype-01', 'proto-node1-v1'])
+parser.add_argument('--expected-uid', help='Expected 24 hex digits: three UID words in displayed order')
 args = parser.parse_args()
+if args.expected_uid and not re.fullmatch(r'[0-9a-fA-F]{24}', args.expected_uid):
+    parser.error('Expected UID must contain exactly 24 hexadecimal digits')
 os.umask(0o077)
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
 destination = ROOT.parent / "Backups" / "marketsys" / args.board / stamp
@@ -43,6 +47,12 @@ with log.open("xb") as output:
                             stdout=output, stderr=subprocess.STDOUT, timeout=300)
 if result.returncode:
     raise RuntimeError(f"Read failed ({result.returncode}); see {log}. No backup verified.")
+uid_match = re.search(r'0x1fff7590:\s+([0-9a-fA-F]{8})\s+([0-9a-fA-F]{8})\s+([0-9a-fA-F]{8})', log.read_text())
+if not uid_match:
+    raise RuntimeError('Target UID was not recorded')
+uid = ''.join(uid_match.groups()).lower()
+if args.expected_uid and uid != args.expected_uid.lower():
+    raise RuntimeError('Target UID does not match the expected board; do not program')
 data = first.read_bytes()
 verification = second.read_bytes()
 if len(data) != 262144 or len(verification) != 262144:
@@ -55,6 +65,7 @@ digest = hashlib.sha256(data).hexdigest()
 metadata = {
     "created_utc": stamp,
     "board_label": args.board,
+    "target_uid_words": uid,
     "photographed_hardware": "RAK3272-SiP Ver B / RAK3172-SiP",
     "base_address": "0x08000000",
     "size_bytes": len(data),
