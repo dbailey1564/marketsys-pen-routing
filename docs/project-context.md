@@ -106,14 +106,16 @@ on 5 V. Both uploads have matching flash readbacks and preserved bootloader
 code. The prototype transport has explicit frames/CRC, acknowledgements and
 bounded retries. After the first mode-change restart, wireless OFF received
 an APPLIED ACK on the first attempt. Duplicate OFF and conflicting-token
-rejection also passed over air. Optical radio-pattern checks are next.
+rejection and expired-duplicate handling also passed over air. All seven
+radio-commanded states now have matching ACKs and user visual confirmation;
+each command and fresh OFF received an APPLIED ACK on the first attempt.
+Final confirmed state was OFF after the FAULT test (OFF token 785359124).
 See radio-bench-link.md for backups, SDK restart requirement and limitations.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: visually confirm radio-commanded patterns and verify transport failures,
-then implement the host interface.
+Next: verify transport failures/recovery, then implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.

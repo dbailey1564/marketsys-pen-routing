@@ -178,11 +178,33 @@ EXPIRED/OFF on attempt 1 and central correctly reported REJECTED with
 CONFIRMED=OFF. It did not restart the pattern. A fresh OFF transaction
 (1024202604) received APPLIED/OFF on attempt 1. Logs:
 build/radio-active-visual.log, radio-expired-duplicate.log, radio-final-off.log.
-Visual confirmation of flashing green is awaiting the user's observation.
+The user subsequently confirmed flashing green and complete darkness after
+the approximately 10-second activation, with red and blue remaining dark.
 
 The basic bidirectional radio path and duplicate/conflict/expired handling
 passed. Final node-reported state is OFF.
-Pending: optical confirmation of radio-commanded patterns, deliberate
-lost-ACK/retry, and unavailable-node tests.
+Pending: deliberate lost-ACK/retry and unavailable-node tests.
 The initial three-attempt failure exercised the bounded watchdog path but
 does not establish a controlled lost-ACK test.
+
+## Completed wireless visual state verification
+
+The user confirmed all six non-OFF patterns separately over the radio link,
+including the return to complete darkness after approximately 10 seconds and
+the unselected dies remaining dark. Every state command and subsequent fresh
+OFF command received an APPLIED ACK on the first attempt:
+
+| State | State-command token | Observed pattern | Subsequent OFF token |
+| --- | --- | --- | --- |
+| ACTIVE | 1024202603 | Flashing green | 1024202604 |
+| NEXT | 1334762276 | Flashing blue | 148992949 |
+| STANDBY | 2077549842 | Solid blue | 4132318881 |
+| HOLD_OPEN | 684982114 | Alternating green/blue | 449476807 |
+| FULL | 1420175036 | Solid red | 1899478556 |
+| FAULT | 2176498190 | Flashing red | 785359124 |
+
+OFF was verified at startup and after every pattern. The final transaction
+785359124 received APPLIED/OFF on attempt 1. This establishes all seven
+indicator states commanded controller-to-Node1 over LoRa, with matching ACKs
+and user visual confirmation. It does not establish range, production power
+performance, or controlled lost-packet recovery.
