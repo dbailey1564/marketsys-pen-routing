@@ -78,5 +78,26 @@ The update record and settings changed from the factory reference; settings
 preservation is not claimed. The pre-revision current-iteration backup above
 is retained separately and was completed before this upload.
 
-Central remains on 0.3.1 until the programmer is returned. No new LoRa pattern
-is claimed verified yet. The historical LED harness remains unchanged.
+The programmer was returned to central and Node1 restored to breadboard
+power. Central 0.4.0 was uploaded and verified against its prepared hash.
+Private record:
+`prototype-01/20261024T222418.751488Z-post-radio-central-upload/verification.json`.
+The controller UID matched and all 175688 application bytes matched the image.
+Bootloader code and activation marker were unchanged outside the reviewed
+update-record range. Full snapshot SHA256:
+`4a52fdcebfd1c058e051d2c8d88b15772275c757f7877bc0f520524608216b48`.
+Runtime status showed READY=1, FW=0.4.0 and both test-injection flags zero.
+
+## Revised LoRa validation in progress
+
+Fresh OFF token 2403248406 received APPLIED/OFF on attempt 1. On the actual
+controller, scripts/check_retired_state.py submitted STANDBY with token
+1024202801; it returned AT_PARAM_ERROR and left the prior transaction
+unchanged. No transmission was started for the removed command. Logs:
+build/revision-040-initial-off.log and revision-040-retired-state.log.
+
+ACTIVE token 2231881984 received APPLIED/ACTIVE on attempt 1. After the
+10-second observation window, fresh OFF token 903122968 received APPLIED/OFF
+on attempt 1. Logs: build/revision-040-active.log and revision-040-active-off.log.
+Visual confirmation of solid green is pending; remaining revised state tests
+have not run yet. The historical LED harness remains unchanged.

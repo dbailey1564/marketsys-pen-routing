@@ -40,9 +40,11 @@ STANDBY was removed by the user's October 24 revision. Its wire value 0x03
 is retired; surviving state IDs are unchanged. Radio firmware 0.4.0 implementing
 this table is compiled and host-tested. Node1's previous iteration was freshly
 backed up twice and verified before upload; Node1 now runs 0.4.0 with matching
-flash readback and OFF GPIO status. DAPLink is on Node1, breadboard power OFF.
-Central 0.4.0 is prepared but not yet installed; LoRa tests await the return
-of the programmer and controller update.
+flash readback and OFF GPIO status. DAPLink has been returned to central,
+which also runs 0.4.0 with verified flash readback; Node1 is on breadboard
+power. Wireless OFF and ACTIVE each received first-attempt ACKs. STANDBY
+was rejected by the controller without starting a transaction. Visual solid
+green confirmation and the remaining six-state revision tests are in progress.
 See indicator-revision-040.md for deployment progress and exact build hashes.
 
 ## Hardware work carried forward
@@ -107,8 +109,9 @@ passed. The user then visually confirmed all seven states, with expected
 colors/patterns, unselected dies dark, and automatic OFF after each test.
 Final state was OFF. See node1-indicator-test.md for exact behavior and verification.
 
-Node1 runs radio bench firmware 0.3.0; the controller now runs 0.3.1 with
-a default-disabled one-shot lost-ACK test control. The DAPLink is
+Earlier radio milestones used Node1 0.3.0 and controller 0.3.1 with
+a default-disabled one-shot lost-ACK test control. Both are now on 0.4.0
+as recorded above; the earlier test results below remain historical. The DAPLink is
 back on the controller; Node1 is powered from breadboard 3.3 V, with its driver
 on 5 V. Both uploads have matching flash readbacks and preserved bootloader
 code. The prototype transport has explicit frames/CRC, acknowledgements and
