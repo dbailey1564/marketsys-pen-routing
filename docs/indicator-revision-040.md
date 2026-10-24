@@ -1,4 +1,4 @@
-# Indicator revision 0.4.0: deployment in progress
+# Indicator revision 0.4.0: backed up, deployed and verified
 
 October 24, 2026. User explicitly requested a backup of the current Node1
 iteration before the revised firmware upload, readback verification and LoRa
@@ -88,7 +88,7 @@ update-record range. Full snapshot SHA256:
 `4a52fdcebfd1c058e051d2c8d88b15772275c757f7877bc0f520524608216b48`.
 Runtime status showed READY=1, FW=0.4.0 and both test-injection flags zero.
 
-## Revised LoRa validation in progress
+## Completed revised LoRa validation
 
 Fresh OFF token 2403248406 received APPLIED/OFF on attempt 1. On the actual
 controller, scripts/check_retired_state.py submitted STANDBY with token
@@ -99,5 +99,30 @@ build/revision-040-initial-off.log and revision-040-retired-state.log.
 ACTIVE token 2231881984 received APPLIED/ACTIVE on attempt 1. After the
 10-second observation window, fresh OFF token 903122968 received APPLIED/OFF
 on attempt 1. Logs: build/revision-040-active.log and revision-040-active-off.log.
-Visual confirmation of solid green is pending; remaining revised state tests
-have not run yet. The historical LED harness remains unchanged.
+The user confirmed solid green for approximately 10 seconds followed by
+complete darkness, with other dies dark. The historical LED harness remains
+unchanged.
+
+All six revised states passed LoRa commands and user visual confirmation:
+
+| State | Command token | Confirmed indication | Fresh OFF token |
+| --- | --- | --- | --- |
+| OFF | 2403248406 | All dark | Initial baseline |
+| ACTIVE | 2231881984 | Solid green | 903122968 |
+| NEXT | 2560310689 | Solid blue | 557035273 |
+| HOLD_OPEN | 1520604496 | Flashing green | 4158423556 |
+| FULL | 612314715 | Solid red | 965899944 |
+| FAULT | 181785431 | Flashing red | 357773534 |
+
+Each state and fresh OFF command received APPLIED acknowledgement on attempt
+1. The user confirmed approximately 10 seconds of the intended illumination,
+then complete darkness, with unselected dies dark. NEXT was repeated because
+the user was away for its initial run; the table uses the observed repeat.
+Logs are build/revision-040-next-repeat*.log, revision-040-hold-open*.log,
+revision-040-full*.log and revision-040-fault*.log, plus ACTIVE logs above.
+
+Final confirmed state: OFF, token 357773534. Test-injection flags remained
+zero. Requested Node1 backup, firmware changes, upload verification and
+LoRa/visual tests are complete. The 500 ms phases and 10-second automatic
+cutoff remain bench settings; production persistence/failure policy remains
+undecided. Historical 0.3.x transport fault tests are not claimed rerun here.

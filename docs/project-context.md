@@ -42,9 +42,11 @@ this table is compiled and host-tested. Node1's previous iteration was freshly
 backed up twice and verified before upload; Node1 now runs 0.4.0 with matching
 flash readback and OFF GPIO status. DAPLink has been returned to central,
 which also runs 0.4.0 with verified flash readback; Node1 is on breadboard
-power. Wireless OFF and ACTIVE each received first-attempt ACKs. STANDBY
-was rejected by the controller without starting a transaction. Visual solid
-green confirmation and the remaining six-state revision tests are in progress.
+power. All six revised states and their fresh OFF commands received APPLIED
+ACKs on the first attempt, and the user visually confirmed each revised
+pattern and darkness afterward. STANDBY was rejected by the controller
+without starting a transaction. Final confirmed state is OFF, token 357773534;
+test-injection flags are zero. The requested revision and verification are complete.
 See indicator-revision-040.md for deployment progress and exact build hashes.
 
 ## Hardware work carried forward
