@@ -69,9 +69,27 @@ The update record and settings region changed during the normal upload and
 application initialization; the settings region is not claimed preserved.
 No bootloader replacement or protection change was performed.
 
-Pending physical work: resistor-installed all-OFF validation, full bench
-circuit hookup, and actual LED ON/OFF tests. Leave the breadboard disconnected
-until that hookup step. Driver EN and whole-node OFF current remain unverified.
+## Physical LED test results
+
+After the bench hookup, the user reported all three dies dark at initial OFF.
+The user then confirmed blue and red each illuminated for approximately
+10 seconds and went completely dark, with the other colors remaining dark.
+The initial green command produced no illumination. The user identified the
+green source connection on IC2 P2 instead of P5, corrected it, and confirmed
+the repeated green test illuminated for approximately 10 seconds and returned
+completely dark, with red and blue remaining dark. This correction did not
+require a firmware change. Serial queries after every activation confirmed
+PB3/PB4/PB5 all LOW. These observations establish the three individual color
+ON/OFF bench tests; they do not establish zero OFF current.
+
+Bench power: DAPLink 3V3 powers Node1; breadboard 5 V powers driver IN+;
+Node1 GND, DAPLink GND and driver IN- share supply ground. Breadboard 3.3 V
+is unused. Driver L- remains the MOSFET source return, separate from the
+supply-ground junction. Driver EN remains disconnected and insulated.
+
+Pending: seven-state indicator behavior, radio/host integration, driver EN
+control, and measured whole-node OFF current. No flash write was needed
+for these physical tests.
 
 Hardware references:
 [RAK3272-SiP pinout](https://docs.rakwireless.com/product-categories/wisduo/rak3272-sip-breakout-board/datasheet/),
