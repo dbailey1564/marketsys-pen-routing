@@ -32,8 +32,10 @@ Private flash backups and credential-bearing files remain outside Git.
   controller owns state advancement and derives the indicator commands,
   including HOLD_OPEN for a new assignment to the same active pen. The app
   should not have to issue separate ACTIVE and NEXT indicator commands.
-  Exact advance trigger and disposition of the previous active pen are pending
-  clarification; see pen-flow-logic.md. Cattle, buyer, and routing metadata
+  A different pen assignment activates immediately and moves the previous
+  ACTIVE pen to NEXT. NEXT therefore denotes the previous active pen, not
+  a future queued pen. The disposition of an older NEXT pen on a subsequent
+  advance is pending; see pen-flow-logic.md. Cattle, buyer, and routing metadata
   remain outside the node protocol.
 - The host interface is intended to be binary and host-agnostic over a USB
   virtual COM connection. The physical serial/USB arrangement still needs to be
