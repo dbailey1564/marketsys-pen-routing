@@ -1,5 +1,9 @@
 # PROTO - Node1 V1: indicator bench firmware
 
+Subsequent milestone: Node1 now runs the 0.3.0 radio receiver with these same
+patterns; see radio-bench-link.md for its current commands and power transfer.
+The LED/STATE commands below document the earlier bench harness.
+
 October 24, 2026. The user connected Node1 alone to the DAPLink on Lin.
 The breadboard and LED driver remained disconnected during programming.
 

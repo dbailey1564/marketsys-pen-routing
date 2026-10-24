@@ -10,17 +10,20 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 os.umask(0o077)
 original = ROOT.parent / 'Backups/marketsys/proto-node1-v1/20261024T192523.820282Z/original-main-flash.bin'
-image = ROOT / 'build/indicator-test/indicator_test.ino.bin'
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--sha256', default='4260f24e80da0deebdd8ef0a24116cd10a3358bb5ca480bf23bd9ecabdd49e12')
-expected_hash = parser.parse_args().sha256
+parser.add_argument('--target', choices=['indicator-test', 'radio-node'], default='indicator-test')
+args = parser.parse_args()
+expected_hash = args.sha256
+sketch_name = args.target.replace('-', '_')
+image = ROOT / 'build' / args.target / (sketch_name + '.ino.bin')
 if len(expected_hash) != 64 or any(c not in '0123456789abcdef' for c in expected_hash):
     raise RuntimeError('Expected a lowercase SHA256 digest')
 image_data = image.read_bytes()
 if hashlib.sha256(image_data).hexdigest() != expected_hash:
     raise RuntimeError('Unexpected firmware image hash')
 stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
-destination = original.parent.parent / (stamp + '-post-indicator-upload')
+destination = original.parent.parent / (stamp + '-post-' + args.target + '-upload')
 destination.mkdir(parents=True, exist_ok=False)
 snapshot = destination / 'main-flash.bin'
 base = (ROOT / 'tools/inspect-flash.cfg').read_text().rstrip()

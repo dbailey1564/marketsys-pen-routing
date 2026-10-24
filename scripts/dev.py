@@ -91,6 +91,9 @@ def build(target):
     elif target == "indicator-test":
         sketch = ROOT / "firmware/indicator_test"
         fqbn = LOCK["fqbn"]
+    elif target in ("radio-node", "radio-central"):
+        sketch = ROOT / "firmware" / target.replace('-', '_')
+        fqbn = LOCK["fqbn"]
     else:
         ensure_reference()
         name = "LoRa_P2P_RX" if target == "reference-rx" else "LoRa_P2P_TX"
@@ -100,10 +103,10 @@ def build(target):
     output = ROOT / "build" / target
     output.mkdir(parents=True, exist_ok=True)
     print(f"Compile target: {fqbn}", flush=True)
-    cli("compile", "--fqbn", fqbn, "--build-path", output, sketch)
+    cli("compile", "--fqbn", fqbn, "--libraries", ROOT / "libraries", "--build-path", output, sketch)
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("task", choices=["setup", "verify", "build-check", "sleep-test", "indicator-test", "reference-rx", "reference-tx"])
+parser.add_argument("task", choices=["setup", "verify", "build-check", "sleep-test", "indicator-test", "radio-node", "radio-central", "reference-rx", "reference-tx"])
 task = parser.parse_args().task
 if task == "setup":
     setup()

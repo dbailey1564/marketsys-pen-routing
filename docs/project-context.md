@@ -100,10 +100,17 @@ passed. The user then visually confirmed all seven states, with expected
 colors/patterns, unselected dies dark, and automatic OFF after each test.
 Final state was OFF. See node1-indicator-test.md for exact behavior and verification.
 
-The UART AT commands are bench controls, not the planned binary host protocol.
-MarketSys radio/host integration and production power management remain
-unimplemented. Official P2P examples remain separate references.
+Node1 now runs radio receiver/indicator firmware 0.3.0. Matching controller
+firmware is compiled but not installed yet; the DAPLink must be moved back to
+the controller, with Node1 transferred to breadboard 3.3 V power. The prototype
+transport has explicit frames/CRC, acknowledgements and bounded retries. Node1
+radio initialization and OFF GPIO status passed; end-to-end radio operation
+awaits the physical transfer and controller upload. See radio-bench-link.md.
 
-Next: implement staged radio transport and the host interface.
+The UART AT commands are bench controls, not the planned binary host protocol.
+Host integration and production power management remain unimplemented.
+Official P2P examples remain separate references.
+
+Next: transfer programmer/power and verify staged radio transport, then the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.
