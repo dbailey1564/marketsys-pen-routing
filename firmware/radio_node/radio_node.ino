@@ -38,7 +38,7 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE1", ready, "0.4.0");
+    benchRadio::printConfig("NODE1", ready, "0.4.1");
     Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=10000\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
         (unsigned long)(dedup.valid ? dedup.token : 0));
@@ -56,7 +56,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node1-RF-0.4.0");
+    api.system.firmwareVersion.set("MS-Node1-RF-0.4.1");
     bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node1 radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     ready = commandReady && benchRadio::begin();

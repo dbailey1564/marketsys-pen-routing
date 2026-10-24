@@ -14,7 +14,7 @@ static const char *result = "IDLE";
 static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 
 static void report() {
-    benchRadio::printConfig("CENTRAL", ready, "0.4.0");
+    benchRadio::printConfig("CENTRAL", ready, "0.4.1");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, bench::name(request.state),
         confirmedKnown ? bench::name(confirmed) : "UNKNOWN", attempts,
@@ -54,9 +54,9 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.4.0");
+    api.system.firmwareVersion.set("MS-Central-RF-0.4.1");
     bool commandReady = api.system.atMode.add((char *)"PEN",
-        (char *)"Bench node 1: decimal token:OFF|ACTIVE|NEXT|HOLD_OPEN|FULL|FAULT",
+        (char *)"Bench node 1: decimal token:OFF|ACTIVE|LAST|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     bool testReady = api.system.atMode.add((char *)"DROP",
         (char *)"Bench only: 1 ignores next transaction's first successful ACK; 0 disables",

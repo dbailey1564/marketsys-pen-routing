@@ -4,7 +4,7 @@
 
 namespace bench {
 // 0x03 was STANDBY and is retired. Never renumber the surviving states.
-enum State { OFF = 0, ACTIVE = 1, NEXT = 2, HOLD_OPEN = 4, FULL = 5, FAULT = 6 };
+enum State { OFF = 0, ACTIVE = 1, LAST = 2, HOLD_OPEN = 4, FULL = 5, FAULT = 6 };
 inline bool validState(uint8_t state) { return state <= FAULT && state != 3; }
 enum Type { SET = 1, ACK = 2 };
 enum Result { APPLIED, DUPLICATE, EXPIRED, CONFLICT };
@@ -12,7 +12,7 @@ static const size_t SIZE = 14;
 struct Frame { uint8_t type, node, state, result; uint32_t token; };
 inline const char *name(uint8_t state) {
     switch (state) {
-    case ACTIVE: return "ACTIVE"; case NEXT: return "NEXT";
+    case ACTIVE: return "ACTIVE"; case LAST: return "LAST";
     case HOLD_OPEN: return "HOLD_OPEN";
     case FULL: return "FULL"; case FAULT: return "FAULT";
     case OFF: return "OFF";

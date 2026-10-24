@@ -8,7 +8,7 @@ import serial
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action', choices=['node-status', 'central-status', 'off', 'active',
-    'next', 'hold_open', 'full', 'fault'])
+    'last', 'hold_open', 'full', 'fault'])
 parser.add_argument('--token', type=int, help='Explicit transaction token for duplicate tests')
 args = parser.parse_args()
 ports = list(Path('/dev/serial/by-id').glob('usb-ARM_DAPLink_CMSIS-DAP_*-if01'))

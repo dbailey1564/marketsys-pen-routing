@@ -31,10 +31,10 @@ Private flash backups and credential-bearing files remain outside Git.
 - The penning application supplies the next ACTIVE pen assignment. The central
   controller owns state advancement and derives the indicator commands,
   including HOLD_OPEN for a new assignment to the same active pen. The app
-  should not have to issue separate ACTIVE and NEXT indicator commands.
+  should not have to issue separate ACTIVE and LAST indicator commands.
   A different pen assignment activates immediately and moves the previous
-  ACTIVE pen to NEXT. NEXT therefore denotes the previous active pen, not
-  a future queued pen. On the next different-pen advance, the older NEXT pen
+  ACTIVE pen to LAST. LAST therefore denotes the previous active pen, not
+  a future queued pen. On the next different-pen advance, the older LAST pen
   becomes OFF. Same-pen assignments produce HOLD_OPEN without advancing the
   two positions. See pen-flow-logic.md. Cattle, buyer, and routing metadata
   remain outside the node protocol.
@@ -48,10 +48,16 @@ Private flash backups and credential-bearing files remain outside Git.
 |---|---|
 | OFF | Off |
 | ACTIVE | Solid green |
-| NEXT | Solid blue |
+| LAST | Solid blue |
 | HOLD_OPEN | Flashing green |
 | FULL | Solid red |
 | FAULT | Flashing red |
+
+Naming update: LAST replaces NEXT, with solid blue and wire value 0x02
+unchanged. Source and helper commands are updated in prepared 0.4.1; both
+images compile and tests pass. Physical boards still run verified 0.4.0 and
+retain the previous NEXT text until deployment. Historical test records keep
+their original names. See pen-flow-logic.md for exact build hashes.
 
 Flash periods and transition timing are not fixed by this table.
 STANDBY was removed by the user's October 24 revision. Its wire value 0x03

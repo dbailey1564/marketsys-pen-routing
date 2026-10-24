@@ -5,6 +5,9 @@
 #include <iostream>
 
 int main() {
+    static_assert(bench::LAST == 2, "LAST must preserve former wire value 0x02");
+    static_assert(indicator::LAST == 2, "LAST pattern must preserve wire mapping");
+    assert(!strcmp(bench::name(2), "LAST"));
     const uint8_t standard[] = "123456789";
     assert(bench::crc(standard, 9) == 0x29b1); // CRC-16/CCITT-FALSE check value.
     uint8_t wire[bench::SIZE];
@@ -51,7 +54,7 @@ int main() {
     const Pattern patterns[] = {
         {indicator::OFF, indicator::DARK, indicator::DARK},
         {indicator::ACTIVE, indicator::GREEN, indicator::GREEN},
-        {indicator::NEXT, indicator::BLUE, indicator::BLUE},
+        {indicator::LAST, indicator::BLUE, indicator::BLUE},
         {indicator::HOLD_OPEN, indicator::GREEN, indicator::DARK},
         {indicator::FULL, indicator::RED, indicator::RED},
         {indicator::FAULT, indicator::RED, indicator::DARK}
