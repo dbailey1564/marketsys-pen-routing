@@ -28,8 +28,13 @@ Private flash backups and credential-bearing files remain outside Git.
   does not supply those P2P settings.
 - The central controller owns radio transport, acknowledgement, and retry logic.
   Nodes apply requested indicator states and report their state.
-- The penning application provides desired pen states. Cattle, buyer, and routing
-  metadata are outside the device protocol.
+- The penning application supplies the next ACTIVE pen assignment. The central
+  controller owns state advancement and derives the indicator commands,
+  including HOLD_OPEN for a new assignment to the same active pen. The app
+  should not have to issue separate ACTIVE and NEXT indicator commands.
+  Exact advance trigger and disposition of the previous active pen are pending
+  clarification; see pen-flow-logic.md. Cattle, buyer, and routing metadata
+  remain outside the node protocol.
 - The host interface is intended to be binary and host-agnostic over a USB
   virtual COM connection. The physical serial/USB arrangement still needs to be
   documented; this build setup does not establish it.
@@ -150,6 +155,7 @@ The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: inspect the penning application's existing framing and implement the host interface.
+Next: settle controller-owned pen flow (pen-flow-logic.md), then inspect the
+penning application's existing framing and implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.
