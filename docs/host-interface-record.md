@@ -1,10 +1,51 @@
-# Penning-application interface: latest recorded position
+# Penning-application interface: reconciled cross-thread record
 
 October 24, 2026. The user clarified that the application engineer holds the
 source and will implement the interface we provide. We do not require access
 to the application source or compatibility with its existing binary format.
 Earlier notes that made framing decisions contingent on that inspection are
 superseded. No host protocol implementation or firmware upload occurs here.
+
+## Recovered earlier packet proposal
+
+The first pass through local repository notes missed a concrete earlier host
+frame example. Direct retrieval of Prototyping MS returned only five recent
+exchanges with no older-page cursor. Related chat **Update Pen Indicator V1
+state table** (01a16401-7f1d-7430-a255-cf3a7c9f7cb5), created from Prototyping
+MS, contains the missing example in turn 01a16449-088e-7c73-a1a1-ab3b66054adc.
+The user asked: "show binary output with header, transid, payload, etc".
+
+The recovered assistant example explicitly calls its framing and CRC proposed,
+not finalized. It sends sale 3's state updates: pen 10 -> NEXT (now called LAST,
+same code 0x02) and pen 20 -> ACTIVE (0x01):
+
+```text
+AA 55 01 01 09 00 03 00 02 0A 00 02 14 00 01 92 BD
+```
+
+| Field | Bytes | Meaning |
+| --- | --- | --- |
+| Sync | AA 55 | Start marker |
+| Version | 01 | Proposed version 1 |
+| Type | 01 | Proposed SET_STATES |
+| Payload length | 09 00 | 9 bytes, includes transaction ID and record count |
+| Transaction ID | 03 00 | Transaction 3 |
+| Record count | 02 | Two pen-state records |
+| Record 1 | 0A 00 02 | Pen 10 -> old NEXT/current LAST |
+| Record 2 | 14 00 01 | Pen 20 -> ACTIVE |
+| CRC16 | 92 BD | 0xBD92, low byte first |
+
+All multibyte fields are little-endian. Candidate CRC-16/CCITT-FALSE uses
+poly 0x1021, init 0xFFFF, no reflection/final XOR, covers VERSION through the
+last payload byte and excludes SYNC. Recalculation with Python binascii.crc_hqx
+confirmed 0xBD92 and the 17-byte frame. This is a real prior proposal, not a
+newly invented frame. No evidence in the recovered turn freezes it as final.
+
+The current controller-owned assignment flow supersedes its SET_STATES payload
+for normal app advancement. The header/transaction/length/CRC structure is a
+recoverable candidate; a new assignment payload and its type/identity semantics
+still require specification. Do not reintroduce app-managed ACTIVE/LAST updates
+just because that older example encoded state records.
 
 ## Recorded agreements and proposals
 
@@ -19,13 +60,15 @@ superseded. No host protocol implementation or firmware upload occurs here.
 - POLL, POLL_LAST, POLL_ALL and POLL_ALL_LAST are earlier planned polling
   commands, not implemented/frozen host message IDs. In those old names,
   LAST refers to previously recorded information, not the renamed LAST pen role.
-- Header/framing, command IDs, field widths, byte order, length encoding,
-  CRC choice/coverage, session handling and response codes are not frozen.
+- A concrete header/framing/CRC and SET_STATES example exists above. Its values
+  were proposed, not frozen. Assignment message ID/payload, session handling,
+  deduplication and response codes remain open.
 
 ## Latest logical assignment payload
 
-The current record establishes a logical assignment message, not a serialized
-byte-for-byte host frame. For illustration only, a new assignment can be shown
+The current assignment-driven contract establishes a logical assignment, not
+yet a revised serialized frame. The earlier SET_STATES candidate is above.
+For illustration only, a new assignment can be shown
 as message kind ASSIGN_PEN, event ID 1042, pen number 14. Those field names
 and that command name are explanatory placeholders, not previously approved
 numeric codes or a new finalized packet definition.

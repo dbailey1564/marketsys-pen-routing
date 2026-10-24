@@ -112,6 +112,11 @@ assumptions and remaining hardware checks. This is not yet an assembled system.
 - Planned polling commands: POLL, POLL_LAST, POLL_ALL, POLL_ALL_LAST.
 - Header/framing, field widths and CRC remain open for our specification;
   they no longer depend on inspecting the penning application's existing format.
+  Cross-thread recovery found an earlier proposed AA55/version/type/length/
+  transaction/count/state-records/CRC host frame (17-byte worked example).
+  It is preserved in host-interface-record.md, with its proposal status and
+  distinction from the new assignment-driven payload. Do not treat absence
+  from an earlier repository summary as proof no packet proposal existed.
 - Radio packet format, addressing, duplicate handling, timeouts, retries, and
   failure/restart behavior require implementation-level specifications.
 
