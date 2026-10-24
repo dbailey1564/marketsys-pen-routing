@@ -172,8 +172,17 @@ rejected test was expected. Logs are build/radio-first-off.log,
 radio-central-restart.log, radio-first-off-after-restart.log,
 radio-duplicate-off.log, and radio-token-conflict.log.
 
-The basic bidirectional radio path and duplicate/conflict handling passed.
-Pending: optical confirmation of radio-commanded patterns, expired-duplicate
-behavior over air, deliberate lost-ACK/retry, and unavailable-node tests.
+ACTIVE with fresh token 1024202603 received APPLIED/ACTIVE on attempt 1.
+After the 10-second bench timeout, repeating that transaction received
+EXPIRED/OFF on attempt 1 and central correctly reported REJECTED with
+CONFIRMED=OFF. It did not restart the pattern. A fresh OFF transaction
+(1024202604) received APPLIED/OFF on attempt 1. Logs:
+build/radio-active-visual.log, radio-expired-duplicate.log, radio-final-off.log.
+Visual confirmation of flashing green is awaiting the user's observation.
+
+The basic bidirectional radio path and duplicate/conflict/expired handling
+passed. Final node-reported state is OFF.
+Pending: optical confirmation of radio-commanded patterns, deliberate
+lost-ACK/retry, and unavailable-node tests.
 The initial three-attempt failure exercised the bounded watchdog path but
 does not establish a controlled lost-ACK test.
