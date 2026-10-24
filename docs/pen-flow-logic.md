@@ -22,6 +22,9 @@ reports/accepts NEXT. No new over-air test is claimed for the rename.
 ## Confirmed direction
 
 - The penning application sends the controller the next ACTIVE pen assignment.
+  Specifically, it reports one destination per head after sale as that head
+  enters the penning alley. Do not advance solely from an earlier sale-recording
+  event if alley entry has not occurred. Consecutive heads are separate events.
   It should not have to send separate ACTIVE and LAST indicator commands.
 - Central manages state advancement and determines the pen-node indications.
 - A new assignment for a different pen activates that pen immediately; a

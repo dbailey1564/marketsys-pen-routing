@@ -5,6 +5,9 @@ source and will implement the interface we provide. We do not require access
 to the application source or compatibility with its existing binary format.
 Earlier notes that made framing decisions contingent on that inspection are
 superseded. No host protocol implementation or firmware upload occurs here.
+Latest clarification: the app reports each head's destination as that head
+enters the penning alley after sale. The new full frame review proposal is
+host-frame-proposal-v2.md; its byte layout is not yet approved or implemented.
 
 ## Recovered earlier packet proposal
 
@@ -66,8 +69,9 @@ just because that older example encoded state records.
 
 ## Latest logical assignment payload
 
-The current assignment-driven contract establishes a logical assignment, not
-yet a revised serialized frame. The earlier SET_STATES candidate is above.
+The current assignment-driven contract establishes a logical event. A revised
+serialized frame is now proposed for review in host-frame-proposal-v2.md; it
+is not frozen. The earlier SET_STATES candidate is above.
 For illustration only, a new assignment can be shown
 as message kind ASSIGN_PEN, event ID 1042, pen number 14. Those field names
 and that command name are explanatory placeholders, not previously approved
