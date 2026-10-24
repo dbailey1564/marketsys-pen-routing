@@ -38,7 +38,33 @@ int main() {
     assert(cache.classify(changed, bench::ACTIVE) == bench::CONFLICT);
     ++changed.token;
     assert(cache.classify(changed, bench::ACTIVE) == bench::APPLIED);
-    for (int s = bench::OFF; s <= bench::FAULT; ++s)
+    auto retired = original; retired.state = 3;
+    bench::encode(retired, wire);
+    assert(!bench::decode(wire, sizeof(wire), decoded));
+    assert(!bench::validState(3));
+    assert(!strcmp(bench::name(3), "INVALID"));
+    for (int s = bench::OFF; s <= bench::FAULT; ++s) {
+        if (!bench::validState(s)) continue;
         assert(!strcmp(bench::name(s), indicator::name(static_cast<indicator::Mode>(s))));
+    }
+    struct Pattern { indicator::Mode mode; indicator::Color first, second; };
+    const Pattern patterns[] = {
+        {indicator::OFF, indicator::DARK, indicator::DARK},
+        {indicator::ACTIVE, indicator::GREEN, indicator::GREEN},
+        {indicator::NEXT, indicator::BLUE, indicator::BLUE},
+        {indicator::HOLD_OPEN, indicator::GREEN, indicator::DARK},
+        {indicator::FULL, indicator::RED, indicator::RED},
+        {indicator::FAULT, indicator::RED, indicator::DARK}
+    };
+    for (const auto &p : patterns) {
+        assert(indicator::colorFor(p.mode, 0) == p.first);
+        assert(indicator::colorFor(p.mode, 499) == p.first);
+        assert(indicator::colorFor(p.mode, 500) == p.second);
+        assert(indicator::colorFor(p.mode, 999) == p.second);
+        assert(indicator::colorFor(p.mode, 1000) == p.first);
+        assert(indicator::colorFor(p.mode, 9999) == p.second);
+        assert(indicator::colorFor(p.mode, 10000) == indicator::DARK);
+    }
+    assert(indicator::colorFor(static_cast<indicator::Mode>(3), 0) == indicator::DARK);
     std::cout << "PASS: codec, CRC golden vector, every single-bit corruption, validation, duplicate/expired/conflict handling, state mapping\n";
 }

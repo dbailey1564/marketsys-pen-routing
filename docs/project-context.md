@@ -29,14 +29,18 @@ It is not a manufacturer specification or a newly verified bench report.
 | State | Intended indication |
 |---|---|
 | OFF | Off |
-| ACTIVE | Flashing green |
-| NEXT | Flashing blue |
-| STANDBY | Solid blue |
-| HOLD_OPEN | Alternating green/blue |
+| ACTIVE | Solid green |
+| NEXT | Solid blue |
+| HOLD_OPEN | Flashing green |
 | FULL | Solid red |
 | FAULT | Flashing red |
 
 Flash periods and transition timing are not fixed by this table.
+STANDBY was removed by the user's October 24 revision. Its wire value 0x03
+is retired; surviving state IDs are unchanged. Radio firmware 0.4.0 implementing
+this table is compiled and host-tested but not yet uploaded. A fresh backup
+of Node1's current iteration is required first; DAPLink is still on central.
+See indicator-revision-040.md for deployment progress and exact build hashes.
 
 ## Hardware work carried forward
 

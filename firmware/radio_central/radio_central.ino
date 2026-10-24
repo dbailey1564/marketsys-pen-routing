@@ -14,7 +14,7 @@ static const char *result = "IDLE";
 static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 
 static void report() {
-    benchRadio::printConfig("CENTRAL", ready, "0.3.1");
+    benchRadio::printConfig("CENTRAL", ready, "0.4.0");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, bench::name(request.state),
         confirmedKnown ? bench::name(confirmed) : "UNKNOWN", attempts,
@@ -38,6 +38,7 @@ int penCommand(SERIAL_PORT, char *, stParam *p) {
     unsigned long token = strtoul(p->argv[0], nullptr, 10);
     if (errno == ERANGE || token == 0) return AT_PARAM_ERROR;
     for (uint8_t s = bench::OFF; s <= bench::FAULT; ++s) {
+        if (!bench::validState(s)) continue;
         if (!strcmp(p->argv[1], bench::name(s))) {
             request = {bench::SET, 1, s, bench::APPLIED, uint32_t(token)};
             pending = true; transmitting = false; attempts = 0;
@@ -53,9 +54,9 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.3.1");
+    api.system.firmwareVersion.set("MS-Central-RF-0.4.0");
     bool commandReady = api.system.atMode.add((char *)"PEN",
-        (char *)"Bench node 1: decimal token:OFF|ACTIVE|NEXT|STANDBY|HOLD_OPEN|FULL|FAULT",
+        (char *)"Bench node 1: decimal token:OFF|ACTIVE|NEXT|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     bool testReady = api.system.atMode.add((char *)"DROP",
         (char *)"Bench only: 1 ignores next transaction's first successful ACK; 0 disables",
