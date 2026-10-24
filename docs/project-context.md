@@ -41,6 +41,9 @@ Private flash backups and credential-bearing files remain outside Git.
 - The host interface is intended to be binary and host-agnostic over a USB
   virtual COM connection. The physical serial/USB arrangement still needs to be
   documented; this build setup does not establish it.
+- The user confirmed we define the penning-application interface for the
+  engineer to implement. Access to his application source or its existing
+  binary communications format is not a prerequisite. See host-interface-record.md.
 
 ## Indicator states
 
@@ -107,8 +110,8 @@ assumptions and remaining hardware checks. This is not yet an assembled system.
 
 - Distinguish commanded state from last node-confirmed state.
 - Planned polling commands: POLL, POLL_LAST, POLL_ALL, POLL_ALL_LAST.
-- Header/framing and CRC remain open pending inspection of the penning
-  application's existing binary framing.
+- Header/framing, field widths and CRC remain open for our specification;
+  they no longer depend on inspecting the penning application's existing format.
 - Radio packet format, addressing, duplicate handling, timeouts, retries, and
   failure/restart behavior require implementation-level specifications.
 
@@ -164,7 +167,7 @@ The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: settle controller-owned pen flow (pen-flow-logic.md), then inspect the
-penning application's existing framing and implement the host interface.
+Next: settle controller-owned pen flow (pen-flow-logic.md), then define our
+host interface for the application engineer and implement it.
 Resolve production power/recharge and measured OFF/sleep
-current separately; inspect existing host framing before fixing its protocol.
+current separately. Existing application source/framing is not required.
