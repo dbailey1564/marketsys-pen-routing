@@ -1,5 +1,6 @@
 """Read the connected prototype's main flash twice; never unlock or program it."""
 from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 import os
@@ -7,9 +8,12 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--board', default='prototype-01', choices=['prototype-01', 'proto-node1-v1'])
+args = parser.parse_args()
 os.umask(0o077)
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
-destination = ROOT.parent / "Backups" / "marketsys" / "prototype-01" / stamp
+destination = ROOT.parent / "Backups" / "marketsys" / args.board / stamp
 destination.mkdir(parents=True, exist_ok=False)
 first = destination / "original-main-flash.bin"
 second = destination / "verification-read.bin"
@@ -50,7 +54,7 @@ if len(set(data)) <= 1:
 digest = hashlib.sha256(data).hexdigest()
 metadata = {
     "created_utc": stamp,
-    "board_label": "prototype-01 (first connected board; label physically before swapping)",
+    "board_label": args.board,
     "photographed_hardware": "RAK3272-SiP Ver B / RAK3172-SiP",
     "base_address": "0x08000000",
     "size_bytes": len(data),

@@ -88,6 +88,9 @@ def build(target):
     elif target == "sleep-test":
         sketch = ROOT / "firmware/sleep_test"
         fqbn = LOCK["sleep_test_fqbn"]
+    elif target == "indicator-test":
+        sketch = ROOT / "firmware/indicator_test"
+        fqbn = LOCK["fqbn"]
     else:
         ensure_reference()
         name = "LoRa_P2P_RX" if target == "reference-rx" else "LoRa_P2P_TX"
@@ -100,7 +103,7 @@ def build(target):
     cli("compile", "--fqbn", fqbn, "--build-path", output, sketch)
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("task", choices=["setup", "verify", "build-check", "sleep-test", "reference-rx", "reference-tx"])
+parser.add_argument("task", choices=["setup", "verify", "build-check", "sleep-test", "indicator-test", "reference-rx", "reference-tx"])
 task = parser.parse_args().task
 if task == "setup":
     setup()
