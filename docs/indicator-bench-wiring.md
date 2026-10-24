@@ -66,7 +66,8 @@ MOSFET source return and is not arbitrarily shorted to supply GND.
 The user confirmed initial all-OFF and all three physical color tests after
 correcting green's source connection from IC2 P2 to P5. Node1 is backed up
 and programmed; the seven-state bench harness and GPIO verification are
-recorded in node1-indicator-test.md. Visual pattern verification is next.
+recorded in node1-indicator-test.md. The user also visually confirmed all
+seven state patterns and their automatic return to OFF.
 Driver EN control and measured whole-node OFF current remain separate work.
 Dark LED does not establish zero current. Radio and host integration remain
 unimplemented in the current recorded harness.

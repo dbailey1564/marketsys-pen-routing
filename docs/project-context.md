@@ -96,13 +96,14 @@ and darkness of the unselected dies. A green source wiring error was corrected
 from IC2 P2 to P5. Firmware 0.2.0 implements all seven indicator states with
 provisional 500 ms phases, OFF at startup, a 10-second bench timeout, and
 single-color switching. Host pattern tests and on-device GPIO pattern checks
-passed. Visual confirmation of the new flashing/alternating patterns remains
-pending. See node1-indicator-test.md for exact behavior and verification.
+passed. The user then visually confirmed all seven states, with expected
+colors/patterns, unselected dies dark, and automatic OFF after each test.
+Final state was OFF. See node1-indicator-test.md for exact behavior and verification.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 MarketSys radio/host integration and production power management remain
 unimplemented. Official P2P examples remain separate references.
 
-Next: visually verify indicator patterns, then implement staged radio transport
-and the host interface. Resolve production power/recharge and measured OFF/sleep
+Next: implement staged radio transport and the host interface.
+Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.

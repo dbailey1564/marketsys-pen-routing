@@ -139,8 +139,20 @@ update-record range. Full readback SHA256:
 The update record and settings differed from the original factory backup;
 settings preservation is not claimed. Final automated state was OFF.
 
-Pending: visual verification of the seven-state patterns, radio/host
-integration, driver EN control, and measured whole-node OFF current.
+## Completed visual seven-state checks
+
+The user confirmed the initial OFF condition and each separately commanded
+pattern: ACTIVE flashing green, NEXT flashing blue, STANDBY solid blue,
+HOLD_OPEN alternating green/blue, FULL solid red, and FAULT flashing red.
+For each non-OFF state the user confirmed approximately 10 seconds of the
+expected illumination followed by complete darkness, with unselected colors
+remaining dark. Each post-test serial query reported state OFF and all three
+GPIO readbacks LOW. Final confirmed condition after FAULT was OFF.
+This establishes visual bench operation of all seven states on Node1 V1;
+it does not establish measured zero leakage or production runtime.
+
+Pending: radio/host integration, driver EN control, and measured whole-node
+OFF current. Phase timing and the 10-second timeout remain bench settings.
 
 Hardware references:
 [RAK3272-SiP pinout](https://docs.rakwireless.com/product-categories/wisduo/rak3272-sip-breakout-board/datasheet/),
