@@ -77,19 +77,32 @@ assumptions and remaining hardware checks. This is not yet an assembled system.
 - Radio packet format, addressing, duplicate handling, timeouts, retries, and
   failure/restart behavior require implementation-level specifications.
 
-## Current implementation boundary
+## Current implementation boundary (October 24)
 
-RUI3 is the selected initial development path. At this milestone the repository
-contains a minimal serial build check, a separate finite timer/sleep harness,
-and development tooling. The official P2P
-examples are maintained separately as references. No MarketSys command parser,
-radio state machine, indicator driver, or production power management has been implemented.
-Prototype-01 has now been programmed with the minimal SiP bring-up sketch after
-its original flash was backed up. AT queries and its repeating UART heartbeat
-confirm execution; see first-upload.md. Timer/sleep test work and a verified
-recovery to the bring-up application are recorded in sleep-timer-test.md.
-No indicator or application radio tests have run.
+The full onsite demonstration was subsequently cancelled in favor of an
+application-engineer visit. The earlier USB power-bank plan is historical.
+The current bench uses the DAPLink as Node1's sole 3.3 V supply and the
+HW-131 breadboard supply's 5 V rail for the LED driver, with common supply
+ground. The breadboard 3.3 V rail is unused. Production power remains open.
 
-Next engineering questions: resolve node power/recharge and measured sleep
-current; inspect the host framing;
-then implement and test indicator behavior and the radio protocol in stages.
+RUI3 is the development path. The repository contains the serial build check,
+finite timer/sleep harness, and Node1 indicator bench harness. The controller
+and Node1 have separate flash backup directories. The one DAPLink has been
+moved from the controller to PROTO - Node1 V1; do not assume both are powered
+or accessible simultaneously.
+
+Node1's physical blue/red/green ON tests passed, including automatic OFF
+and darkness of the unselected dies. A green source wiring error was corrected
+from IC2 P2 to P5. Firmware 0.2.0 implements all seven indicator states with
+provisional 500 ms phases, OFF at startup, a 10-second bench timeout, and
+single-color switching. Host pattern tests and on-device GPIO pattern checks
+passed. Visual confirmation of the new flashing/alternating patterns remains
+pending. See node1-indicator-test.md for exact behavior and verification.
+
+The UART AT commands are bench controls, not the planned binary host protocol.
+MarketSys radio/host integration and production power management remain
+unimplemented. Official P2P examples remain separate references.
+
+Next: visually verify indicator patterns, then implement staged radio transport
+and the host interface. Resolve production power/recharge and measured OFF/sleep
+current separately; inspect existing host framing before fixing its protocol.

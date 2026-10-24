@@ -1,5 +1,6 @@
 """Read back Node1 application and compare preserved regions to its own backup."""
 from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 import os
@@ -10,7 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 os.umask(0o077)
 original = ROOT.parent / 'Backups/marketsys/proto-node1-v1/20261024T192523.820282Z/original-main-flash.bin'
 image = ROOT / 'build/indicator-test/indicator_test.ino.bin'
-expected_hash = '4260f24e80da0deebdd8ef0a24116cd10a3358bb5ca480bf23bd9ecabdd49e12'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--sha256', default='4260f24e80da0deebdd8ef0a24116cd10a3358bb5ca480bf23bd9ecabdd49e12')
+expected_hash = parser.parse_args().sha256
+if len(expected_hash) != 64 or any(c not in '0123456789abcdef' for c in expected_hash):
+    raise RuntimeError('Expected a lowercase SHA256 digest')
 image_data = image.read_bytes()
 if hashlib.sha256(image_data).hexdigest() != expected_hash:
     raise RuntimeError('Unexpected firmware image hash')

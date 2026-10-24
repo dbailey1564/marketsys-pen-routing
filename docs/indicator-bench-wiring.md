@@ -30,19 +30,20 @@ LED positive terminals join L+; each negative reaches its selected FET drain.
 All three used FET sources reach driver L-, not an arbitrarily substituted GND.
 Driver IN- and RAK ground are the supply common ground.
 
-## Resistor stage: proposed, awaiting user installation and validation
+## Resistor stage: installation procedure (subsequently bench-tested)
 
 With both rails off, remove manual gate-to-source shorting jumpers and all
 manual 3.3 V gate links. Install three 10 kohm gate-to-source resistors:
 IC1 P1-P5, IC1 P3-P2, IC2 P1-P5. A 10 kohm resistor replaces each short;
 do not leave the short in parallel. With GPIO disconnected, repeat all-OFF.
-No RAK GPIO connection or firmware upload is established by this document.
+The subsequent hookup, firmware upload and tests are recorded in
+node1-indicator-test.md; the installation instructions here are retained.
 
 Prepare one 1 kohm series resistor per gate, leaving the controller end isolated
 until the correct node firmware and power arrangement are verified.
 
-Proposed output assignment (verified against manufacturer header table and
-installed RUI3 4.2.4 variant.h on Lin, not yet physically connected):
+Installed output assignment (verified against manufacturer header table,
+installed RUI3 4.2.4 variant.h on Lin, and subsequent physical color tests):
 
 | Color | RAK physical connection | SDK name | Through 1 kohm to |
 | --- | --- | --- | --- |
@@ -57,14 +58,15 @@ that was only built for serial/timer tests.
 
 ## Power arrangement and outstanding work
 
-Central RAK remains powered/connected to laptop through RAKDAP1. Pen-node
-hardware uses the user-verified HW-131 rails: 3.3 V logic and 5 V driver,
-approximately +/-0.01 V reported. USB powers HW-131; barrel jack unused.
-No external 3.3 V is to be paralleled with the central programmer supply.
+The single RAKDAP1 has been moved to PROTO - Node1 V1. Its 3V3 output powers
+Node1; HW-131 5 V powers the driver, with common supply GND. Breadboard 3.3 V
+is unused. USB powers HW-131; barrel jack unused. Driver L- remains the
+MOSFET source return and is not arbitrarily shorted to supply GND.
 
-Pending: resistor installation/all-OFF test, explicit output initialization,
-separate indicator-test firmware build, correct target identification and
-backup before programming the pen node, then GPIO-driven state verification.
+The user confirmed initial all-OFF and all three physical color tests after
+correcting green's source connection from IC2 P2 to P5. Node1 is backed up
+and programmed; the seven-state bench harness and GPIO verification are
+recorded in node1-indicator-test.md. Visual pattern verification is next.
 Driver EN control and measured whole-node OFF current remain separate work.
 Dark LED does not establish zero current. Radio and host integration remain
 unimplemented in the current recorded harness.

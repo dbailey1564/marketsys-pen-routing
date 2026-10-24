@@ -17,7 +17,7 @@ flash, not OTP/system ROM or a complete option-byte image. Restore is untested.
 The backed-up bootloader matched all 12608 packaged bootloader bytes plus
 the four-byte activation marker. Private backup images remain outside Git.
 
-## Installed application
+## Initial application: 0.1.0 (superseded by 0.2.0 below)
 
 Source: `firmware/indicator_test/indicator_test.ino`.
 Build: `python3 scripts/dev.py indicator-test`, pinned RUI3 4.2.4, SiP FQBN.
@@ -87,9 +87,60 @@ Node1 GND, DAPLink GND and driver IN- share supply ground. Breadboard 3.3 V
 is unused. Driver L- remains the MOSFET source return, separate from the
 supply-ground junction. Driver EN remains disconnected and insulated.
 
-Pending: seven-state indicator behavior, radio/host integration, driver EN
-control, and measured whole-node OFF current. No flash write was needed
-for these physical tests.
+No flash write was needed for those initial physical tests.
+
+## Seven-state bench application: 0.2.0
+
+The existing sketch now implements the seven agreed indicator states.
+Wiring is unchanged. `ATC+STATE=?` reports requested state, elapsed time,
+actual selected color, GPIO digital readbacks, phase timing, and application
+version 0.2.0. `ATC+STATE=<name>` accepts these exact uppercase names:
+
+| State | Pattern |
+| --- | --- |
+| OFF | All outputs LOW |
+| ACTIVE | Green 500 ms, dark 500 ms, repeat |
+| NEXT | Blue 500 ms, dark 500 ms, repeat |
+| STANDBY | Solid blue |
+| HOLD_OPEN | Green 500 ms, blue 500 ms, repeat |
+| FULL | Solid red |
+| FAULT | Red 500 ms, dark 500 ms, repeat |
+
+The 500 ms phases are provisional demo choices, not approved production
+timings. Color changes clear all outputs before a 2 ms gap and then enable
+the selected color. Scheduling uses elapsed time, so this gap slightly
+shortens the illuminated part of a phase. Only one color is driven at a time.
+All non-OFF states expire after 10 seconds for this bench harness; this is
+not a production command-expiry or radio-failure policy. Reissuing a state
+restarts its phase and timeout. Invalid state writes clear the outputs and
+return an error. Queries do not restart the state. Startup remains OFF.
+The earlier ATC+LED color commands remain available for diagnosis and are
+reported as TEST_BLUE/TEST_RED/TEST_GREEN by the state query.
+
+Application SHA256:
+`da29bd337e05cfce2aa8c967c55ede4a5a4ceaee7b5a35eb6e4207dc7157503c`.
+Custom firmware version is MS-Node1-LED-0.2.0; AT+VER still reports the SDK.
+
+Host tests in `tests/indicator_pattern_test.cpp` passed checks of all states,
+phase boundaries, cutoff boundaries, manual diagnostics, and unsigned timer
+rollover. `scripts/node1_states.py` supports `status`, each lowercase state
+name, and `verify`. Verification actively exercises LEDs and ends at OFF.
+It samples both phases and checks GPIO exclusivity, the timeout, and
+invalid-command OFF behavior. Its readbacks do not replace visual checks.
+
+Completed 0.2.0 verification: `build/node1-states-verification.log` passed
+all seven states, both phases, GPIO exclusivity, the 10-second timeout and
+invalid-command OFF. Flash verification record:
+`20261024T202935.668017Z-post-indicator-upload/verification.json` in Node1's
+private backup area. All 174480 application bytes matched the compiled image.
+Bootloader code and activation marker were unchanged, excluding its reviewed
+update-record range. Full readback SHA256:
+`abc05878ca2f3ab80b8abbdddb55b878641d0043376f74b0829d202b82927fc3`.
+The update record and settings differed from the original factory backup;
+settings preservation is not claimed. Final automated state was OFF.
+
+Pending: visual verification of the seven-state patterns, radio/host
+integration, driver EN control, and measured whole-node OFF current.
 
 Hardware references:
 [RAK3272-SiP pinout](https://docs.rakwireless.com/product-categories/wisduo/rak3272-sip-breakout-board/datasheet/),
