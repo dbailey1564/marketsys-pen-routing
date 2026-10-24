@@ -109,13 +109,17 @@ an APPLIED ACK on the first attempt. Duplicate OFF and conflicting-token
 rejection and expired-duplicate handling also passed over air. All seven
 radio-commanded states now have matching ACKs and user visual confirmation;
 each command and fresh OFF received an APPLIED ACK on the first attempt.
-Final confirmed state was OFF after the FAULT test (OFF token 785359124).
+An unpowered-node test then produced exactly three completed transmissions,
+no ACK, and FAILED while retaining the prior confirmed state. After power
+was restored, fresh ACTIVE and OFF commands each succeeded on attempt 1,
+with user confirmation of flashing green then darkness. No controller restart
+or firmware change was needed. Final confirmed state is OFF (token 1024202703).
 See radio-bench-link.md for backups, SDK restart requirement and limitations.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: verify transport failures/recovery, then implement the host interface.
+Next: verify deliberate lost-ACK recovery, then implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.

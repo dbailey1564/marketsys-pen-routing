@@ -183,7 +183,8 @@ the approximately 10-second activation, with red and blue remaining dark.
 
 The basic bidirectional radio path and duplicate/conflict/expired handling
 passed. Final node-reported state is OFF.
-Pending: deliberate lost-ACK/retry and unavailable-node tests.
+Pending: deliberate lost-ACK/retry testing. Unavailable-node testing was
+subsequently completed below.
 The initial three-attempt failure exercised the bounded watchdog path but
 does not establish a controlled lost-ACK test.
 
@@ -208,3 +209,24 @@ OFF was verified at startup and after every pattern. The final transaction
 indicator states commanded controller-to-Node1 over LoRa, with matching ACKs
 and user visual confirmation. It does not establish range, production power
 performance, or controlled lost-packet recovery.
+
+## Unpowered-node failure and recovery
+
+The user switched OFF Node1's breadboard supply while leaving the controller
+powered through DAPLink. ACTIVE token 1024202701 produced exactly three
+transmit attempts, each with a P2P TX-done event and no ACK. Central reported
+FAILED, ATTEMPTS=3, COMMANDED=ACTIVE, retaining last CONFIRMED=OFF rather
+than falsely confirming ACTIVE. Log: build/radio-node-unpowered.log.
+The host helper's failure exception was expected for this deliberate test.
+
+The user restored breadboard power, waited for startup and confirmed Node1
+remained dark. Fresh ACTIVE token 1024202702 received APPLIED/ACTIVE on
+attempt 1. The user confirmed approximately 10 seconds of green flashing,
+then complete darkness, with red and blue remaining dark. A fresh OFF
+transaction 1024202703 received APPLIED/OFF on attempt 1. Logs:
+build/radio-node-recovery.log and build/radio-node-recovery-off.log.
+
+This verifies bounded failure reporting with an unavailable node and recovery
+without restarting or reprogramming the controller. It does not simulate a
+command delivered successfully followed by a lost ACK; that test remains open.
+Final node-confirmed state after this milestone is OFF.
