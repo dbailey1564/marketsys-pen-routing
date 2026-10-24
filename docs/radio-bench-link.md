@@ -28,7 +28,7 @@ the verified indicator harness. No cattle, buyer, or routing metadata is sent.
 
 Node1 image SHA256:
 `0f6b3736798a464fcc4b1851470954dd2b5c13df0606f6563b1821ebec9205e1`.
-Controller image SHA256:
+Initial controller 0.3.0 image SHA256 (superseded by 0.3.1 below):
 `daa355302123ccb06d87539379c8ceddf27747442de6d7da45c4bf2734a5593c`.
 Custom application versions are MS-Node1-RF-0.3.0 and MS-Central-RF-0.3.0.
 
@@ -183,8 +183,8 @@ the approximately 10-second activation, with red and blue remaining dark.
 
 The basic bidirectional radio path and duplicate/conflict/expired handling
 passed. Final node-reported state is OFF.
-Pending: deliberate lost-ACK/retry testing. Unavailable-node testing was
-subsequently completed below.
+Deliberate lost-ACK/retry and unavailable-node testing were subsequently
+completed below.
 The initial three-attempt failure exercised the bounded watchdog path but
 does not establish a controlled lost-ACK test.
 
@@ -228,5 +228,50 @@ build/radio-node-recovery.log and build/radio-node-recovery-off.log.
 
 This verifies bounded failure reporting with an unavailable node and recovery
 without restarting or reprogramming the controller. It does not simulate a
-command delivered successfully followed by a lost ACK; that test remains open.
+command delivered successfully followed by a lost ACK; that test is below.
 Final node-confirmed state after this milestone is OFF.
+
+## Controlled lost-ACK test: controller 0.3.1
+
+Node1 stays on its verified 0.3.0 receiver image. Controller 0.3.1 adds a
+one-shot UART-only bench control: ATC+DROP=1 arms the next accepted transaction
+to ignore its first matching successful ACK. ATC+DROP=0 disables it; query
+with ATC+DROP=?. It defaults disabled on startup and is not persisted.
+The arm is consumed when a valid PEN command starts; the transaction latch
+clears after the ignored ACK or terminal completion. Rejected ACKs are not
+ignored. Ignoring an ACK leaves its retry deadline and previous confirmation
+unchanged. Serial status reports both arm and transaction-latch state.
+Normal packet format, RF settings and Node1 code are unchanged.
+
+The central image compiled, uploaded and passed full flash readback:
+175720 application bytes, SHA256
+`a3cb2959747dc25192dca860cefd92084a128c6491b34081eefc889a878c541f`.
+Private verification record:
+`prototype-01/20261024T211958.770610Z-post-radio-central-upload/verification.json`.
+Hardware UID matched and bootloader code/activation marker were unchanged
+outside the reviewed update-record range. Full snapshot SHA256:
+`1e6be56adb2800ca59b638d1b5baf4b53151a593457fa57582328dd56545b539`.
+Settings differ from the factory backup; their preservation is not claimed.
+
+Live script `scripts/lost_ack_test.py`, logged to build/radio-lost-ack-test.log:
+
+- Established fresh OFF confirmation with token 1781629467.
+- Armed one-shot dropping, sent ACTIVE token 2186859522, and observed the
+  first matching APPLIED ACK received over air but intentionally ignored.
+- Queried during the retry interval: transaction remained PENDING, attempt 1,
+  last CONFIRMED=OFF. There was no false delivery confirmation.
+- Observed exactly attempts 1 and 2. Attempt 2 received DUPLICATE/ACTIVE and
+  completed ACK/CONFIRMED=ACTIVE, demonstrating retry recovery.
+- Repeated the same token at 10.369 seconds after the original command write;
+  EXPIRED/OFF was received by 10.623 seconds, before the approximately
+  11-second cutoff that a timer restart on retry would produce. The script
+  rejects a missed timing window instead of claiming timing success.
+- Disabled test injection explicitly and obtained APPLIED/OFF on attempt 1
+  using fresh token 1479022242. Both test flags were zero afterward.
+
+This simulates loss at the controller's ACK-consumption boundary; the first
+ACK was physically received, not jammed or corrupted over RF. It verifies
+the real over-air resend/duplicate path and retention of the original bench
+timeout. It is not a statistical interference or packet-loss-rate test.
+Visual confirmation of green flashing followed by darkness during this
+specific injected-loss run is pending the user's observation.

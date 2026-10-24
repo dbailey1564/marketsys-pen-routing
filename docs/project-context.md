@@ -100,7 +100,8 @@ passed. The user then visually confirmed all seven states, with expected
 colors/patterns, unselected dies dark, and automatic OFF after each test.
 Final state was OFF. See node1-indicator-test.md for exact behavior and verification.
 
-Node1 and controller now both run radio bench firmware 0.3.0. The DAPLink is
+Node1 runs radio bench firmware 0.3.0; the controller now runs 0.3.1 with
+a default-disabled one-shot lost-ACK test control. The DAPLink is
 back on the controller; Node1 is powered from breadboard 3.3 V, with its driver
 on 5 V. Both uploads have matching flash readbacks and preserved bootloader
 code. The prototype transport has explicit frames/CRC, acknowledgements and
@@ -113,13 +114,19 @@ An unpowered-node test then produced exactly three completed transmissions,
 no ACK, and FAILED while retaining the prior confirmed state. After power
 was restored, fresh ACTIVE and OFF commands each succeeded on attempt 1,
 with user confirmation of flashing green then darkness. No controller restart
-or firmware change was needed. Final confirmed state is OFF (token 1024202703).
+or firmware change was needed for that power-recovery test.
+The subsequent controlled lost-ACK test ignored the first received APPLIED
+ACK, retained the prior confirmed state while pending, and succeeded on
+attempt 2 with a DUPLICATE ACK. An expired-duplicate probe by 10.623 seconds
+verified that the retry did not extend Node1's original 10-second cutoff.
+Test injection is disabled and final confirmed state is OFF (token 1479022242).
+Visual confirmation of this specific injected-loss run is pending.
 See radio-bench-link.md for backups, SDK restart requirement and limitations.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: verify deliberate lost-ACK recovery, then implement the host interface.
+Next: confirm the injected-loss visual observation, then implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.

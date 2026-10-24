@@ -1,5 +1,6 @@
 """Read controller flash and verify radio application, hardware identity, bootloader."""
 from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 import os
@@ -15,7 +16,11 @@ old = original.read_bytes()
 if hashlib.sha256(old).hexdigest() != '17edd1313d7e11163100b740c254091bcc6fe2d42798211a4c94eac5e54ba53b':
     raise RuntimeError('Unexpected original controller backup')
 image = (root / 'build/radio-central/radio_central.ino.bin').read_bytes()
-expected = 'daa355302123ccb06d87539379c8ceddf27747442de6d7da45c4bf2734a5593c'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--sha256', default='daa355302123ccb06d87539379c8ceddf27747442de6d7da45c4bf2734a5593c')
+expected = parser.parse_args().sha256
+if not re.fullmatch(r'[0-9a-f]{64}', expected):
+    raise RuntimeError('Expected a lowercase SHA256 digest')
 if hashlib.sha256(image).hexdigest() != expected:
     raise RuntimeError('Unexpected controller firmware image')
 stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')

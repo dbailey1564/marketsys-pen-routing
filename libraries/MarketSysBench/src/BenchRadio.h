@@ -46,9 +46,9 @@ inline bool send(const bench::Frame &frame) {
     sent = false;
     return api.lora.psend(bench::SIZE, outbox, false);
 }
-inline void printConfig(const char *role, bool ready) {
-    Serial.printf("MS_RADIO=%s;READY=%d;FREQ=%lu;SF=%u;BW=%lu;CR=%u;POWER=%u;FW=0.3.0\r\n",
+inline void printConfig(const char *role, bool ready, const char *version = "0.3.0") {
+    Serial.printf("MS_RADIO=%s;READY=%d;FREQ=%lu;SF=%u;BW=%lu;CR=%u;POWER=%u;FW=%s\r\n",
         role, ready, (unsigned long)api.lora.pfreq.get(), api.lora.psf.get(),
-        (unsigned long)api.lora.pbw.get(), api.lora.pcr.get(), api.lora.ptp.get());
+        (unsigned long)api.lora.pbw.get(), api.lora.pcr.get(), api.lora.ptp.get(), version);
 }
 }

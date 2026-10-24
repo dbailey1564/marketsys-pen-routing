@@ -7,17 +7,27 @@
 
 static bool ready = false, pending = false, transmitting = false;
 static bool confirmedKnown = false;
+static bool dropArmed = false, dropThisTransaction = false;
 static uint8_t confirmed = bench::OFF, attempts = 0;
 static uint32_t deadline = 0, confirmedAt = 0;
 static const char *result = "IDLE";
 static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 
 static void report() {
-    benchRadio::printConfig("CENTRAL", ready);
+    benchRadio::printConfig("CENTRAL", ready, "0.3.1");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, bench::name(request.state),
         confirmedKnown ? bench::name(confirmed) : "UNKNOWN", attempts,
         confirmedKnown ? (unsigned long)(millis() - confirmedAt) : 0UL);
+    Serial.printf("MS_DROP_ARMED=%d;TRANSACTION_DROP_PENDING=%d\r\n", dropArmed, dropThisTransaction);
+}
+int dropCommand(SERIAL_PORT, char *, stParam *p) {
+    if (p->argc == 1 && !strcmp(p->argv[0], "?")) { report(); return AT_OK; }
+    if (pending) return AT_ERROR;
+    if (p->argc != 1 || (strcmp(p->argv[0], "0") && strcmp(p->argv[0], "1")))
+        return AT_PARAM_ERROR;
+    dropArmed = !strcmp(p->argv[0], "1");
+    report(); return AT_OK;
 }
 int penCommand(SERIAL_PORT, char *, stParam *p) {
     if (p->argc == 1 && !strcmp(p->argv[0], "?")) { report(); return AT_OK; }
@@ -31,6 +41,8 @@ int penCommand(SERIAL_PORT, char *, stParam *p) {
         if (!strcmp(p->argv[1], bench::name(s))) {
             request = {bench::SET, 1, s, bench::APPLIED, uint32_t(token)};
             pending = true; transmitting = false; attempts = 0;
+            dropThisTransaction = dropArmed;
+            dropArmed = false; // One transaction only; never persists across reset.
             deadline = millis(); result = "PENDING";
             report(); return AT_OK;
         }
@@ -41,11 +53,14 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.3.0");
+    api.system.firmwareVersion.set("MS-Central-RF-0.3.1");
     bool commandReady = api.system.atMode.add((char *)"PEN",
         (char *)"Bench node 1: decimal token:OFF|ACTIVE|NEXT|STANDBY|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
-    ready = commandReady && benchRadio::begin();
+    bool testReady = api.system.atMode.add((char *)"DROP",
+        (char *)"Bench only: 1 ignores next transaction's first successful ACK; 0 disables",
+        (char *)"DROP", dropCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
+    ready = commandReady && testReady && benchRadio::begin();
     report();
 }
 void loop() {
@@ -53,6 +68,15 @@ void loop() {
     bench::Frame ack;
     if (benchRadio::take(ack) && pending && ack.type == bench::ACK &&
         ack.node == request.node && ack.token == request.token) {
+        if (dropThisTransaction && ack.state == request.state && ack.result <= bench::DUPLICATE) {
+            dropThisTransaction = false;
+            Serial.printf("MS_TEST_ACK_IGNORED=1;TOKEN=%lu;RESULT=%u;CONFIRMED=%s\r\n",
+                (unsigned long)ack.token, ack.result,
+                confirmedKnown ? bench::name(confirmed) : "UNKNOWN");
+            // Leave transaction, deadline and last confirmation untouched.
+            return;
+        }
+        dropThisTransaction = false;
         confirmedKnown = true; confirmed = ack.state; confirmedAt = millis();
         result = (ack.state == request.state && ack.result <= bench::DUPLICATE) ? "ACK" : "REJECTED";
         pending = false; transmitting = false;
@@ -66,7 +90,8 @@ void loop() {
     }
     if (pending && int32_t(millis() - deadline) >= 0) {
         if (attempts >= 3) {
-            pending = false; transmitting = false; result = "FAILED"; report();
+            pending = false; transmitting = false; dropThisTransaction = false;
+            result = "FAILED"; report();
         } else {
             ++attempts;
             transmitting = benchRadio::send(request);
