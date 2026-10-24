@@ -273,5 +273,7 @@ This simulates loss at the controller's ACK-consumption boundary; the first
 ACK was physically received, not jammed or corrupted over RF. It verifies
 the real over-air resend/duplicate path and retention of the original bench
 timeout. It is not a statistical interference or packet-loss-rate test.
-Visual confirmation of green flashing followed by darkness during this
-specific injected-loss run is pending the user's observation.
+The user confirmed green flashed for approximately 10 seconds and then went
+completely dark during this injected-loss run, with red and blue remaining
+dark. The lost-ACK recovery milestone therefore passed both automated and
+visual verification. Final confirmed state remains OFF, injection disabled.

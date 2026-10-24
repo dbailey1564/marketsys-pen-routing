@@ -120,13 +120,14 @@ ACK, retained the prior confirmed state while pending, and succeeded on
 attempt 2 with a DUPLICATE ACK. An expired-duplicate probe by 10.623 seconds
 verified that the retry did not extend Node1's original 10-second cutoff.
 Test injection is disabled and final confirmed state is OFF (token 1479022242).
-Visual confirmation of this specific injected-loss run is pending.
+The user also visually confirmed this injected-loss run: approximately
+10 seconds of green flashing, then complete darkness, other dies dark.
 See radio-bench-link.md for backups, SDK restart requirement and limitations.
 
 The UART AT commands are bench controls, not the planned binary host protocol.
 Host integration and production power management remain unimplemented.
 Official P2P examples remain separate references.
 
-Next: confirm the injected-loss visual observation, then implement the host interface.
+Next: inspect the penning application's existing framing and implement the host interface.
 Resolve production power/recharge and measured OFF/sleep
 current separately; inspect existing host framing before fixing its protocol.
