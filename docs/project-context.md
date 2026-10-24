@@ -38,8 +38,11 @@ It is not a manufacturer specification or a newly verified bench report.
 Flash periods and transition timing are not fixed by this table.
 STANDBY was removed by the user's October 24 revision. Its wire value 0x03
 is retired; surviving state IDs are unchanged. Radio firmware 0.4.0 implementing
-this table is compiled and host-tested but not yet uploaded. A fresh backup
-of Node1's current iteration is required first; DAPLink is still on central.
+this table is compiled and host-tested. Node1's previous iteration was freshly
+backed up twice and verified before upload; Node1 now runs 0.4.0 with matching
+flash readback and OFF GPIO status. DAPLink is on Node1, breadboard power OFF.
+Central 0.4.0 is prepared but not yet installed; LoRa tests await the return
+of the programmer and controller update.
 See indicator-revision-040.md for deployment progress and exact build hashes.
 
 ## Hardware work carried forward

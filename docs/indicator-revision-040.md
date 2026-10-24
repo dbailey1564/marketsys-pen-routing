@@ -1,10 +1,10 @@
-# Indicator revision 0.4.0: prepared, not uploaded
+# Indicator revision 0.4.0: deployment in progress
 
 October 24, 2026. User explicitly requested a backup of the current Node1
 iteration before the revised firmware upload, readback verification and LoRa
-tests. The DAPLink is currently on central; a physical transfer is required
-before Node1 can be freshly backed up. No board has been reflashed for this
-revision yet. Previous backups remain preserved.
+tests. The DAPLink has been transferred to Node1 and a fresh backup completed
+before uploading. Previous backups remain preserved. See the deployment
+record below for completed steps and remaining hardware validation.
 
 ## Intended state table
 
@@ -54,5 +54,29 @@ BenchPattern header, not retroactively applied to old test records.
 7. Update/readback-verify central 0.4.0, then test all six states over LoRa
    with acknowledgements and user visual observation.
 
-Current status: deployment awaits the Node1 programmer transfer. Compilation
-and host tests do not establish that the new indications have run on hardware.
+## Deployment record
+
+Node1's connected radio image reported 0.3.0, READY=1 and state OFF. Its UID
+matched 00330045 5233500d 20303938. Before uploading, two complete 262144-byte
+flash reads matched. Backup directory on Lin:
+`/home/dbailey1564/Development/Backups/marketsys/proto-node1-v1/20261024T220547.954762Z/`.
+SHA256 of both images:
+`b5092d22a00826bcb4b5f16ec0446ef0f81c3ce5331d200c73d533869c4dd4d5`.
+This also matches the earlier 0.3.0 post-upload snapshot. The original current
+iteration is retained privately outside Git, including its then-current main
+flash settings; restore remains untested. Log: build/node1-pre-040-backup.log.
+
+The official RAK UART uploader completed the Node1 0.4.0 transfer. Runtime
+status reported FW=0.4.0, READY=1, state OFF and all GPIO LOW. Full flash
+readback record:
+`20261024T221033.524887Z-post-radio-node-upload/verification.json` in Node1's
+private backup area. All 175512 application bytes matched the prepared image.
+Bootloader code and activation marker remained unchanged outside the reviewed
+update-record range. Snapshot SHA256:
+`0848ade0c31d89d93ce3e9252a4e7542977c1637fd3c281b9ec17ba6d126b98d`.
+The update record and settings changed from the factory reference; settings
+preservation is not claimed. The pre-revision current-iteration backup above
+is retained separately and was completed before this upload.
+
+Central remains on 0.3.1 until the programmer is returned. No new LoRa pattern
+is claimed verified yet. The historical LED harness remains unchanged.

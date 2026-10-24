@@ -49,8 +49,9 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.02, exclusive=True) as port:
     port.write(b'\r\n'); receive(0.2)
     command('AT')
     status, _ = command('ATC+PEN=?')
-    if 'FW=0.3.1' not in status or 'MS_RADIO=CENTRAL;READY=1;' not in status:
-        raise RuntimeError('Expected central 0.3.1 with radio ready')
+    supported = any('FW='+version in status for version in ('0.3.1', '0.4.0'))
+    if not supported or 'MS_RADIO=CENTRAL;READY=1;' not in status:
+        raise RuntimeError('Expected supported central firmware with radio ready')
     command('ATC+DROP=0')
     off()
     try:
