@@ -105,3 +105,14 @@ only from DAPLink. Keep the indicator breadboard supply off during programming.
 Verify Node1 UID 003300455233500d20303938 and take a fresh two-read backup
 before uploading its explicit address-1 image. Repeat individual identification
 and backup for Node2 and Node3; do not connect two 3.3 V supply outputs together.
+
+## Node1 pre-upload backup verified
+
+After the user connected Node1, SWD confirmed UID
+`003300455233500d20303938`. Two new 262144-byte reads match each other and
+the prior verified 0.4.0 snapshot, SHA256:
+`0848ade0c31d89d93ce3e9252a4e7542977c1637fd3c281b9ec17ba6d126b98d`.
+Private backup: `proto-node1-v1/20261025T010225.630459Z/`.
+Log: build/node1-pre-042-backup.log. Initial UART AT queries returned no
+response; serial wiring TX->PA3 / RX->PA2 is being checked before upload.
+Node1 has not been reflashed at this checkpoint.
