@@ -1,7 +1,7 @@
 # MarketSys Interface Protocol Specification
 
-Review draft — October 24, 2026. This is the current consolidated app-to-
-controller specification. Firmware does not yet implement this host protocol.
+Review proposal — October 24, 2026. This document defines the proposed
+app-to-controller interface. Firmware does not yet implement this host protocol.
 Session versus persistent event identity remains an engineer decision. The
 CRC procedure below is exact for the current draft; changing frame fields
 requires regenerating the frame examples, not changing the CRC algorithm.
@@ -16,8 +16,8 @@ state codes are not required in this outgoing message.
 
 ## 2. Fixed-size outgoing HEAD_DESTINATION frame
 
-There is no payload-length field. VERSION and TYPE identify a fixed-size
-frame. With the proposed session and transaction fields, the frame is 16 bytes:
+With the proposed session and transaction fields, the outgoing
+HEAD_DESTINATION frame is 16 bytes:
 
 | Zero-based offset | COBOL position | Size | Field | Current draft |
 | --- | --- | --- | --- | --- |
@@ -30,15 +30,15 @@ frame. With the proposed session and transaction fields, the frame is 16 bytes:
 | 13 | 14 | 1 | ALPHA_DESIGNATION | Reserved for letter designation |
 | 14-15 | 15-16 | 2 | CRC16 | Low byte, then high byte |
 
-The two destination bytes are a number plus an optional alpha designation,
-not a single numeric pen value of 1..65535. The current worked examples use
+The two destination bytes encode a pen number and an optional alpha designation.
+The worked examples use
 00 for no letter and ASCII B (42 hex) for B; that alpha encoding/valid range
 and whether number 0 is reserved still need final agreement.
 
 Session/transaction integers use little-endian byte order in this draft.
 If the engineer selects another event-identity structure, update offsets,
-frame length and CRC test vectors before implementation. Do not treat the
-unresolved session field as required by an already-final agreement.
+frame length and CRC test vectors before implementation. The session field
+is proposed and remains subject to review.
 
 ## 3. Exact CRC definition
 
@@ -232,11 +232,6 @@ To debug the first byte, FFFF XOR 0200 = FDFF. Its eight subsequent register
 values are EBDF, C79F, 9F1F, 2E1F, 5C3E, B87C, 60D9, C1B2. This provides
 a checkpoint before comparing the remainder of the frame.
 
-Changing the alpha byte to ASCII B (42 hex) gives CRC 63B3, sent B3 63.
-The former 18-byte example's ED 93 CRC is not valid for this shortened frame:
-the removed length bytes change the CRC input. That older example remains
-historical and must not be used as the current test vector.
-
 ## 5. Receiver check and conformance tests
 
 The receiver repeats the same calculation over positions 3..14 and compares
@@ -271,6 +266,4 @@ event identity does. Reply framing must distinguish controller acceptance
 from node-confirmed application/failure and correlate the event. Replies,
 resynchronization/timeouts, reset recovery and field allocations remain under
 review. AA55 can occur inside a frame: use the known version/type frame size
-and CRC, not a second AA55 as an automatic terminator. Firmware remains on
-the previously deployed version; this document does not imply a host-protocol
-implementation or flash update.
+and CRC, not a second AA55 as an automatic terminator.
