@@ -116,3 +116,14 @@ Private backup: `proto-node1-v1/20261025T010225.630459Z/`.
 Log: build/node1-pre-042-backup.log. Initial UART AT queries returned no
 response; serial wiring TX->PA3 / RX->PA2 is being checked before upload.
 Node1 has not been reflashed at this checkpoint.
+
+Node1 UART follow-up: after the user's proceed response, both the normal
+status helper and longer AT/AT+VER queries still received no UART bytes.
+A debugger SYSRESETREQ reset and subsequent post-startup queries did not
+restore communication. Brief halt/resume diagnostics found the CPU executing
+with no CFSR fault bits set; no other process held /dev/ttyACM0. This does
+not establish the cause of the UART silence. No bootloader-entry or upload
+command executed because the status precondition failed. User must reseat
+DAPLink TX->PA3 and RX->PA2 with USB power disconnected before retrying.
+Logs: build/node1-042-uart-diagnostic.log, node1-042-debug-reset.log,
+node1-042-uart-after-reset.log and node1-042-runtime-diagnostic.log.
