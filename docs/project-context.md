@@ -176,3 +176,15 @@ Next: settle controller-owned pen flow (pen-flow-logic.md), then define our
 host interface for the application engineer and implement it.
 Resolve production power/recharge and measured OFF/sleep
 current separately. Existing application source/framing is not required.
+
+## Current host CRC documentation revision
+
+The consolidated review draft is docs/interface-protocol-specification.md.
+The current outgoing HEAD_DESTINATION example is fixed at 16 bytes, removes
+payload length, and uses numeric/alpha destination bytes. Session-versus-
+persistent-event identity remains open. Its detailed CRC section includes
+COBOL arithmetic XOR, ORD/CHAR preflight, raw-byte serialization, intermediate
+register results and five conformance vectors. The standalone GnuCOBOL 3.2
+reference passed all vectors and full-frame serialization on Lin; the
+engineer's actual compiler/runtime has not been provided or tested. No host
+firmware implementation or upload is implied by this documentation revision.

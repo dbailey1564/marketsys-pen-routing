@@ -7,7 +7,9 @@ Earlier notes that made framing decisions contingent on that inspection are
 superseded. No host protocol implementation or firmware upload occurs here.
 Latest clarification: the app reports each head's destination as that head
 enters the penning alley after sale. The new full frame review proposal is
-host-frame-proposal-v2.md; its byte layout is not yet approved or implemented.
+[Interface Protocol Specification](interface-protocol-specification.md); its
+byte layout is not yet frozen or implemented. The current draft removes the
+payload-length field and splits destination into numeric and alpha bytes.
 
 ## Recovered earlier packet proposal
 
@@ -45,9 +47,8 @@ confirmed 0xBD92 and the 17-byte frame. This is a real prior proposal, not a
 newly invented frame. No evidence in the recovered turn freezes it as final.
 
 The current controller-owned assignment flow supersedes its SET_STATES payload
-for normal app advancement. The header/transaction/length/CRC structure is a
-recoverable candidate; a new assignment payload and its type/identity semantics
-still require specification. Do not reintroduce app-managed ACTIVE/LAST updates
+for normal app advancement. The historical length field is superseded by the current fixed-size draft.
+Its assignment payload and type/identity semantics remain under review. Do not reintroduce app-managed ACTIVE/LAST updates
 just because that older example encoded state records.
 
 ## Recorded agreements and proposals
@@ -70,7 +71,7 @@ just because that older example encoded state records.
 ## Latest logical assignment payload
 
 The current assignment-driven contract establishes a logical event. A revised
-serialized frame is now proposed for review in host-frame-proposal-v2.md; it
+serialized frame is now proposed in interface-protocol-specification.md; it
 is not frozen. The earlier SET_STATES candidate is above.
 For illustration only, a new assignment can be shown
 as message kind ASSIGN_PEN, event ID 1042, pen number 14. Those field names
