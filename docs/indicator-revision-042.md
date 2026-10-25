@@ -71,3 +71,37 @@ until those boards are individually connected, backed up, flashed and tested.
 All five targets compiled. Central uses 160792 bytes program storage and
 34312 bytes static RAM; node builds use at most 160664 bytes program storage
 and 33912 bytes static RAM, within the pinned board's reported allocations.
+
+## Controller deployment completed
+
+Official RAK UART uploader reported Upgrade Complete. The first readback
+attempt failed on an SWD memory read at 0x08005fc4; no reflash or unlock was
+performed. A new read-only attempt succeeded after the controller was running.
+Private verification record:
+`prototype-01/20261025T005539.584601Z-post-addressed-upload/verification.json`.
+All 175928 application bytes match the prepared central image. Hardware UID
+matches. Bootloader regions outside the reviewed 0x4004..0x400F update record
+remain identical to this board's pre-upload snapshot. Settings-region bytes
+changed; preservation of all settings is not claimed. Full snapshot SHA256:
+`02f63d8f13a1411b2703c46bc4d25e43f654ae0c89c0ac9783b22f29d062b484`.
+Runtime reports CENTRAL, READY=1, FW=0.4.2, MAX_NODES=50; test-injection flags
+are zero. Logs: build/controller-042-upload.log, controller-042-status.log,
+controller-042-flash-verification.log.
+
+Live scripts/check_addressing.py rejected address 0, 51, 255 and -1; zero and
+overflow tokens; and retired/obsolete STANDBY/NEXT names. Each invalid command
+left the prior transaction unchanged. Address 50 OFF token 4213089096 was
+accepted, transmitted exactly three times and ended FAILED with confirmation
+UNKNOWN, as expected with no address-50 node on the bench. No node confirmation
+was invented. Log: build/controller-042-addressing-check.log. This is a parser /
+bounded-transport check, not an over-air success test with 50 physical nodes.
+
+Node1 remains on its previously verified 0.4.0 until the programmer is moved.
+Node2 and Node3 have prepared 0.4.2 images, but no prior identity, backup,
+upload or radio verification has been recorded for them in this repository.
+Next physical step: all power off, unplug DAPLink USB, disconnect Node1's
+breadboard 3.3 V, move the six programmer connections to Node1, and power it
+only from DAPLink. Keep the indicator breadboard supply off during programming.
+Verify Node1 UID 003300455233500d20303938 and take a fresh two-read backup
+before uploading its explicit address-1 image. Repeat individual identification
+and backup for Node2 and Node3; do not connect two 3.3 V supply outputs together.

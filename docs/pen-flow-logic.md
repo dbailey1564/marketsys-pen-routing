@@ -16,8 +16,9 @@ value and solid-blue pattern. Prepared Node1 SHA256:
 `2b28ec905e365f4f2e52be58bcfdd301fbf9f33cf128b4ba1031c026f3bf4a6e`.
 Prepared central SHA256:
 `2d19bf10ced48b13c3e5678cb0c9299e5c9efbd96df9c7a9e9cb75ace1d9c822`.
-Neither board has been reflashed for this naming update; deployed 0.4.0 still
-reports/accepts NEXT. No new over-air test is claimed for the rename.
+At that milestone neither board had been reflashed. The subsequent 0.4.2
+50-node revision is now deployed on central; node uploads are pending.
+See indicator-revision-042.md for current hardware status.
 
 ## Confirmed direction
 
@@ -102,4 +103,5 @@ indicator states with their triggering events not yet defined here.
 The 0.4.0 firmware has verified radio state control and bounded transport,
 not controller-owned business flow. The 10-second automatic OFF remains a
 bench timeout, not an advance/close event or a production persistence rule.
-No node/controller has been reflashed during this discussion.
+The subsequent controller 0.4.2 upload adds addressed diagnostic control,
+not business flow; see indicator-revision-042.md. Node uploads are pending.

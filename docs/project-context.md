@@ -188,3 +188,16 @@ register results and five conformance vectors. The standalone GnuCOBOL 3.2
 reference passed all vectors and full-frame serialization on Lin; the
 engineer's actual compiler/runtime has not been provided or tested. No host
 firmware implementation or upload is implied by this documentation revision.
+
+## Latest physical firmware status: 0.4.2 deployment
+
+The user requested addressing for 50 nodes. Revision 0.4.2 adds controller
+selection of addresses 1..50, per-node last-confirmed state, and explicit
+compile-time node identity. Controller is now uploaded and readback-verified
+on 0.4.2. Node1 is still on 0.4.0 pending programmer transfer; Node2/Node3
+images are prepared but not yet deployed. This supersedes earlier current-
+revision statements above; those paragraphs describe prior milestones.
+See indicator-revision-042.md for hashes, backup and deployment evidence.
+Node builds now require --node-id N and have separate build/radio-node-N
+output directories. The automatic 10-second bench cutoff remains. Host binary
+protocol and head-entry business flow remain unimplemented.
