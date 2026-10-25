@@ -33,8 +33,7 @@ frame. With the proposed session and transaction fields, the frame is 16 bytes:
 The two destination bytes are a number plus an optional alpha designation,
 not a single numeric pen value of 1..65535. The current worked examples use
 00 for no letter and ASCII B (42 hex) for B; that alpha encoding/valid range
-and whether number 0 is reserved still need final agreement. The user's
-high-byte alpha reservation and removal of length are reflected here.
+and whether number 0 is reserved still need final agreement.
 
 Session/transaction integers use little-endian byte order in this draft.
 If the engineer selects another event-identity structure, update offsets,
