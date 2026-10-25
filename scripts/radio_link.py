@@ -9,6 +9,7 @@ import serial
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action', choices=['node-status', 'central-status', 'off', 'active',
     'last', 'hold_open', 'full', 'fault'])
+parser.add_argument('--node', type=int, choices=range(1, 51), default=1, metavar='1..50')
 parser.add_argument('--token', type=int, help='Explicit transaction token for duplicate tests')
 args = parser.parse_args()
 ports = list(Path('/dev/serial/by-id').glob('usb-ARM_DAPLink_CMSIS-DAP_*-if01'))
@@ -35,14 +36,14 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
     command('AT')
     node = args.action == 'node-status'
     response = command('ATC+NODE=?' if node else 'ATC+PEN=?')
-    role = 'NODE1' if node else 'CENTRAL'
+    role = f'NODE{args.node}' if node else 'CENTRAL'
     if 'MS_RADIO='+role+';READY=1;FREQ=915000000;' not in response:
         raise RuntimeError('Wrong firmware role or radio initialization failed')
     if args.action not in ('node-status', 'central-status'):
         token = args.token if args.token is not None else secrets.randbelow(0xffffffff) + 1
         if not 1 <= token <= 0xffffffff:
             raise ValueError('Token must be 1..4294967295')
-        result = command(f'ATC+PEN={token}:{args.action.upper()}')
+        result = command(f'ATC+PEN={token}:{args.node}:{args.action.upper()}')
         end = time.monotonic() + 9
         terminal = re.compile(r'MS_LINK=(ACK|REJECTED|FAILED);TOKEN='+str(token)+r';')
         while not terminal.search(result) and time.monotonic() < end:
@@ -52,5 +53,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
                 result += more
         match = terminal.search(result)
         if not match or match[1] != 'ACK':
-            raise RuntimeError('State not confirmed by Node1: '+(match[1] if match else 'host timeout'))
-        print('PASS: Node1 acknowledged '+args.action.upper(), flush=True)
+            raise RuntimeError(f'State not confirmed by Node{args.node}: '+(match[1] if match else 'host timeout'))
+        if f'MS_TARGET_NODE={args.node};' not in result:
+            raise RuntimeError('Controller reported a different target node')
+        print(f'PASS: Node{args.node} acknowledged '+args.action.upper(), flush=True)

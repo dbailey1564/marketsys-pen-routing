@@ -80,7 +80,7 @@ def verify():
         raise RuntimeError("Pinned RUI3 core is not installed; run setup")
     print(f'Using Arduino CLI {LOCK["arduino_cli_version"]}, {LOCK["core"]}@{LOCK["core_version"]}', flush=True)
 
-def build(target):
+def build(target, node_id=None):
     verify()
     if target == "build-check":
         sketch = ROOT / "firmware/build_check"
@@ -101,16 +101,25 @@ def build(target):
         # Vendor examples require LED_GREEN/LED_BLUE from the evaluation board.
         fqbn = LOCK["reference_fqbn"]
     output = ROOT / "build" / target
+    if target == "radio-node":
+        output = ROOT / "build" / f"radio-node-{node_id}"
     output.mkdir(parents=True, exist_ok=True)
     print(f"Compile target: {fqbn}", flush=True)
-    cli("compile", "--fqbn", fqbn, "--libraries", ROOT / "libraries", "--build-path", output, sketch)
+    extra = ["--build-property", f"compiler.cpp.extra_flags=-DMARKETSYS_NODE_ID={node_id}"] if target == "radio-node" else []
+    cli("compile", "--fqbn", fqbn, "--libraries", ROOT / "libraries", "--build-path", output, *extra, sketch)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("task", choices=["setup", "verify", "build-check", "sleep-test", "indicator-test", "radio-node", "radio-central", "reference-rx", "reference-tx"])
-task = parser.parse_args().task
+parser.add_argument("--node-id", type=int, choices=range(1, 51), metavar="1..50")
+args = parser.parse_args()
+task = args.task
+if task == "radio-node" and args.node_id is None:
+    parser.error("radio-node requires --node-id 1..50")
+if task != "radio-node" and args.node_id is not None:
+    parser.error("--node-id applies only to radio-node")
 if task == "setup":
     setup()
 elif task == "verify":
     verify()
 else:
-    build(task)
+    build(task, args.node_id)

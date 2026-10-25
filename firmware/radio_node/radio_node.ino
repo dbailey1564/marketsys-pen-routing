@@ -1,5 +1,13 @@
 #include <Arduino.h>
 #include <BenchProtocol.h>
+#include <BenchAddress.h>
+#ifndef MARKETSYS_NODE_ID
+#error "Build with an explicit MARKETSYS_NODE_ID (1..50)"
+#endif
+static_assert(MARKETSYS_NODE_ID >= 1 && MARKETSYS_NODE_ID <= bench::MAX_NODES, "Invalid node ID");
+#define MS_STRING_INNER(x) #x
+#define MS_STRING(x) MS_STRING_INNER(x)
+static const uint8_t nodeId = MARKETSYS_NODE_ID;
 #include <BenchPattern.h>
 #include <BenchRadio.h>
 #include <cstring>
@@ -38,7 +46,8 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE1", ready, "0.4.1");
+    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.4.2");
+    Serial.printf("MS_NODE_ID=%u;MAX_NODES=50\r\n", nodeId);
     Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=10000\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
         (unsigned long)(dedup.valid ? dedup.token : 0));
@@ -56,8 +65,8 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node1-RF-0.4.1");
-    bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node1 radio status or OFF",
+    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.4.2");
+    bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     ready = commandReady && benchRadio::begin();
     report();
@@ -66,10 +75,10 @@ void loop() {
     update();
     if (!ready) { dark(); delay(5); return; }
     bench::Frame request;
-    if (benchRadio::take(request) && request.type == bench::SET && request.node == 1) {
+    if (benchRadio::take(request) && bench::forNode(request, nodeId)) {
         bench::Result result = dedup.classify(request, state);
         if (result == bench::APPLIED) { apply(request.state); dedup.remember(request); }
-        acknowledgement = {bench::ACK, 1, state, uint8_t(result), request.token};
+        acknowledgement = {bench::ACK, nodeId, state, uint8_t(result), request.token};
         ackAt = millis() + 50; // Let central switch from TX to RX.
         ackTries = 0;
         ackPending = true;

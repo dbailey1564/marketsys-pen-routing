@@ -10,7 +10,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--board', default='prototype-01', choices=['prototype-01', 'proto-node1-v1'])
+parser.add_argument('--board', default='prototype-01', choices=['prototype-01'] + [f'proto-node{i}-v1' for i in range(1, 51)])
 parser.add_argument('--expected-uid', help='Expected 24 hex digits: three UID words in displayed order')
 args = parser.parse_args()
 if args.expected_uid and not re.fullmatch(r'[0-9a-fA-F]{24}', args.expected_uid):
