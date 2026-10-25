@@ -127,3 +127,32 @@ command executed because the status precondition failed. User must reseat
 DAPLink TX->PA3 and RX->PA2 with USB power disconnected before retrying.
 Logs: build/node1-042-uart-diagnostic.log, node1-042-debug-reset.log,
 node1-042-uart-after-reset.log and node1-042-runtime-diagnostic.log.
+
+## Node1 deployment completed
+
+Reseating the serial connections restored AT replies. Before upload, Node1
+reported FW=0.4.0, READY=1, OFF and all GPIO LOW. The official RAK UART uploader
+then completed the address-1 0.4.2 upload. Runtime now reports NODE1, READY=1,
+FW=0.4.2, NODE_ID=1, MAX_NODES=50, OFF and PB3/PB4/PB5 all LOW.
+
+The first immediate readback hit an SWD memory-read error at 0x08005f90.
+After querying the running firmware, a second read-only attempt succeeded;
+no reflash was needed. Private verification record:
+`proto-node1-v1/20261025T011104.070211Z-post-addressed-upload/verification.json`.
+All 175536 application bytes match the prepared address-1 image. UID matches
+003300455233500d20303938. Bootloader regions outside the reviewed upload-record
+range remain identical to Node1's own pre-upload backup. Settings changed;
+full settings preservation is not claimed. Full-flash snapshot SHA256:
+`3cbbe04981a4176a4e49bc0255f202f708d141dcfd552302b3928d38c514a6d6`.
+Logs: build/node1-pre-042-reseated.log, node1-042-upload.log,
+node1-042-status.log, node1-042-flash-verification.log.
+
+Current physical status: controller and Node1 are verified on 0.4.2.
+Node2/Node3 remain pending individual connection, identity, backup and upload.
+No new 0.4.2 over-air/visual indicator validation is claimed yet; the one
+DAPLink is still on Node1. Next: unplug DAPLink USB with breadboard power off,
+move its six connections to Node2, then reconnect USB. Node2 must have its
+antenna attached and no parallel breadboard 3.3 V supply during programming.
+Before subsequent SWD verification, let the uploaded firmware finish starting
+and obtain its UART runtime status; both immediate startup reads in this
+iteration failed before later read-only verification succeeded.

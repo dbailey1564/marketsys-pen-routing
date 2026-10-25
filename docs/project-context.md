@@ -194,8 +194,9 @@ firmware implementation or upload is implied by this documentation revision.
 The user requested addressing for 50 nodes. Revision 0.4.2 adds controller
 selection of addresses 1..50, per-node last-confirmed state, and explicit
 compile-time node identity. Controller is now uploaded and readback-verified
-on 0.4.2. Node1 is still on 0.4.0 pending programmer transfer; Node2/Node3
-images are prepared but not yet deployed. This supersedes earlier current-
+on 0.4.2. Node1 is also uploaded and readback-verified on 0.4.2 with
+NODE_ID=1, OFF and all GPIO LOW. Node2/Node3 images are prepared but not
+yet deployed. This supersedes earlier current-
 revision statements above; those paragraphs describe prior milestones.
 See indicator-revision-042.md for hashes, backup and deployment evidence.
 Node builds now require --node-id N and have separate build/radio-node-N
