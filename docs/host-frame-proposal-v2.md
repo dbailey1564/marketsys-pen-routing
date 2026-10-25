@@ -17,6 +17,14 @@ not interchangeable unless the user's operational process makes them so.
 
 ## Proposed 18-byte HEAD_DESTINATION frame
 
+Review update: the session-versus-persistent-event-counter choice has been
+deferred for engineer input; see engineer-questions.md. The 18-byte layout
+below remains a draft, not an approved requirement for a session field.
+The user also proposes destination low byte = pen number (up to 255), high
+byte reserved for an alphabetic designation. The earlier numeric-16-bit
+interpretation below is superseded by that direction; exact alpha encoding
+(suggested 00 absent, otherwise uppercase ASCII A-Z) is not yet approved.
+
 All multibyte integers are unsigned little-endian. IDs and field widths below
 are proposals. Version 0x02 distinguishes this draft from the recovered older
 version-1 SET_STATES proposal; type 0x10 is a proposed allocation.
