@@ -189,3 +189,44 @@ Node3 remains pending connection, identification, backup and upload. No new
 Next: with all power off, unplug DAPLink USB, move all six programmer wires
 to Node3, then reconnect USB. Keep Node3's antenna attached and power it only
 from DAPLink while programming; keep the breadboard supply off.
+
+## Node3 deployment completed; all four uploads verified
+
+Node3 answered AT and reported original RUI_4.0.6_RAK3272-SiP. SWD identified
+UID `003400345233500d20303938`, distinct from the other three boards. Two
+matching 262144-byte pre-upload reads are retained privately at
+`proto-node3-v1/20261025T012306.120473Z/`, SHA256
+`17edd1313d7e11163100b740c254091bcc6fe2d42798211a4c94eac5e54ba53b`.
+All 12608 bootloader-code bytes and the four-byte activation marker matched
+the installed reference before upload.
+
+The official RAK UART uploader completed the address-3 0.4.2 image. After
+startup and an ATZ restart, runtime reported NODE3, READY=1, FW=0.4.2,
+NODE_ID=3, MAX_NODES=50, OFF and PB3/PB4/PB5 all LOW. First readback succeeded.
+Private verification record:
+`proto-node3-v1/20261025T012543.525568Z-post-addressed-upload/verification.json`.
+All 175528 application bytes match the prepared image. UID matches and
+bootloader regions outside the reviewed update-record range match Node3's
+own pre-upload backup. Settings changed; full settings preservation is not
+claimed. Full-flash snapshot SHA256:
+`f5617334be673f65b76aaa615ac94ece22d802a8cf8d8e3d31fab253ba0d2b5f`.
+Logs: build/node3-pre-042-uart.log, node3-pre-042-backup.log,
+node3-pre-042-bootloader.log, node3-042-upload.log, node3-042-restart.log,
+node3-042-status.log and node3-042-flash-verification.log.
+
+| Physical board | UID | Verified firmware | Address | Last UART indication |
+| --- | --- | --- | --- | --- |
+| Controller | 0027001c4b33501220333734 | 0.4.2 | Central | READY=1, MAX_NODES=50 |
+| Node1 | 003300455233500d20303938 | 0.4.2 | 1 | READY=1, OFF, GPIO LOW |
+| Node2 | 003300265233500d20303938 | 0.4.2 | 2 | READY=1, OFF, GPIO LOW |
+| Node3 | 003400345233500d20303938 | 0.4.2 | 3 | READY=1, OFF, GPIO LOW |
+
+Requested controller/Node1/Node2/Node3 uploads and byte-level verification
+are complete. Addresses 4..50 are supported in source and command tests;
+only three physical pen nodes have been programmed. No 0.4.2 addressed
+LoRa ACK or user visual indication check is claimed yet. Next: with all
+power off, unplug DAPLink USB and return its six connections to the controller.
+Power the pen nodes separately from regulated 3.3 V with their antennas
+attached before over-air checks; never connect the breadboard 3.3 V output
+and DAPLink 3.3 V output together. The single LED/driver bench may be used
+for visual checks, while bare nodes can only provide radio/GPIO confirmation.
