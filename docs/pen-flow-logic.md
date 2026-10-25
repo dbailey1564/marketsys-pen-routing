@@ -17,8 +17,8 @@ value and solid-blue pattern. Prepared Node1 SHA256:
 Prepared central SHA256:
 `2d19bf10ced48b13c3e5678cb0c9299e5c9efbd96df9c7a9e9cb75ace1d9c822`.
 At that milestone neither board had been reflashed. The subsequent 0.4.2
-50-node revision is now deployed and verified on central and Node1;
-Node2/Node3 uploads are pending.
+50-node revision is now deployed and verified on central, Node1 and Node2;
+Node3 upload is pending.
 See indicator-revision-042.md for current hardware status.
 
 ## Confirmed direction
@@ -106,4 +106,4 @@ not controller-owned business flow. The 10-second automatic OFF remains a
 bench timeout, not an advance/close event or a production persistence rule.
 The subsequent controller 0.4.2 upload adds addressed diagnostic control,
 not business flow; see indicator-revision-042.md. Node1 is also verified
-on 0.4.2; Node2/Node3 uploads are pending.
+on 0.4.2, as is Node2; Node3 upload is pending.

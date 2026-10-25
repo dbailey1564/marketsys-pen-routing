@@ -156,3 +156,36 @@ antenna attached and no parallel breadboard 3.3 V supply during programming.
 Before subsequent SWD verification, let the uploaded firmware finish starting
 and obtain its UART runtime status; both immediate startup reads in this
 iteration failed before later read-only verification succeeded.
+
+## Node2 deployment completed
+
+Node2 answered AT and reported original RUI_4.0.6_RAK3272-SiP. SWD identified
+UID `003300265233500d20303938`, distinct from central and Node1. Two matching
+262144-byte pre-upload reads are retained privately at
+`proto-node2-v1/20261025T011729.385256Z/`, SHA256
+`17edd1313d7e11163100b740c254091bcc6fe2d42798211a4c94eac5e54ba53b`.
+All 12608 packaged bootloader-code bytes and the four-byte activation marker
+matched the installed reference. Factory main-flash contents match previous
+factory snapshots; the unique device identity was read separately from UID.
+
+The official RAK uploader completed the explicit address-2 0.4.2 image.
+After startup and an ATZ restart to initialize the P2P configuration, runtime
+reported NODE2, READY=1, FW=0.4.2, NODE_ID=2, MAX_NODES=50, OFF and all three
+GPIO LOW. The subsequent readback succeeded on its first attempt.
+Private verification record:
+`proto-node2-v1/20261025T012012.177511Z-post-addressed-upload/verification.json`.
+All 175536 application bytes match the prepared Node2 image. UID matches and
+bootloader regions outside the reviewed upload-record range remain unchanged
+from Node2's own original backup. Settings changed; full settings preservation
+is not claimed. Full-flash snapshot SHA256:
+`556b05c7f36e5f83a716ed07ebc72196af69c7c1430bfb5d5f095a49807a128c`.
+Logs: build/node2-pre-042-uart.log, node2-pre-042-backup.log,
+node2-pre-042-bootloader.log, node2-042-upload.log, node2-042-restart.log,
+node2-042-status.log and node2-042-flash-verification.log.
+
+Current physical status: central, Node1 and Node2 are verified on 0.4.2.
+Node3 remains pending connection, identification, backup and upload. No new
+0.4.2 over-air or visual test is claimed; the single programmer is on Node2.
+Next: with all power off, unplug DAPLink USB, move all six programmer wires
+to Node3, then reconnect USB. Keep Node3's antenna attached and power it only
+from DAPLink while programming; keep the breadboard supply off.
