@@ -9,6 +9,11 @@ verification. Addressed over-air testing remains pending. The binary host
 interface and automatic head-entry pen flow remain unimplemented; indicators
 still have a 10-second bench cutoff. This is not production firmware.
 
+Prepared node revision **0.4.3** adds a one-time boot light test: five current
+indications, two seconds each, 250 ms flash phases, then OFF. Normal command
+timings remain unchanged. It is built/tested but not yet flashed; central
+remains compatible on 0.4.2. See [boot-test revision](docs/indicator-revision-043.md).
+
 ## Development workspace
 
 Open `/home/dbailey1564/Development/marketsys-pen-routing` through VS Code's
