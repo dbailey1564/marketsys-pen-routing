@@ -1,7 +1,7 @@
 # Node revision 0.4.3: automatic boot light test
 
 Prepared October 28, 2026 at the user's request. Node1 is now uploaded and
-verified on 0.4.3; Nodes 2/3 remain on 0.4.2 pending their uploads. Central
+verified on 0.4.3, as is Node2; Node3 remains on 0.4.2 pending upload. Central
 remains on 0.4.2 and requires no change. The addressed radio protocol is unchanged.
 
 ## Startup indication
@@ -112,3 +112,39 @@ and scripts/check_boot_cancel.py. Node2 and Node3 builds remain ready; the
 single DAPLink is still on Node1. Next: power off, unplug USB, move all six
 connections to Node2, and reconnect with DAPLink as its only power source.
 Keep the breadboard supply off and the node antenna attached.
+
+## Node2 deployment and runtime verification completed
+
+Node2 UID matched `003300265233500d20303938`; UART reported address 2,
+FW=0.4.2, READY=1 and OFF. Two fresh full-flash reads matched its prior
+verified snapshot. Private backup: `proto-node2-v1/20261028T105434.681825Z/`,
+SHA256 `556b05c7f36e5f83a716ed07ebc72196af69c7c1430bfb5d5f095a49807a128c`.
+The official UART uploader completed the prepared address-2 0.4.3 image.
+Private readback verification:
+`proto-node2-v1/20261028T105656.852729Z-post-addressed-upload/verification.json`.
+All 175920 application bytes match SHA256
+`a7e67422095e702b26b961b9d2938540acda56c661e20086d0b0a7be6ce1c763`.
+UID matches and bootloader regions outside the reviewed upload-record range
+are unchanged from its own pre-upload backup. Settings changed. Snapshot SHA256:
+`2b6eb74973e5a480088ac6497104e1b43a7f927d36c9242ffd3706d34d92fd61`.
+
+Runtime observer captured all five boot states and final OFF. Host-observed
+step durations were 2.0000, 2.0027, 1.9960, 2.0023 and 1.9988 seconds;
+total 9.9998 seconds. Ninety-nine GPIO reports passed color mapping, one-color
+output, flashing ON/OFF observations and final LOW checks. Boot timing reports
+were 250/2000 ms, reverting to 500/10000 ms after completion. Optical
+verification and external waveform timing were not performed.
+
+UART OFF during the next boot immediately cancelled the sequence. Outputs
+remained LOW beyond the next scheduled step. Final status: NODE2, READY=1,
+FW=0.4.3, NODE_ID=2, OFF, all GPIO LOW, BOOT_TEST=0 and normal timings.
+Logs: build/node2-pre-043-backup.log, node2-043-upload.log,
+node2-043-flash-verification.log, node2-043-boot-test.log,
+node2-043-boot-summary.json, node2-043-boot-cancel.log and
+node2-043-final-status.log.
+
+Current deployment: Nodes1/2 are verified on 0.4.3; central and Node3 remain
+on 0.4.2. The programmer is on Node2. Next: with breadboard power off, unplug
+DAPLink USB, move all six connections to Node3, then reconnect USB. Keep its
+antenna attached and use DAPLink as the only node power source. No post-update
+LoRa or physical LED observation is claimed for either updated node yet.
