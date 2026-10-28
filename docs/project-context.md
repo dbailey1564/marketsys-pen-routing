@@ -213,8 +213,10 @@ phases and two seconds per indication. Node1/2/3 0.4.3 images compile and
 host tests pass. Sequence: ACTIVE, LAST, HOLD_OPEN, FULL, FAULT, then OFF.
 It starts after successful setup, runs nonblocking and yields to a real
 command. Normal commands retain 500 ms phases and a ten-second cutoff.
-All hardware still runs 0.4.2 pending individual node uploads; central needs
-no update. See indicator-revision-043.md for hashes, behavior and test plan.
+Node1 now runs readback-verified 0.4.3 with a passed on-device GPIO boot
+sequence and UART OFF cancellation check. Central and Nodes2/3 still run
+0.4.2; central needs no update. Physical LED observation and post-update
+LoRa checks remain pending. See indicator-revision-043.md for hashes, behavior and test plan.
 On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
 addressed OFF token 1707266160 on attempt 1 (RSSI -26 dBm, SNR 12 dB).
 This is one 0.4.2 reachability check, not all-state or three-node validation.
@@ -226,8 +228,10 @@ phases and two seconds per indication. Node1/2/3 0.4.3 images compile and
 host tests pass. Sequence: ACTIVE, LAST, HOLD_OPEN, FULL, FAULT, then OFF.
 It starts after successful setup, runs nonblocking and yields to a real
 command. Normal commands retain 500 ms phases and a ten-second cutoff.
-All hardware still runs 0.4.2 pending individual node uploads; central needs
-no update. See indicator-revision-043.md for hashes, behavior and test plan.
+Node1 now runs readback-verified 0.4.3 with a passed on-device GPIO boot
+sequence and UART OFF cancellation check. Central and Nodes2/3 still run
+0.4.2; central needs no update. Physical LED observation and post-update
+LoRa checks remain pending. See indicator-revision-043.md for hashes, behavior and test plan.
 On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
 addressed OFF token 1707266160 on attempt 1 (RSSI -26 dBm, SNR 12 dB).
 This is one 0.4.2 reachability check, not all-state or three-node validation.

@@ -1,18 +1,20 @@
 # MarketSys pen routing
 
 Firmware and host-interface work for a central controller and LoRa pen indicators.
-Current bench firmware is **0.4.2**, uploaded and readback-verified on the
-controller and Node1/Node2/Node3. Central supports addresses **1-50**; the
+Current deployed firmware: **0.4.2** on central and Nodes2/3; **0.4.3** on
+Node1, with its boot light sequence checked through runtime GPIO reports.
+All four uploads have byte-for-byte readback verification. Central supports addresses **1-50**; the
 three physical nodes have distinct addresses 1, 2 and 3. See the
 [deployment record](docs/indicator-revision-042.md) for backups, hashes and
-verification. Addressed over-air testing remains pending. The binary host
+verification. Node1 acknowledged OFF over air on 0.4.2; addressed testing of the updated
+0.4.3 node and the other nodes remains pending. The binary host
 interface and automatic head-entry pen flow remain unimplemented; indicators
 still have a 10-second bench cutoff. This is not production firmware.
 
-Prepared node revision **0.4.3** adds a one-time boot light test: five current
+Node revision **0.4.3** adds a one-time boot light test: five current
 indications, two seconds each, 250 ms flash phases, then OFF. Normal command
-timings remain unchanged. It is built/tested but not yet flashed; central
-remains compatible on 0.4.2. See [boot-test revision](docs/indicator-revision-043.md).
+timings remain unchanged. Node1 is uploaded and GPIO-tested; Nodes2/3 have prepared images awaiting
+upload. Central remains compatible on 0.4.2. See [boot-test revision](docs/indicator-revision-043.md).
 
 ## Development workspace
 

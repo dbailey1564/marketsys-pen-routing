@@ -1,8 +1,8 @@
 # Node revision 0.4.3: automatic boot light test
 
-Prepared October 28, 2026 at the user's request. All physical boards remain
-on verified 0.4.2 until individually uploaded. Central requires no firmware
-change; 0.4.3 is a node-only revision with the same addressed radio protocol.
+Prepared October 28, 2026 at the user's request. Node1 is now uploaded and
+verified on 0.4.3; Nodes 2/3 remain on 0.4.2 pending their uploads. Central
+remains on 0.4.2 and requires no change. The addressed radio protocol is unchanged.
 
 ## Startup indication
 
@@ -57,13 +57,13 @@ stack/heap measurement. No on-device/visual result is claimed before upload.
 Build: python3 scripts/dev.py radio-node --node-id N. Images remain separated
 under build/radio-node-N. New host test: tests/boot_light_test.cpp.
 
-## Deployment pending
+## Deployment procedure
 
-The programmer was last confirmed on central. To deploy, turn breadboard
+For each node upload, turn breadboard
 power off and unplug DAPLink USB, disconnect the node's external 3.3 V supply,
-move all six programmer connections to Node1, and reconnect USB. Use only
+move all six programmer connections to the selected node, and reconnect USB. Use only
 DAPLink power while programming and keep its antenna attached. Verify UID,
-take a fresh two-read private backup, upload the explicit address-1 image,
+take a fresh two-read private backup, upload that node's explicit-address image,
 read back all application bytes and verify preserved bootloader regions.
 Repeat with each board's own identity and address-specific image for Nodes 2/3.
 
@@ -73,3 +73,42 @@ with the RGB wiring connected. Expect the complete sequence above and final
 OFF. Then verify a real command can cancel a running boot test and that normal
 command timing remains 500 ms / 10 seconds. Host binary interface and automatic
 head-entry flow remain separate, unimplemented work.
+
+## Node1 deployment and runtime verification completed
+
+Node1 UID matched `003300455233500d20303938`; pre-upload UART reported
+0.4.2, READY=1, OFF. Two new full-flash reads matched the prior verified
+0.4.2 snapshot. Private backup: `proto-node1-v1/20261028T104512.392026Z/`,
+SHA256 `3cbbe04981a4176a4e49bc0255f202f708d141dcfd552302b3928d38c514a6d6`.
+The official UART uploader completed the prepared address-1 0.4.3 image.
+Private SWD verification record:
+`proto-node1-v1/20261028T104744.121347Z-post-addressed-upload/verification.json`.
+All 175928 application bytes match its prepared SHA256. UID matches, and
+bootloader regions outside the reviewed update-record range are unchanged
+from Node1's own pre-upload backup. Settings changed; full settings preservation
+is not claimed. Full snapshot SHA256:
+`874af3204735a5d6a0acc73cfdc580905e8769793e2d119c22bd5ef6a2165d75`.
+
+Runtime observer restarted Node1 and captured ACTIVE, LAST, HOLD_OPEN, FULL,
+FAULT, then OFF. Host-observed step durations were 2.0010, 2.0030, 1.9969,
+2.0009 and 2.0031 seconds; total 10.0049 seconds. Ninety-nine GPIO reports
+showed the expected color mappings with no simultaneous HIGH colors; both
+flashing states included ON and OFF samples. The node reported boot phase
+250 ms and step limit 2000 ms, followed by normal 500 ms / 10000 ms values.
+This is GPIO/internal timing validation, not optical measurement or an external
+scope capture. The user has not yet confirmed the physical light sequence.
+
+A second restart plus ATC+NODE=OFF during the first test step produced
+CANCELLED immediately; repeated queries stayed OFF with all three GPIO LOW
+for 2.5 seconds, past the next scheduled boot step. Final UART status:
+NODE1, READY=1, FW=0.4.3, NODE_ID=1, OFF, PB3/PB4/PB5=0, BOOT_TEST=0,
+PHASE_MS=500 and LIMIT_MS=10000. No post-update LoRa command is claimed yet.
+
+Logs and summary: build/node1-pre-043-backup.log, node1-043-upload.log,
+node1-043-flash-verification.log, node1-043-boot-test.log,
+node1-043-boot-summary.json, node1-043-boot-cancel.log and
+node1-043-final-status.log. Reusable tooling: scripts/observe_boot_light_test.py
+and scripts/check_boot_cancel.py. Node2 and Node3 builds remain ready; the
+single DAPLink is still on Node1. Next: power off, unplug USB, move all six
+connections to Node2, and reconnect with DAPLink as its only power source.
+Keep the breadboard supply off and the node antenna attached.
