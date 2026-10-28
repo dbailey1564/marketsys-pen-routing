@@ -205,3 +205,16 @@ See indicator-revision-042.md for hashes, backup and deployment evidence.
 Node builds now require --node-id N and have separate build/radio-node-N
 output directories. The automatic 10-second bench cutoff remains. Host binary
 protocol and head-entry business flow remain unimplemented.
+
+## Prepared node revision 0.4.3 (October 28)
+
+The user requested a light test at the end of node startup with 250 ms flash
+phases and two seconds per indication. Node1/2/3 0.4.3 images compile and
+host tests pass. Sequence: ACTIVE, LAST, HOLD_OPEN, FULL, FAULT, then OFF.
+It starts after successful setup, runs nonblocking and yields to a real
+command. Normal commands retain 500 ms phases and a ten-second cutoff.
+All hardware still runs 0.4.2 pending individual node uploads; central needs
+no update. See indicator-revision-043.md for hashes, behavior and test plan.
+On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
+addressed OFF token 1707266160 on attempt 1 (RSSI -26 dBm, SNR 12 dB).
+This is one 0.4.2 reachability check, not all-state or three-node validation.

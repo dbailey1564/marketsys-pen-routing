@@ -9,6 +9,7 @@ static_assert(MARKETSYS_NODE_ID >= 1 && MARKETSYS_NODE_ID <= bench::MAX_NODES, "
 #define MS_STRING(x) MS_STRING_INNER(x)
 static const uint8_t nodeId = MARKETSYS_NODE_ID;
 #include <BenchPattern.h>
+#include <BootLightTest.h>
 #include <BenchRadio.h>
 #include <cstring>
 
@@ -21,24 +22,44 @@ static uint32_t ackAt = 0;
 static uint8_t ackTries = 0;
 static bench::Frame acknowledgement;
 static bench::Dedup dedup;
+static indicator::BootLightTest bootTest;
 
 static void dark() {
     for (uint32_t pin : pins) digitalWrite(pin, LOW);
     color = indicator::DARK;
 }
 static void update() {
-    uint32_t elapsed = uint32_t(millis() - started);
-    if (state != bench::OFF && elapsed >= indicator::LIMIT_MS) {
+    const uint32_t now = millis();
+    uint32_t elapsed = uint32_t(now - started);
+    uint32_t phaseMs = indicator::PHASE_MS, limitMs = indicator::LIMIT_MS;
+    if (bootTest.running()) {
+        auto sample = bootTest.sample(now);
+        if (!sample.running) {
+            state = bench::OFF; started = now; elapsed = 0;
+            Serial.println("MS_BOOT_TEST=DONE;STATE=OFF");
+        } else {
+            if (state != sample.mode) {
+                state = sample.mode;
+                Serial.printf("MS_BOOT_TEST=STEP;STATE=%s\r\n", bench::name(state));
+            }
+            elapsed = sample.elapsed;
+            phaseMs = indicator::BOOT_PHASE_MS; limitMs = indicator::BOOT_STEP_MS;
+        }
+    } else if (state != bench::OFF && elapsed >= indicator::LIMIT_MS) {
         state = bench::OFF;
         Serial.println("MS_NODE=AUTO_OFF");
     }
-    int next = indicator::colorFor(static_cast<indicator::Mode>(state), elapsed);
+    int next = indicator::colorFor(static_cast<indicator::Mode>(state), elapsed, phaseMs, limitMs);
     if (next != color) {
         dark();
         if (next >= 0) { delay(2); digitalWrite(pins[next], HIGH); color = next; }
     }
 }
 static void apply(uint8_t requested) {
+    if (bootTest.running()) {
+        bootTest.cancel();
+        Serial.println("MS_BOOT_TEST=CANCELLED;REASON=COMMAND");
+    }
     dark();
     state = requested;
     started = millis();
@@ -46,11 +67,14 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.4.2");
+    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.4.3");
     Serial.printf("MS_NODE_ID=%u;MAX_NODES=50\r\n", nodeId);
-    Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=10000\r\n",
+    Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=%lu;PHASE_MS=%lu;BOOT_TEST=%d\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
-        (unsigned long)(dedup.valid ? dedup.token : 0));
+        (unsigned long)(dedup.valid ? dedup.token : 0),
+        (unsigned long)(bootTest.running() ? indicator::BOOT_STEP_MS : indicator::LIMIT_MS),
+        (unsigned long)(bootTest.running() ? indicator::BOOT_PHASE_MS : indicator::PHASE_MS),
+        bootTest.running());
 }
 int nodeCommand(SERIAL_PORT, char *, stParam *p) {
     if (p->argc == 1 && !strcmp(p->argv[0], "?")) { report(); return AT_OK; }
@@ -65,11 +89,16 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.4.2");
+    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.4.3");
     bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     ready = commandReady && benchRadio::begin();
     report();
+    if (ready) {
+        Serial.println("MS_BOOT_TEST=START;PHASE_MS=250;STEP_MS=2000;TOTAL_MS=10000");
+        bootTest.start(millis());
+        update();
+    }
 }
 void loop() {
     update();

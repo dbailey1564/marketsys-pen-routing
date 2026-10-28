@@ -8,10 +8,11 @@ enum Color { DARK = -1, BLUE = 0, RED = 1, GREEN = 2 };
 static const uint32_t PHASE_MS = 500;
 static const uint32_t LIMIT_MS = 10000;
 
-inline Color colorFor(Mode mode, uint32_t elapsed)
+inline Color colorFor(Mode mode, uint32_t elapsed,
+                      uint32_t phaseMs = PHASE_MS, uint32_t limitMs = LIMIT_MS)
 {
-    if (elapsed >= LIMIT_MS) return DARK;
-    const bool first = (elapsed / PHASE_MS) % 2 == 0;
+    if (elapsed >= limitMs) return DARK;
+    const bool first = (elapsed / phaseMs) % 2 == 0;
     switch (mode) {
     case ACTIVE: return GREEN;
     case LAST: case TEST_BLUE: return BLUE;
