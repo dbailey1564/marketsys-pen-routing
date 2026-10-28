@@ -1,5 +1,8 @@
 # Indicator bench wiring and resistor stage
 
+[Complete node wiring diagram - high-resolution PNG](images/node-complete-wiring.png)
+shows the operating power/GPIO wiring and separate programming-only connections.
+
 Updated October 24, 2026. User-reported manual OFF/ON tests passed for all
 three colors on the rebuilt assembly. Earlier suspect assemblies were set
 aside; no conclusion about their root cause was established. Replacement
