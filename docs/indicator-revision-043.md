@@ -191,3 +191,31 @@ The single programmer is still on Node3. Next: with all power off, unplug
 DAPLink USB and return its six connections to central. Power nodes separately
 from regulated 3.3 V with antennas attached before radio checks. Do not parallel
 DAPLink and breadboard 3.3 V outputs. The controller needs no firmware update.
+
+## Node1 addressed radio indication test after 0.4.3 update
+
+With central connected, Node1 acknowledged OFF token 485294525 on attempt 1.
+The user then requested the complete indication test. Each normal command
+below received APPLIED with its requested state on the first transmission.
+Each illuminated state was given its full normal ten-second window before
+advancing; flashing uses normal 500 ms phases rather than the shorter boot
+sequence timings. The final fresh OFF received APPLIED/OFF on attempt 1.
+
+| State | Token | Result | Attempt |
+| --- | --- | --- | --- |
+| ACTIVE | 2070760980 | APPLIED / ACTIVE | 1 |
+| LAST | 3724716211 | APPLIED / LAST | 1 |
+| HOLD_OPEN | 2242584524 | APPLIED / HOLD_OPEN | 1 |
+| FULL | 3948410128 | APPLIED / FULL | 1 |
+| FAULT | 332631230 | APPLIED / FAULT | 1 |
+| OFF | 3558796681 | APPLIED / OFF | 1 |
+
+Received RSSI ranged -25..-24 dBm and SNR 12..13 dB. Central reported FW=0.4.2
+and test-injection flags zero. Node1's last physically verified firmware is
+0.4.3; the ACK protocol does not itself transmit a firmware-version field.
+These results establish addressed transport and node-reported state application,
+not optical correctness. User visual confirmation of the five patterns and
+final darkness is pending. Nodes2/3 still need post-update radio tests.
+Logs: build/node1-043-visual-active.log, node1-043-visual-last.log,
+node1-043-visual-hold-open.log, node1-043-visual-full.log,
+node1-043-visual-fault.log, node1-043-visual-final-off.log.
