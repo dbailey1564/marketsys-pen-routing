@@ -213,8 +213,8 @@ phases and two seconds per indication. Node1/2/3 0.4.3 images compile and
 host tests pass. Sequence: ACTIVE, LAST, HOLD_OPEN, FULL, FAULT, then OFF.
 It starts after successful setup, runs nonblocking and yields to a real
 command. Normal commands retain 500 ms phases and a ten-second cutoff.
-Nodes1/2 now run readback-verified 0.4.3 with passed on-device GPIO boot
-sequences and UART OFF cancellation checks. Central and Node3 still run
+Nodes1/2/3 now run readback-verified 0.4.3 with passed on-device GPIO boot
+sequences and UART OFF cancellation checks. Central remains on compatible
 0.4.2; central needs no update. Physical LED observation and post-update
 LoRa checks remain pending. See indicator-revision-043.md for hashes, behavior and test plan.
 On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
@@ -228,8 +228,8 @@ phases and two seconds per indication. Node1/2/3 0.4.3 images compile and
 host tests pass. Sequence: ACTIVE, LAST, HOLD_OPEN, FULL, FAULT, then OFF.
 It starts after successful setup, runs nonblocking and yields to a real
 command. Normal commands retain 500 ms phases and a ten-second cutoff.
-Nodes1/2 now run readback-verified 0.4.3 with passed on-device GPIO boot
-sequences and UART OFF cancellation checks. Central and Node3 still run
+Nodes1/2/3 now run readback-verified 0.4.3 with passed on-device GPIO boot
+sequences and UART OFF cancellation checks. Central remains on compatible
 0.4.2; central needs no update. Physical LED observation and post-update
 LoRa checks remain pending. See indicator-revision-043.md for hashes, behavior and test plan.
 On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged

@@ -1,8 +1,8 @@
 # Node revision 0.4.3: automatic boot light test
 
-Prepared October 28, 2026 at the user's request. Node1 is now uploaded and
-verified on 0.4.3, as is Node2; Node3 remains on 0.4.2 pending upload. Central
-remains on 0.4.2 and requires no change. The addressed radio protocol is unchanged.
+Prepared and deployed October 28, 2026 at the user's request. All three
+nodes are uploaded and verified on 0.4.3. Central remains on 0.4.2 and
+requires no change. The addressed radio protocol is unchanged.
 
 ## Startup indication
 
@@ -148,3 +148,46 @@ on 0.4.2. The programmer is on Node2. Next: with breadboard power off, unplug
 DAPLink USB, move all six connections to Node3, then reconnect USB. Keep its
 antenna attached and use DAPLink as the only node power source. No post-update
 LoRa or physical LED observation is claimed for either updated node yet.
+
+## Node3 deployment completed; all three nodes verified
+
+Node3 UID matched `003400345233500d20303938`; pre-upload UART reported
+NODE_ID=3, FW=0.4.2, READY=1 and OFF. Two new full-flash reads matched its
+prior verified snapshot. Private backup:
+`proto-node3-v1/20261028T110123.097636Z/`, SHA256
+`f5617334be673f65b76aaa615ac94ece22d802a8cf8d8e3d31fab253ba0d2b5f`.
+The official RAK UART uploader completed its prepared address-3 0.4.3 image.
+Private readback record:
+`proto-node3-v1/20261028T110337.993332Z-post-addressed-upload/verification.json`.
+All 175920 application bytes match SHA256
+`24b7e627409890ce7ce87f2ab20b76ec6ec41d8dc4a10bb1b132122eaa60f834`.
+UID matches and bootloader regions outside the reviewed upload-record range
+are unchanged from its own pre-upload backup. Settings changed. Snapshot SHA256:
+`419d83d437d8b7cf1396bcb7b31115d6bf350a9f594a15575f8d2cca9b2ac86e`.
+
+The observer captured all five boot states and final OFF. Host-observed step
+durations: 2.0011, 2.0040, 1.9970, 1.9970 and 2.0068 seconds; total 10.0059 s.
+Ninety-nine GPIO reports passed expected colors, one-color output, flashing
+ON/OFF observations and final LOW. Boot timing reported 250/2000 ms and
+normal timing returned to 500/10000 ms. UART OFF during another boot cancelled
+the sequence immediately; outputs stayed LOW beyond the next scheduled step.
+Final status: NODE3, READY=1, FW=0.4.3, NODE_ID=3, OFF, all GPIO LOW and
+BOOT_TEST=0. No optical measurement or external waveform capture was performed.
+Logs: build/node3-pre-043-backup.log, node3-043-upload.log,
+node3-043-flash-verification.log, node3-043-boot-test.log,
+node3-043-boot-summary.json, node3-043-boot-cancel.log and
+node3-043-final-status.log.
+
+| Board | Deployed firmware | Address | Upload / readback | Boot GPIO / OFF cancellation |
+| --- | --- | --- | --- | --- |
+| Controller | 0.4.2 | Central, addresses 1-50 | Previously verified | Not a node boot test |
+| Node1 | 0.4.3 | 1 | Passed | Passed |
+| Node2 | 0.4.3 | 2 | Passed | Passed |
+| Node3 | 0.4.3 | 3 | Passed | Passed |
+
+All requested node boot-test uploads and GPIO/runtime checks are complete.
+Physical LED observation and post-update addressed LoRa checks remain pending.
+The single programmer is still on Node3. Next: with all power off, unplug
+DAPLink USB and return its six connections to central. Power nodes separately
+from regulated 3.3 V with antennas attached before radio checks. Do not parallel
+DAPLink and breadboard 3.3 V outputs. The controller needs no firmware update.
