@@ -1,5 +1,14 @@
 # Indicator bench wiring and resistor stage
 
+## Current EN connection reported October 30
+
+The user confirmed EN is tied to driver IN+ on the soldered assembly. Earlier
+manual-test notes and the October 26 PNG show the prior unconnected-EN setup;
+that EN detail is historical. No GPIO is connected to EN and no enable GPIO
+firmware has been added. Red illuminated; blue/green have been intermittent,
+with a suspected loose connection and retesting recorded in indicator-revision-044.md.
+
+
 [Complete node wiring diagram - high-resolution PNG](images/node-complete-wiring.png)
 shows the operating power/GPIO wiring and separate programming-only connections.
 

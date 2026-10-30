@@ -117,3 +117,35 @@ these acknowledgements. Node1 remains on 0.4.3 with no new upload.
 Logs: build/node1-pre044-repeat-active.log, node1-pre044-repeat-last.log,
 node1-pre044-repeat-hold-open.log, node1-pre044-repeat-full.log,
 node1-pre044-repeat-fault.log, node1-pre044-repeat-final-off.log.
+
+## Retest after reported loose connection (October 30)
+
+The user confirmed EN is tied to driver IN+ and red illuminated. During
+later held-blue testing, blue reportedly illuminated as soon as meter probes
+were placed across IC1 pins 1 and 5. During a subsequent green hold, the user
+reported 5.01 V across IN+/IN- and 1.25 V across points called G+/G-. The latter
+points were not identified as LED terminals versus MOSFET gate/source, so no
+gate-voltage or LED-voltage conclusion is recorded from that reading. The
+user then reported a loose connection appeared to be the fault and requested
+a complete retest. Exact failed joint and sustained repair are not established.
+
+The green hold was stopped and OFF acknowledged before the retest. Every
+normal indication below and final OFF received APPLIED on attempt 1. Each
+illuminated state had a ten-second observation window; flashing remained
+500 ms on/off. No 0.4.4 upload occurred.
+
+| State | Token | Result | Attempt |
+| --- | --- | --- | --- |
+| ACTIVE | 1011600292 | APPLIED / ACTIVE | 1 |
+| LAST | 4217398380 | APPLIED / LAST | 1 |
+| HOLD_OPEN | 4081888454 | APPLIED / HOLD_OPEN | 1 |
+| FULL | 505630375 | APPLIED / FULL | 1 |
+| FAULT | 1076572103 | APPLIED / FAULT | 1 |
+| OFF | 1367656471 | APPLIED / OFF | 1 |
+
+Final confirmed state is OFF, with no hold left running. Optical observations
+for this full retest are pending. The acknowledgements establish radio command
+application only; they do not prove that the loose connection is repaired.
+Logs: build/node1-connection-retest-active.log, node1-connection-retest-last.log,
+node1-connection-retest-hold-open.log, node1-connection-retest-full.log,
+node1-connection-retest-fault.log and node1-connection-retest-off.log.
