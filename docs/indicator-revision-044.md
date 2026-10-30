@@ -69,3 +69,27 @@ additional readiness/observation time; it does not establish or prove repair
 of their root cause. A physical power-cycle observation is still required
 with the LED driver powered and stable. Avoid issuing OFF or other state commands
 that cancel the pending sequence while observing startup.
+
+## Pre-update Node1 radio light test
+
+At the user's request, the controller ran the existing normal indication
+commands before Node1 was connected for its 0.4.4 upload. Each illuminated
+state had its full ten-second window, followed by a fresh OFF. These are
+normal 500 ms flashing phases, not the accelerated 250 ms boot sequence.
+
+| State | Token | Result | Attempt |
+| --- | --- | --- | --- |
+| ACTIVE | 2704632808 | APPLIED / ACTIVE | 1 |
+| LAST | 3449343149 | APPLIED / LAST | 1 |
+| HOLD_OPEN | 3722287221 | APPLIED / HOLD_OPEN | 1 |
+| FULL | 3328906513 | APPLIED / FULL | 1 |
+| FAULT | 1778992942 | APPLIED / FAULT | 1 |
+| OFF | 1249496033 | APPLIED / OFF | 1 |
+
+All six commands were acknowledged on the first attempt. Final confirmed
+state is OFF. Optical confirmation is pending user observation; an ACK does
+not establish that the requested LED die illuminated. Central reported
+0.4.2; Node1's last verified firmware remains 0.4.3. No 0.4.4 upload occurred.
+Logs: build/node1-pre044-active.log, node1-pre044-last.log,
+node1-pre044-hold-open.log, node1-pre044-full.log, node1-pre044-fault.log
+and node1-pre044-final-off.log.
