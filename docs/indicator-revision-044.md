@@ -93,3 +93,27 @@ not establish that the requested LED die illuminated. Central reported
 Logs: build/node1-pre044-active.log, node1-pre044-last.log,
 node1-pre044-hold-open.log, node1-pre044-full.log, node1-pre044-fault.log
 and node1-pre044-final-off.log.
+
+## Repeat requested after blue/green optical failure report
+
+After the preceding test, the user reported blue and green still were not
+active. That is a reported optical failure despite successful command ACKs;
+it must not be recorded as a visually passed indication test. The user asked
+for a repeat, which ran all five normal states and a fresh OFF again.
+
+| State | Repeat token | Result | Attempt |
+| --- | --- | --- | --- |
+| ACTIVE | 3779358408 | APPLIED / ACTIVE | 1 |
+| LAST | 382751713 | APPLIED / LAST | 1 |
+| HOLD_OPEN | 1595460079 | APPLIED / HOLD_OPEN | 1 |
+| FULL | 3987535791 | APPLIED / FULL | 1 |
+| FAULT | 2319914037 | APPLIED / FAULT | 1 |
+| OFF | 4033176357 | APPLIED / OFF | 1 |
+
+Each state was acknowledged on attempt 1, with ten-second windows for the
+illuminated states. Final confirmed state is OFF. The repeat's optical
+observations have not yet been supplied; do not infer a hardware fix from
+these acknowledgements. Node1 remains on 0.4.3 with no new upload.
+Logs: build/node1-pre044-repeat-active.log, node1-pre044-repeat-last.log,
+node1-pre044-repeat-hold-open.log, node1-pre044-repeat-full.log,
+node1-pre044-repeat-fault.log, node1-pre044-repeat-final-off.log.
