@@ -16,6 +16,12 @@ indications, two seconds each, 250 ms flash phases, then OFF. Normal command
 timings remain unchanged. All three nodes are uploaded, readback-verified and GPIO-tested, including
 OFF-command cancellation. Physical LED observation remains pending. Central remains compatible on 0.4.2. See [boot-test revision](docs/indicator-revision-043.md).
 
+Prepared node revision **0.4.4** adds a nonblocking ten-second dark wait after
+initialization, before the boot light sequence. First light starts roughly
+fifteen seconds after power-on plus setup time. All three node images compile
+and tests pass; they have not been flashed. State commands cancel the pending
+test. See [delayed boot-test revision](docs/indicator-revision-044.md).
+
 ## Development workspace
 
 Open `/home/dbailey1564/Development/marketsys-pen-routing` through VS Code's

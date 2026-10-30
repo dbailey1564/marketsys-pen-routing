@@ -10,32 +10,40 @@ int main() {
     // Deliberately start across millis() rollover.
     const uint32_t began = UINT32_MAX - 1000;
     test.start(began);
+    for (uint32_t elapsed : {0u, 1u, 9999u}) {
+        auto waiting = test.sample(uint32_t(began + elapsed));
+        assert(waiting.running && waiting.waiting && waiting.mode == OFF);
+        assert(test.waiting());
+    }
     for (uint32_t step = 0; step < 5; ++step) {
         for (uint32_t elapsed : {0u, 249u, 250u, 499u, 500u, 1749u, 1750u, 1999u}) {
-            auto s = test.sample(uint32_t(began + step*2000 + elapsed));
-            assert(s.running && s.mode == states[step] && s.elapsed == elapsed);
+            auto s = test.sample(uint32_t(began + BOOT_DELAY_MS + step*2000 + elapsed));
+            assert(s.running && !s.waiting && s.mode == states[step] && s.elapsed == elapsed);
             bool flashing = s.mode == HOLD_OPEN || s.mode == FAULT;
             Color expected = flashing && (elapsed/250)%2 ? DARK : steady[step];
             assert(colorFor(s.mode, s.elapsed, BOOT_PHASE_MS, BOOT_STEP_MS) == expected);
         }
     }
-    auto done = test.sample(uint32_t(began + 10000));
+    auto done = test.sample(uint32_t(began + BOOT_DELAY_MS + 10000));
     assert(!done.running && done.mode == OFF);
-    assert(!test.running() && !test.sample(uint32_t(began + 12000)).running);
+    assert(!test.running() && !test.sample(uint32_t(began + BOOT_DELAY_MS + 12000)).running);
     // Missed loop iterations cannot extend a phase or restart the sequence.
-    test.start(100); auto late = test.sample(8600);
+    test.start(100); auto late = test.sample(BOOT_DELAY_MS + 8600);
     assert(late.running && late.mode == FAULT && late.elapsed == 500);
-    assert(!test.sample(10100).running);
+    assert(!test.sample(BOOT_DELAY_MS + 10100).running);
     // A real command cancels startup for good, even before first update.
     test.start(100); test.cancel();
     assert(!test.sample(100).running && !test.sample(1000).running);
-    test.start(100); assert(test.sample(4600).mode == HOLD_OPEN);
-    test.cancel(); assert(!test.sample(5000).running && !test.sample(15000).running);
+    test.start(100); assert(test.sample(9999).waiting);
+    test.cancel();
+    assert(!test.sample(10100).running && !test.sample(20100).running);
+    test.start(100); assert(test.sample(BOOT_DELAY_MS + 4600).mode == HOLD_OPEN);
+    test.cancel(); assert(!test.sample(5000).running && !test.sample(BOOT_DELAY_MS + 15000).running);
     // Accelerated boot limits must not change normal command behavior.
     assert(colorFor(HOLD_OPEN, 250) == GREEN);
     assert(colorFor(HOLD_OPEN, 500) == DARK);
     assert(colorFor(FULL, 2000) == RED);
     assert(colorFor(FULL, 9999) == RED && colorFor(FULL, 10000) == DARK);
     assert(colorFor(FULL, 2000, BOOT_PHASE_MS, BOOT_STEP_MS) == DARK);
-    std::cout << "PASS: five boot states, 250ms phases, 2s steps, final OFF, rollover, late update, cancellation, normal timings\n";
+    std::cout << "PASS: 10s cancellable dark delay, five boot states, 250ms phases, 2s steps, final OFF, rollover, late update, cancellation, normal timings\n";
 }

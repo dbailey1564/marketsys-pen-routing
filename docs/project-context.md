@@ -235,3 +235,15 @@ LoRa checks remain pending. See indicator-revision-043.md for hashes, behavior a
 On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
 addressed OFF token 1707266160 on attempt 1 (RSSI -26 dBm, SNR 12 dB).
 This is one 0.4.2 reachability check, not all-state or three-node validation.
+
+## Prepared node revision 0.4.4 (October 30)
+
+The user approved an extra ten-second dark delay after successful node/radio
+initialization, before the unchanged ten-second light sequence. Roughly five
+seconds initial startup plus setup plus ten seconds wait precede first green.
+The delay is nonblocking and cancelled by an indicator command, as is the
+active test. Host tests and builds for Nodes1/2/3 pass. All nodes still run
+0.4.3 pending uploads; central remains 0.4.2. See indicator-revision-044.md
+for exact behavior, prepared hashes and runtime validation tools. The reported
+unreliable optical behavior/EN sensitivity remains a separate hardware issue;
+the delay is not a proven repair. No EN GPIO wiring or firmware was added.
