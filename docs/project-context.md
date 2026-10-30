@@ -236,7 +236,7 @@ On October 28, the 0.4.2 controller UART test passed and Node1 acknowledged
 addressed OFF token 1707266160 on attempt 1 (RSSI -26 dBm, SNR 12 dB).
 This is one 0.4.2 reachability check, not all-state or three-node validation.
 
-## Prepared node revision 0.4.4 (October 30)
+## Withdrawn node revision 0.4.4 (October 30)
 
 The user approved an extra ten-second dark delay after successful node/radio
 initialization, before the unchanged ten-second light sequence. Roughly five
@@ -247,3 +247,17 @@ active test. Host tests and builds for Nodes1/2/3 pass. All nodes still run
 for exact behavior, prepared hashes and runtime validation tools. The reported
 unreliable optical behavior/EN sensitivity remains a separate hardware issue;
 the delay is not a proven repair. No EN GPIO wiring or firmware was added.
+
+## Current baseline restored to 0.4.3 (October 30)
+
+The user reported repaired connections and explicitly requested rollback of
+Lin and GitHub to 0.4.3, confirming the nodes were never flashed with 0.4.4.
+The exact pre-0.4.4 node sketch, BootLightTest helper, boot-test unit tests and
+runtime verification scripts have been restored. All three node images are
+rebuilt from 0.4.3. The additional ten-second wait is removed; startup retains
+its original five-second window plus setup, followed by the ten-second light
+sequence. Quarter-second flashing and two-second steps remain unchanged.
+The controller remains 0.4.2. No hardware flashing/reset is part of this rollback.
+Later EN wiring and test observations are retained. Revision 0.4.4 is marked
+withdrawn/never flashed, not deleted from Git history. Current source and deployed
+nodes are 0.4.3; do not treat the earlier prepared-revision section as active.

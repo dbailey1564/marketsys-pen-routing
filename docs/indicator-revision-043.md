@@ -219,3 +219,39 @@ final darkness is pending. Nodes2/3 still need post-update radio tests.
 Logs: build/node1-043-visual-active.log, node1-043-visual-last.log,
 node1-043-visual-hold-open.log, node1-043-visual-full.log,
 node1-043-visual-fault.log, node1-043-visual-final-off.log.
+
+## Source rollback to 0.4.3 after repaired connections (October 30)
+
+The user reported repaired connections and requested Lin/GitHub rollback to
+0.4.3, explicitly confirming the nodes were not flashed and remain at 0.4.3.
+The node sketch, BootLightTest helper, boot-test unit test and both runtime
+verification scripts were restored exactly from the parent of the 0.4.4
+change (af84707). No additional ten-second delay remains. The original
+five-second startup window plus setup and ten-second indication sequence
+remain. Central stays on 0.4.2. No hardware was flashed or reset.
+
+Host boot-test checks (with address/undefined-behavior sanitizers), normal
+pattern/codec/CRC tests and all-50-address isolation tests passed. All three
+node images were rebuilt successfully; program/RAM usage matches 0.4.3.
+Each rebuilt application was compared with the application slice of its own
+verified 0.4.3 flash snapshot. The only differences are eight bytes within
+the automatically generated build time/date strings. RUI3 platform.txt's
+prebuild hook invokes buildtime.py to regenerate the variant version.c file.
+Every application byte outside that timestamp field is identical. The nodes'
+original deployed image hashes above remain correct; these are rebuilt images:
+
+| Target | Rebuilt 0.4.3 SHA256 |
+| --- | --- |
+| Node1 | `09bc72fec93945f11c80726f6944f6f9b76bfd0a4b80c59c5ab42aca07b62bcd` |
+| Node2 | `a75a4cad4d9ed20e3f2e36f72a17b2974826b4fbdbc2db040a70e28487bd5d1f` |
+| Node3 | `8466da5ffa9fdc1e39558cf29432b8529c3ba45538f21716d635ce83f87e4854` |
+
+Logs: build/radio-node1-043-rollback-build.log,
+radio-node2-043-rollback-build.log, radio-node3-043-rollback-build.log,
+and 043-rollback-comparison.log. The abandoned 0.4.4 proposal and later hardware
+observations are retained as historical records; 0.4.4 is marked withdrawn and
+never flashed. This rollback makes Lin/GitHub source match the installed
+firmware revision without rewriting history or discarding wiring/test records.
+The user's repaired-connection report does not itself add an optical pass
+for any earlier failed test; subsequent visual results should be recorded
+as they are supplied.

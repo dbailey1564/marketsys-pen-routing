@@ -1,4 +1,10 @@
-# Node revision 0.4.4: delayed power-on light test
+# Node revision 0.4.4: withdrawn, never flashed
+
+**Withdrawn October 30, 2026 at the user's request after repaired connections.**
+The nodes were never flashed with this revision and remain on 0.4.3. Node
+source, test tools and deployment images are restored to 0.4.3. The controller
+remains 0.4.2. The proposal and subsequent hardware-test records below are
+retained as history, not instructions to deploy a delayed startup test.
 
 Prepared October 30, 2026 after the user reported seeing only the final red
 portion when applying power and approved an additional ten-second delay.
