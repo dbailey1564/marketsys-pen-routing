@@ -506,3 +506,15 @@ Logs: build/node1-060-first-live-poll.log through node3. This establishes live
 query/response and reported state for all three addresses, not physical LED
 output, persistent-light duration or restart-restoration validation. Those
 hardware checks remain pending.
+
+## Node1 post-upload indication and persistence radio test — October 31
+
+Node1 acknowledged ACTIVE, LAST, HOLD_OPEN, FULL and FAULT in sequence. Each
+was held for two seconds after its command helper completed. A further ACTIVE
+command was followed by sixteen seconds without refreshing SET; a live read-only
+POLL then reported ACTIVE. Explicit OFF was acknowledged and another live POLL
+confirmed OFF. This verifies reported state beyond the former ten-second cutoff
+and final OFF, not physical illumination or restart restoration. User optical
+confirmation and hardware restart/restoration tests remain pending. Logs:
+build/node1-060-bench.log; machine result: build/node1-060-bench-result.json.
+The test altered no firmware or wiring and left Node1's saved desired state OFF.
