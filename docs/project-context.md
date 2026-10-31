@@ -376,3 +376,16 @@ record; it does not establish that the unreachable node displays FAULT/red.
 It does not yet decide whether other nodes may proceed, operator exclusion,
 fault clearing, durable log retention, timestamps, or the application reporting
 frame. Those remain open. No firmware change or flash accompanies this record.
+
+## Ratified two-stage replies — October 31
+
+User approved immediate controller acceptance followed by a detailed
+completion result after radio delivery attempts. Acceptance does not mean
+node-confirmed application or physical illumination. Completion should give
+an overall outcome and affected-pen delivery detail, as discussed: commanded
+state, last confirmed state, and whether the node responded. Exact status
+codes, binary serialization, event-correlation field and durable acceptance
+commit point still require design. The event identity decision is deferred
+for discussion with the application engineer. Specific rejection taxonomy
+and lost-reply retrieval were recommended in the discussion but not separately
+ratified by this yes. No firmware integration or flash accompanies this record.

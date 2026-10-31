@@ -98,3 +98,16 @@ The implemented 14-byte MS/version/type/node/state/result/token/CRC frame is
 controller-to-node LoRa transport, not the penning application's USB packet.
 It does not establish our host framing or assignment-event contract. Bench
 ATC+PEN controls also remain separate from the intended binary host interface.
+
+## Ratified two-stage replies — October 31
+
+User approved immediate controller acceptance followed by a detailed
+completion result after radio delivery attempts. Acceptance does not mean
+node-confirmed application or physical illumination. Completion should give
+an overall outcome and affected-pen delivery detail, as discussed: commanded
+state, last confirmed state, and whether the node responded. Exact status
+codes, binary serialization, event-correlation field and durable acceptance
+commit point still require design. The event identity decision is deferred
+for discussion with the application engineer. Specific rejection taxonomy
+and lost-reply retrieval were recommended in the discussion but not separately
+ratified by this yes. No firmware integration or flash accompanies this record.
