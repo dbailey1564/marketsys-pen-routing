@@ -1,47 +1,30 @@
 # MarketSys pen routing
 
-Firmware and host-interface work for a central controller and LoRa pen indicators.
-Current deployed firmware: **0.4.2** on central; **0.4.3** on Nodes1/2/3,
-with all three boot light sequences checked through runtime GPIO reports.
-All four uploads have byte-for-byte readback verification. Central supports addresses **1-50**; the
-three physical nodes have distinct addresses 1, 2 and 3. See the
-[deployment record](docs/indicator-revision-042.md) for backups, hashes and
-verification. Node1 acknowledged OFF over air on 0.4.2; addressed testing of the updated
-0.4.3 node and the other nodes remains pending. The binary host
-interface and automatic head-entry pen flow remain unimplemented; indicators
-still have a 10-second bench cutoff. This is not production firmware.
+Firmware for a central controller and addressed LoRa pen indicators.
 
-Node revision **0.4.3** adds a one-time boot light test: five current
-indications, two seconds each, 250 ms flash phases, then OFF. Normal command
-timings remain unchanged. All three nodes are uploaded, readback-verified and GPIO-tested, including
-OFF-command cancellation. Physical LED observation remains pending. Central remains compatible on 0.4.2. See [boot-test revision](docs/indicator-revision-043.md).
+Current deployed firmware: **0.6.0** on the controller and Nodes **1, 2 and 3**.
+All four uploads have matching hardware identities, exact application readback
+and preserved checked bootloader regions. Each node's full startup sequence
+was observed through UART, ending OFF with all three output GPIO LOW. These
+checks do not establish a physical optical pass.
 
-The proposed 0.4.4 startup-delay change was withdrawn on October 30 after the
-user reported repaired connections. Node source, build images and runtime
-verification tools are restored to **0.4.3**, matching all three deployed nodes.
-The boot light test starts after the existing five-second startup window and
-successful setup; there is no additional ten-second wait. The controller
-remains on compatible 0.4.2. No board was flashed during the rollback.
+The release includes six persistent indications, four live/cache polling
+controls, saved controller intent, startup-aware restoration, explicit
+new-auction clearing, bounded reboot attempts and durable node fault flags.
+The normal ten-second automatic OFF is removed. The startup light test remains
+five indications, two seconds each, with 250 ms flash phases after the initial
+five-second window plus setup. Addresses 1–50 are supported; the default
+configured prototype roster is 1–3.
 
-## Prepared release 0.5.0 (October 31)
+Application event identity, binary app input/replies and automatic head-entry
+flow integration remain deferred. This is prototype firmware. Post-upload
+LoRa polling, persistent-light, real restart/recovery and optical checks remain
+pending until the programmer returns to the controller and nodes are powered.
 
-Controller and three addressed node images are built, tested and frozen for the
-next flash session; **not yet flashed**. This adds read-only live/cache polling:
-POLL, POLL_LAST, POLL_ALL, POLL_ALL_LAST. Seven host test programs pass and all
-four RAK builds compile. The six state commands and existing bench timings
-remain unchanged. TBD app framing, event identity, replies, reset recovery and
-flow integration are excluded. See [release scope and flash plan](docs/indicator-revision-050.md)
-and [checksums/board identities](docs/firmware-release-050.json).
-
-## Recovery release 0.6.0 deployment in progress
-
-Controller **0.6.0** is uploaded and byte-for-byte readback-verified. Nodes 1–3 remain on **0.4.3** pending their individual uploads. The unflashed 0.5.0 package is superseded.
-This adds persistent indications, durable controller intent, boot-aware periodic
-restoration, new-auction clearing, bounded reboot recovery and per-node fault
-records, along with polling. Nine host test programs and all four builds pass.
-Application event input and replies remain deferred. No automatic head-entry
-flow integration is claimed. See [scope and flash plan](docs/indicator-revision-060.md)
-and [frozen image manifest](docs/firmware-release-060.json).
+See [release behavior and deployment evidence](docs/indicator-revision-060.md)
+and [image/board manifest](docs/firmware-release-060.json). Private full-flash
+backups remain outside Git; generated images are frozen on Lin under the
+ignored build/releases/0.6.0 directory.
 
 ## Development workspace
 
