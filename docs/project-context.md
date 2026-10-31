@@ -261,3 +261,13 @@ The controller remains 0.4.2. No hardware flashing/reset is part of this rollbac
 Later EN wiring and test observations are retained. Revision 0.4.4 is marked
 withdrawn/never flashed, not deleted from Git history. Current source and deployed
 nodes are 0.4.3; do not treat the earlier prepared-revision section as active.
+
+## Node1 confirmed full visual pass (October 31)
+
+The user confirmed all five commanded indications and final darkness during
+a fresh complete Node1 radio bench test. All six commands received APPLIED
+on attempt 1; final OFF token 1290912394. See indicator-revision-043.md for
+the exact record. Central remains 0.4.2; all nodes remain 0.4.3. No hold is
+running and no firmware change was made. This completes Node1's full post-
+update visual/radio check; earlier optical failures remain historical and
+Nodes2/3 validation is separate. Read-only polling remains unimplemented.

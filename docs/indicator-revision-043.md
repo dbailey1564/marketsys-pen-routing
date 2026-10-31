@@ -255,3 +255,30 @@ firmware revision without rewriting history or discarding wiring/test records.
 The user's repaired-connection report does not itself add an optical pass
 for any earlier failed test; subsequent visual results should be recorded
 as they are supplied.
+
+## Node1 full visual and radio test passed (October 31)
+
+After earlier connection repairs and intermittent-color reports, the user
+requested a fresh full bench light test and subsequently confirmed that all
+colors and flashing patterns appeared correctly. Every command received
+APPLIED with the requested state on the first transmission. Normal timings
+were used: ten-second state windows and 500 ms flashing phases. This was an
+over-air bench test, not the shorter power-on sequence.
+
+| State | Token | Result | Attempt | User visual result |
+| --- | --- | --- | --- | --- |
+| ACTIVE | 2783452520 | APPLIED / ACTIVE | 1 | Solid green passed |
+| LAST | 3306709715 | APPLIED / LAST | 1 | Solid blue passed |
+| HOLD_OPEN | 1786353486 | APPLIED / HOLD_OPEN | 1 | Flashing green passed |
+| FULL | 3018219552 | APPLIED / FULL | 1 | Solid red passed |
+| FAULT | 3870437375 | APPLIED / FAULT | 1 | Flashing red passed |
+| OFF | 1290912394 | APPLIED / OFF | 1 | Final darkness passed |
+
+Central reported FW=0.4.2; Node1's last verified installed image remains
+0.4.3. RX signal was -26 dBm RSSI with SNR 12..13 dB for this test. No firmware
+was flashed or altered. Final confirmed state is OFF, and no hold is running.
+The user's confirmation applies to this complete test, not retroactively to
+the earlier failed observations, and does not prove long-term reliability or
+that every earlier fault had the same cause. Nodes2/3 still need separate
+post-update full visual/radio checks. Read-only polling and application flow
+remain unimplemented; no status-poll capability is implied by these ACKs.
