@@ -308,3 +308,13 @@ communication-failure policy and any explicit sleep/session-close operation
 remain separate decisions. This record changes no firmware: deployed nodes
 0.4.3 and prepared 0.5.0 images still contain the ten-second cutoff and must
 be updated before claiming persistent operation.
+
+## Ratified FULL authority — October 31
+
+User decision: the penning application will set the condition for FULL.
+Do not infer FULL automatically from ordinary ACTIVE/LAST advancement or
+add an independent controller occupancy rule. This establishes authority,
+not a finalized application command frame. FULL clearing, assignment to a
+FULL pen, interaction with active/last roles, and reply semantics still
+require decisions. Polling remains requested and is prepared in 0.5.0,
+not installed. No firmware change or flash accompanies this record.
