@@ -366,3 +366,13 @@ acknowledgment/identity, startup-test handling, reset-completion criteria and
 operator exclusion remain unresolved. Preserve the separately ratified startup
 light test; after recovery the intended new-auction state must be OFF, not a
 previous-auction indication. No permanent restart loop should be inferred.
+
+## Ratified controller fault for unresolved reset node — October 31
+
+User directed the controller to log a fault on a node when the new-auction
+OFF/reboot recovery cannot confirm it. Record a per-node controller fault
+rather than claiming successful clearing or reboot. This is a controller
+record; it does not establish that the unreachable node displays FAULT/red.
+It does not yet decide whether other nodes may proceed, operator exclusion,
+fault clearing, durable log retention, timestamps, or the application reporting
+frame. Those remain open. No firmware change or flash accompanies this record.
