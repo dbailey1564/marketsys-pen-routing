@@ -179,3 +179,22 @@ preservation is not claimed. Snapshot SHA256 2a8bf0962e52b6e3b3d2e3ee33b82f66f70
 Post-upload LoRa, persistent indication and controller-restoration checks remain
 pending until the programmer returns to the controller and nodes are powered.
 Logs: build/node1-pre-060-*.log and build/node1-060-*.log.
+
+## Node2 deployed and readback-verified — October 31
+
+Node2 UID 003300265233500d20303938 matched. Fresh two-read private backup:
+proto-node2-v1/20261031T213717.342371Z, SHA256 2b6eb74973e5a480088ac6497104e1b43a7f927d36c9242ffd3706d34d92fd61.
+Reference bootloader/activation marker and frozen image/source checksums passed.
+Official RAK UART uploader installed the 176248-byte 0.6.0 image
+SHA256 921523de28a90229121b02c8cdcd67c1a4dc33628e388add16e8be456ddf2255. A subsequent UART restart observed all five boot steps
+in order and final OFF; runtime reports NODE2, READY=1, FW=0.6.0, address 2,
+LIMIT_MS=0, normal phase 500 ms, boot test complete and all three GPIO LOW.
+These are software/UART observations, not a user-confirmed optical pass.
+
+Private full readback verification: proto-node2-v1/20261031T213939.814880Z-post-addressed-upload/verification.json.
+Hardware identity, exact application bytes and preserved bootloader outside the
+reviewed update-record range pass. Settings region changed; full settings
+preservation is not claimed. Snapshot SHA256 b353c5f68cadb50332e5513531ab3bb486ce8fc0cfe82fdf100fca273404c93d.
+Post-upload LoRa, persistent indication and controller-restoration checks remain
+pending until the programmer returns to the controller and nodes are powered.
+Logs: build/node2-pre-060-*.log and build/node2-060-*.log.
