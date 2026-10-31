@@ -322,3 +322,24 @@ controller power-cut test, interrupted-clear test or failed-node reboot test.
 Logs: build/auction-060-seed.log, auction-060-clear.log,
 auction-060-controller-restart.log and auction-060-after-restart.log.
 All nodes remain intended/confirmed OFF. No firmware or wiring changed.
+
+## Missing Node3 new-auction recovery and durable fault — October 31
+
+User intentionally switched Node3 off. New-auction clear durably advanced to
+local auction generation 2. Nodes1/2 confirmed OFF; Node3 exhausted bounded
+OFF delivery, the bounded remote reboot request had no acknowledgment, and
+post-wait live query remained unanswered. Controller emitted Node3 UNCONFIRMED
+and a per-node fault, with one fault in the completed sweep. The host helper's
+nonzero exit is the intended report of an incomplete confirmed clear, not a
+claim that Node3 rebooted or turned OFF. The powered-off node cannot receive
+the reboot; this tests the negative/unreachable branch, not successful remote
+reboot execution.
+
+Fault query showed only Node3 faulted, desired OFF for all three. A controller
+software restart then retained AUCTION=2 and the Node3 fault; Nodes1/2 still had
+no faults. This verifies retained fault across reset, not a physical controller
+power-cut test. Node3 remains physically off until the user restores its power.
+Logs: build/auction-060-missing-node3.log, auction-060-missing-node3-faults.log,
+auction-060-fault-restart.log and auction-060-fault-after-restart.log. No firmware
+or wiring changed. Fault remains latched pending a later explicit new-auction
+clear; communication recovery alone must not be represented as fault clearing.
