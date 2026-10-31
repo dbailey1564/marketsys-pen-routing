@@ -555,3 +555,20 @@ establish controller/node restart restoration, new-auction recovery/reboot,
 missing-node fault handling, cached/all-node polling or physical power-loss
 acceptance. Those hardware tests remain separate and pending. No firmware or
 wiring changed for this confirmation.
+
+## Node1 power-cycle restoration confirmed — October 31
+
+Node1 was commanded ACTIVE and live-polled ACTIVE while the controller saved
+that intent. The user was asked to power-cycle only Node1 with the controller
+remaining powered, then confirmed return to green. A subsequent read-only live
+POLL reported ACTIVE on attempt 1. This establishes the observed Node1 return
+to saved green after the manual restart; the user's reply did not separately
+confirm every startup-test step during that cycle. No standalone remote reboot
+was commanded. Controller remote reboot support is currently invoked only by
+new-auction failed-OFF recovery.
+
+Cleanup explicitly commanded OFF and a fresh live POLL confirmed OFF on attempt
+1; the controller's active role returned to zero. Logs: node1-060-recovery-before,
+node1-060-recovery-after and node1-060-recovery-cleanup under ignored build/.
+Controller power-loss retention and new-auction failure/reboot/fault handling
+still need hardware acceptance tests. No firmware or wiring changed.
