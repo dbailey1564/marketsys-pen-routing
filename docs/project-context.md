@@ -621,3 +621,18 @@ Logs: build/auction-060-missing-node3.log, auction-060-missing-node3-faults.log,
 auction-060-fault-restart.log and auction-060-fault-after-restart.log. No firmware
 or wiring changed. Fault remains latched pending a later explicit new-auction
 clear; communication recovery alone must not be represented as fault clearing.
+
+## Node3 return and explicit new-auction fault cleanup — October 31
+
+After the user restored Node3 power and confirmed startup finished, live POLL
+reported Node3 OFF. Its controller fault remained latched at 1 despite recovered
+communication; Nodes1/2 remained fault-free. A subsequent explicit new-auction
+clear advanced local generation to 3 and confirmed all three configured nodes
+OFF with zero faults. Fault query then showed desired OFF and no fault on all
+three nodes. This completes the intentionally offline-node test and cleanup.
+No successful remote reboot was observed: Node3 was physically powered off
+during reboot attempts. A physical controller power-loss test and interrupted
+clear remain separate unperformed tests. Logs: build/auction-060-node3-return.log,
+auction-060-final-clear.log and auction-060-final-faults.log. No firmware or
+wiring changed. Final state: all configured nodes confirmed OFF, no controller
+faults, ACTIVE/LAST empty, auction generation 3.
