@@ -1,10 +1,24 @@
 # Indicator bench wiring and resistor stage
 
+## Confirmed red-channel change (October 31)
+
+During Node2's red-channel troubleshooting, the user moved red to IC2's
+formerly unused FET and reported the test good, then confirmed the new pin
+mapping: gate IC2 P3, source IC2 P2, drain IC2 P4. PB4 still drives red through
+1 kohm; its 10 kohm gate-to-source resistor belongs across IC2 P3-P2. IC1's
+former red FET (P3/P2/P4) is removed from the red path. The original FET or its
+solder/adapter connections remain suspect; the exact failed component/joint
+has not been isolated. This swap does not require a firmware pin change.
+The updated PNG shows this replacement wiring and EN tied to IN+.
+This change is confirmed for Node2's assembly; do not assume Node1 or Node3
+has been physically rewired the same way.
+
+
 ## Current EN connection reported October 30
 
 The user confirmed EN is tied to driver IN+ on the soldered assembly. Earlier
-manual-test notes and the October 26 PNG show the prior unconnected-EN setup;
-that EN detail is historical. No GPIO is connected to EN and no enable GPIO
+manual-test notes and the original October 26 PNG showed the prior unconnected-
+EN setup; the PNG has now been updated to the tied-high configuration. No GPIO is connected to EN and no enable GPIO
 firmware has been added. Red illuminated; blue/green have been intermittent,
 with a suspected loose connection and retesting recorded in indicator-revision-044.md.
 
@@ -26,9 +40,9 @@ The manufacturer's page 1 was rendered and visually inspected to confirm it.
 | Device | Package | Gate | Source | Drain | Color |
 | --- | --- | --- | --- | --- | --- |
 | Q1 | IC1 | P1 | P5 | P6 | Blue |
-| Q2 | IC1 | P3 | P2 | P4 | Red |
+| Q2 | IC1 | P3 | P2 | P4 | Removed from red path; suspect FET or joint |
 | Q3 | IC2 | P1 | P5 | P6 | Green |
-| Q4 | IC2 | P3 | P2 | P4 | Unused |
+| Q4 | IC2 | P3 | P2 | P4 | Red (replacement path) |
 
 [onsemi FDC6401N datasheet](https://www.onsemi.com/download/data-sheet/pdf/fdc6401n-d.pdf).
 Adapter numbering must match installed chip orientation; square pad convention
@@ -46,7 +60,7 @@ Driver IN- and RAK ground are the supply common ground.
 
 With both rails off, remove manual gate-to-source shorting jumpers and all
 manual 3.3 V gate links. Install three 10 kohm gate-to-source resistors:
-IC1 P1-P5, IC1 P3-P2, IC2 P1-P5. A 10 kohm resistor replaces each short;
+IC1 P1-P5 (blue), IC2 P3-P2 (red), IC2 P1-P5 (green). A 10 kohm resistor replaces each short;
 do not leave the short in parallel. With GPIO disconnected, repeat all-OFF.
 The subsequent hookup, firmware upload and tests are recorded in
 node1-indicator-test.md; the installation instructions here are retained.
@@ -60,7 +74,7 @@ installed RUI3 4.2.4 variant.h on Lin, and subsequent physical color tests):
 | Color | RAK physical connection | SDK name | Through 1 kohm to |
 | --- | --- | --- | --- |
 | Blue | J8 pin 2 | PB3 | IC1 P1 |
-| Red | J8 pin 3 | PB4 | IC1 P3 |
+| Red | J8 pin 3 | PB4 | IC2 P3 |
 | Green | J8 pin 4 | PB5 | IC2 P1 |
 
 [RAK3272-SiP pinout](https://docs.rakwireless.com/product-categories/wisduo/rak3272-sip-breakout-board/datasheet/).

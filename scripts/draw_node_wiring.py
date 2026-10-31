@@ -32,10 +32,10 @@ def jump_return(y):
 
 # Header
 box((0,0,W,208),'#18364b','#18364b',0)
-txt(130,55,'MarketSys | Complete Node Wiring',82,True,'white')
+txt(130,55,'MarketSys | Node Wiring - Replacement Red FET',66,True,'white')
 txt(135,148,'RAK3272-SiP / RAK3172-SiP  +  LD1500SB  +  FDC6401N  +  one RGB LED',40,False,'#d7e8f3')
 txt(130,248,'BENCH OPERATING CONNECTIONS',40,True)
-txt(3670,248,'Revision 0.4.2  |  October 26, 2026',34,False,MUTED,'ra')
+txt(3670,248,'Revision 0.4.2  |  October 31, 2026',34,False,MUTED,'ra')
 
 # Power and driver
 box((170,315,1000,720),'#eef6f8')
@@ -54,8 +54,10 @@ txt(1530,420,'IN+  (green lead)',35,False,INK,'lm')
 txt(1530,540,'IN-  (red lead)',35,False,INK,'lm')
 txt(2370,420,'L+  (yellow)',35,True,GOLD,'rm')
 txt(2370,540,'L-  (orange)',35,True,ORANGE,'rm')
-wire([(1700,620),(1700,675)],'#8a5d39',6);terminal(1700,675,'#8a5d39')
-txt(1750,675,'EN (brown): UNCONNECTED',34,True,'#8a5d39','lm')
+wire([(1700,620),(1700,675),(1450,675),(1450,558)],'#8a5d39',6)
+d.arc((1432,522,1468,558),90,270,fill='#8a5d39',width=6)
+wire([(1450,522),(1450,420),(1500,420)],'#8a5d39',6);dot(1450,420,RED)
+txt(1750,675,'EN (brown): JUMPER TO IN+',34,True,'#8a5d39','lm')
 wire([(2400,420),(3400,420),(3400,1750)],GOLD)
 wire([(3550,540),(3550,2020)],ORANGE);jump_return(540)
 txt(3400,355,'L+',39,True,GOLD,'ma');txt(3550,475,'L-',39,True,ORANGE,'ma')
@@ -73,7 +75,7 @@ txt(270,1700,'Address: build as node 1-50',32,False,MUTED)
 txt(2890,710,'ONE RGB LED',41,True,INK,'ma')
 txt(2890,760,'Three dies shown separately below',31,False,MUTED,'ma')
 
-channels=[('BLUE','PB3','J8 position 2','IC1 / Q1','P1','P6','P5',BLUE,0),('RED','PB4','J8 position 3','IC1 / Q2','P3','P4','P2',RED,450),('GREEN','PB5','J8 position 4','IC2 / Q3','P1','P6','P5',GREEN,900)]
+channels=[('BLUE','PB3','J8 position 2','IC1 / Q1','P1','P6','P5',BLUE,0),('RED','PB4','J8 position 3','IC2 / Q4','P3','P4','P2',RED,450),('GREEN','PB5','J8 position 4','IC2 / Q3','P1','P6','P5',GREEN,900)]
 for name,pb,header,ic,g,dr,src,c,dy in channels:
  gy=1000+dy;ly=850+dy;sy=1120+dy
  # Gate trace and its series resistor
@@ -113,10 +115,10 @@ txt(1430,2175,'L- is a separate driver return: do not jumper it to supply GND.',
 box((130,2280,1850,2790),'#f5f8fb')
 txt(175,2315,'FDC6401N CONNECTION CHECK',40,True)
 txt(175,2378,'Channel',33,True);txt(600,2378,'Gate',33,True);txt(920,2378,'Source',33,True);txt(1260,2378,'Drain',33,True)
-for yy,values,c in [(2440,('Blue / IC1','P1','P5','P6'),BLUE),(2505,('Red / IC1','P3','P2','P4'),RED),(2570,('Green / IC2','P1','P5','P6'),GREEN)]:
+for yy,values,c in [(2440,('Blue / IC1','P1','P5','P6'),BLUE),(2505,('Red / IC2','P3','P2','P4'),RED),(2570,('Green / IC2','P1','P5','P6'),GREEN)]:
  for xx,v in zip([175,600,920,1260],values):txt(xx,yy,v,36,True,c)
-txt(175,2640,'IC2 unused Q4: gate P3, source P2, drain P4.',33)
-txt(175,2700,'No LED connection on Q4. Use actual package pin numbers;',31,False,MUTED)
+txt(175,2640,'IC1 Q2: removed from red path; FET/joints suspect.',33)
+txt(175,2700,'Red uses IC2 Q4. Use actual package pin numbers;',31,False,MUTED)
 txt(175,2740,'do not infer orientation from the adapter square pad.',31,False,MUTED)
 box((1910,2280,3670,2790),'#f5f8fb')
 txt(1955,2315,'PROGRAMMING ONLY | RAKDAP1',40,True)
@@ -128,7 +130,7 @@ txt(1955,2700,'the node. Never connect two 3.3 V supply outputs together.',31)
 txt(1955,2750,'DAPLink 5 V and nRST are unused in this bench hookup.',31,False,MUTED)
 
 # Footer
-txt(130,2840,'Wire colors identify signals in this drawing; driver lead colors are written beside its terminals.',32,False,MUTED)
-txt(130,2890,'Source: verified indicator-bench-wiring.md and hardware-identification.md | GPIO and pin map unchanged in firmware 0.4.2.',29,False,MUTED)
+txt(130,2840,'Confirmed replacement assembly (Node2). Other nodes may retain original red wiring. Bridges are crossings, not connections.',32,False,MUTED)
+txt(130,2890,'Source: indicator-bench-wiring.md and hardware-identification.md | PB3/PB4/PB5 assignments unchanged; no firmware change required.',29,False,MUTED)
 im.save(OUT,dpi=(300,300),optimize=True)
 print(OUT, im.size)

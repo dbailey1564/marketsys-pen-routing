@@ -271,3 +271,16 @@ the exact record. Central remains 0.4.2; all nodes remain 0.4.3. No hold is
 running and no firmware change was made. This completes Node1's full post-
 update visual/radio check; earlier optical failures remain historical and
 Nodes2/3 validation is separate. Read-only polling remains unimplemented.
+
+## Node2 red-channel FET replacement (October 31)
+
+The user reported a successful test after moving red to IC2's formerly unused
+FET and confirmed G=IC2 P3, S=IC2 P2, D=IC2 P4. Red remains controlled by PB4
+through 1 kohm; its 10 kohm pull-down is gate-to-source at the new FET. IC1's
+old red FET/joints remain suspect, not conclusively diagnosed. The diagram and
+wiring table are updated for the replacement assembly; this does not imply
+other nodes were rewired. EN is tied to IN+ per the earlier user confirmation.
+No firmware change or flash was made. Node2 red hold was stopped; its shutdown
+OFF and a retry were unacknowledged, so no fresh radio OFF confirmation is
+claimed. The user subsequently reported the replacement test good, without
+specifying a new radio transaction or complete five-state visual pass.
