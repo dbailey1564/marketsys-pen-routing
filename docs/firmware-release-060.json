@@ -45,7 +45,7 @@
     "libraries/MarketSysBench/src/BootLightTest.h": "45d55973eda9656777385dfbae75310fc087e4eb5fa5ec0709b40f7e31c194a3",
     "libraries/MarketSysBench/src/RoutingStore.h": "63cc7f6725f5e1a040fc6357793989dfdb2a2a012ea677015901bc74b3a7096f"
   },
-  "hardware_validation": "All uploads/readbacks and three-node indication/persistence/visual checks pass; Node1/2 manual green restoration, successful new-auction clear, clear/fault retention across controller software restart, unreachable Node3 bounded reboot/fault path, repower and explicit fault cleanup pass. Final all nodes OFF and faults clear. Successful remote reboot execution, physical controller power-cut and interrupted-clear tests remain unperformed.",
+  "hardware_validation": "Prior upload/indicator/persistence/manual restoration/new-auction/unreachable-node tests pass. Node3 successful remote REBOOT via vendor bench injection now verified by matched ACK, BOOTING, ready OFF and user-observed startup; final all nodes desired OFF and faults clear. Automatic successful-reboot escalation end-to-end, physical controller power-cut and interrupted-clear tests remain unperformed.",
   "verified_targets": [
     "controller",
     "node1",

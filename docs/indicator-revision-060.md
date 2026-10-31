@@ -358,3 +358,28 @@ clear remain separate unperformed tests. Logs: build/auction-060-node3-return.lo
 auction-060-final-clear.log and auction-060-final-faults.log. No firmware or
 wiring changed. Final state: all configured nodes confirmed OFF, no controller
 faults, ACTIVE/LAST empty, auction generation 3.
+
+## Successful remote Node3 reboot verified — October 31
+
+User requested a reboot test. Inspection of the installed RUI3 At_P2pSend
+implementation established that its existing AT+PSEND can transmit a valid
+MarketSys REBOOT frame without new firmware. An isolated bench helper waited
+for an idle controller reconciliation boundary, verified Node3 ready/OFF, and
+sent exactly one CRC-checked addressed REBOOT frame with a fresh token. It
+matched the REBOOT_ACK by node/token/CRC, then observed Node3 STATUS BOOTING
+and subsequent ready/OFF via the normal controller queries. User confirmed
+the startup light test completed. Final live POLL confirmed OFF, and controller
+fault query showed no faults and desired OFF on all three nodes.
+
+This verifies successful on-device remote reboot execution and post-boot
+readiness. It used the installed vendor raw-send interface as a bench injection;
+there is still no dedicated MarketSys standalone reboot AT command. Earlier
+statements that the firmware cannot remotely reboot at all were too broad:
+the node handler exists and is now hardware-tested. No firmware was changed
+or reflashed. This test did not force the automatic failed-OFF trigger or
+exercise the coordinator's successful-reboot transaction end to end.
+
+Logs: build/node3-060-remote-reboot.log and node3-060-remote-reboot-final.log;
+structured result: build/node3-060-remote-reboot-result.json. All nodes remain
+intended OFF with no controller faults. Physical controller power-cut and
+interrupted-clear acceptance remain separate unperformed tests.
