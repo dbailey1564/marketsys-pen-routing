@@ -33,6 +33,16 @@ remain unchanged. TBD app framing, event identity, replies, reset recovery and
 flow integration are excluded. See [release scope and flash plan](docs/indicator-revision-050.md)
 and [checksums/board identities](docs/firmware-release-050.json).
 
+## Next upload: prepared 0.6.0
+
+The unflashed 0.5.0 package is superseded by **0.6.0** for the requested upload.
+This adds persistent indications, durable controller intent, boot-aware periodic
+restoration, new-auction clearing, bounded reboot recovery and per-node fault
+records, along with polling. Nine host test programs and all four builds pass.
+Application event input and replies remain deferred. No automatic head-entry
+flow integration is claimed. See [scope and flash plan](docs/indicator-revision-060.md)
+and [frozen image manifest](docs/firmware-release-060.json).
+
 ## Development workspace
 
 Open `/home/dbailey1564/Development/marketsys-pen-routing` through VS Code's

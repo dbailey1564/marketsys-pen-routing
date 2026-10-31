@@ -10,7 +10,7 @@ static void answer(uint8_t state) {
  benchRadio::inject({bench::STATUS,f.node,state,bench::APPLIED,f.token});loop();
 }
 int main(){
- setup(); assert(ready && api.system.atMode.handlers.size()==6);
+ setup(); maintenanceEnabled=false; assert(ready && api.system.atMode.handlers.size()==9);
  assert(call("POLL_LAST",{"1"})==AT_OK);
  assert(Serial.out.find("CONFIRMED=UNKNOWN;KNOWN=0")!=std::string::npos);
  assert(call("POLL",{"0","1"})==AT_PARAM_ERROR);
@@ -23,7 +23,7 @@ int main(){
  benchRadio::inject({bench::STATUS,2,bench::ACTIVE,bench::APPLIED,78});loop();assert(pending);
  benchRadio::inject({bench::STATUS,2,bench::FULL,bench::APPLIED,77});loop();
  assert(!pending && confirmations.get(2).state==bench::FULL);
- assert(!commanded.get(2).known);
+ assert(commanded.get(2).known && commanded.get(2).state==bench::OFF);
  auto count=benchRadio::outgoing.size();
  assert(call("POLL_LAST",{"2"})==AT_OK);assert(call("POLL_ALL_LAST",{"?"})==AT_OK);
  assert(benchRadio::outgoing.size()==count);

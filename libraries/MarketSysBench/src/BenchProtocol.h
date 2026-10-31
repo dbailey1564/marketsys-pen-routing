@@ -6,8 +6,8 @@ namespace bench {
 // 0x03 was STANDBY and is retired. Never renumber the surviving states.
 enum State { OFF = 0, ACTIVE = 1, LAST = 2, HOLD_OPEN = 4, FULL = 5, FAULT = 6 };
 inline bool validState(uint8_t state) { return state <= FAULT && state != 3; }
-enum Type { SET = 1, ACK = 2, QUERY = 3, STATUS = 4 };
-enum Result { APPLIED, DUPLICATE, EXPIRED, CONFLICT };
+enum Type { SET = 1, ACK = 2, QUERY = 3, STATUS = 4, REBOOT = 5, REBOOT_ACK = 6 };
+enum Result { APPLIED, DUPLICATE, EXPIRED, CONFLICT, BOOTING };
 static const size_t SIZE = 14;
 struct Frame { uint8_t type, node, state, result; uint32_t token; };
 inline const char *name(uint8_t state) {
@@ -37,9 +37,10 @@ inline void encode(const Frame &f, uint8_t *data) {
 }
 inline bool decode(const uint8_t *data, size_t length, Frame &f) {
     if (length != SIZE || data[0] != 'M' || data[1] != 'S' || data[2] != 1 ||
-        (data[3] != SET && data[3] != ACK && data[3] != QUERY && data[3] != STATUS) || data[4] == 0 || !validState(data[5]) ||
-        data[6] > CONFLICT || data[7] != 0 || ((data[3] == SET || data[3] == QUERY || data[3] == STATUS) && data[6] != APPLIED) ||
-        (data[3] == QUERY && data[5] != OFF) ||
+        (data[3] != SET && data[3] != ACK && data[3] != QUERY && data[3] != STATUS && data[3] != REBOOT && data[3] != REBOOT_ACK) || data[4] == 0 || !validState(data[5]) ||
+        data[6] > BOOTING || (data[3] == ACK && data[6] > CONFLICT) || data[7] != 0 || ((data[3] == SET || data[3] == QUERY || data[3] == REBOOT || data[3] == REBOOT_ACK) && data[6] != APPLIED) ||
+        ((data[3] == QUERY || data[3] == REBOOT || data[3] == REBOOT_ACK) && data[5] != OFF) ||
+        (data[3] == STATUS && data[6] != APPLIED && data[6] != BOOTING) ||
         crc(data, 12) != uint16_t(data[12] | uint16_t(data[13]) << 8)) return false;
     f.type = data[3]; f.node = data[4]; f.state = data[5]; f.result = data[6];
     f.token = 0;

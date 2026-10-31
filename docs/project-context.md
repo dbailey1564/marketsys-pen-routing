@@ -399,3 +399,20 @@ Acceptance is still distinct from completed radio delivery. Exact storage
 mechanism, atomicity/recovery implementation and encoded storage-error reply
 remain to be designed. Event identity remains deferred to the application
 engineer. No firmware implementation or flash accompanies this record.
+
+## Prepared recovery release 0.6.0 — October 31
+
+User authorized removal of the ten-second cutoff, deferred application replies
+and asked to commit the remaining agreed recovery changes for upload. Controller
+and Node1/2/3 images are now built and frozen. Implemented: persistent node
+indications, complete startup test, BOOTING-aware polling, saved controller
+state intent/role fields, periodic reconciliation, durable new-auction OFF
+intent, bounded failed-OFF reboot recovery and persistent controller fault
+latches. Nine strict host test programs pass; all four pinned RAK builds pass.
+No wiring graphic changes. Application event input/identity, binary integration,
+automatic head-entry advancement and application replies remain deferred; no
+placeholder business command or application event field was invented. Exact
+implementation/limits: [indicator-revision-060.md](indicator-revision-060.md).
+Image/UID/source manifest: [firmware-release-060.json](firmware-release-060.json).
+At this preparation milestone no 0.6.0 board has been flashed; deployed baseline
+is still controller 0.4.2 and nodes 0.4.3.

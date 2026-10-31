@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdarg>
 #include <map>
+#include <cstring>
 static uint32_t fakeNow = 0;
 inline uint32_t millis() { return fakeNow; }
 inline void delay(uint32_t ms) { fakeNow += ms; }
@@ -26,4 +27,17 @@ struct AtMock {
  std::map<std::string,int(*)(int,char*,stParam*)> handlers;
  bool add(char*n,char*,char*,int(*f)(int,char*,stParam*),int){handlers[n]=f;return true;}
 };
-struct { struct {SetMock lpm,firmwareVersion; AtMock atMode;} system;} api;
+struct FlashMock {
+ uint8_t bytes[4096];bool fail=false,tear=false,readFail=false;int writes=0;
+ FlashMock(){memset(bytes,255,sizeof bytes);}
+ bool get(uint32_t offset,uint8_t*b,uint32_t n){if(readFail||offset+n>sizeof bytes)return false;memcpy(b,bytes+offset,n);return true;}
+ bool set(uint32_t offset,uint8_t*b,uint32_t n){
+  ++writes;if(fail||offset+n>sizeof bytes)return false;
+  memset(bytes+(offset/2048)*2048,255,2048);
+  if(tear){memcpy(bytes+offset,b,n/2);return false;}
+  memcpy(bytes+offset,b,n);return true;
+ }
+};
+struct { struct {SetMock lpm,firmwareVersion; AtMock atMode;FlashMock flash;int rebootCount=0;
+ void reboot(){++rebootCount;}
+ } system;} api;

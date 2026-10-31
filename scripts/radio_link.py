@@ -8,7 +8,7 @@ import serial
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action', choices=['node-status', 'central-status', 'off', 'active',
-    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last'])
+    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last', 'auction-clear', 'faults', 'roster'])
 parser.add_argument('--node', type=int, choices=range(1, 51), default=1, metavar='1..50')
 parser.add_argument('--token', type=int, help='Explicit transaction token for duplicate tests')
 args = parser.parse_args()
@@ -23,14 +23,27 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
             data.extend(port.read(port.in_waiting or 1))
         return data.decode('ascii', errors='replace')
     def command(text):
-        print('TX:', text, flush=True)
-        port.write((text+'\r\n').encode('ascii'))
-        port.flush()
-        response = read_for(0.5)
-        print(response.strip(), flush=True)
-        if 'OK' not in [line.strip() for line in response.splitlines()]:
+        deadline = time.monotonic() + 90
+        while True:
+            print('TX:', text, flush=True)
+            port.write((text+'\r\n').encode('ascii'))
+            port.flush()
+            response = ''
+            until = time.monotonic() + 2
+            while time.monotonic() < until:
+                response += read_for(0.1)
+                lines = [line.strip() for line in response.splitlines()]
+                if 'OK' in lines or any(line.startswith('AT_') and 'ERROR' in line for line in lines):
+                    break
+            print(response.strip(), flush=True)
+            lines = [line.strip() for line in response.splitlines()]
+            if 'OK' in lines:
+                return response
+            # Recovery occupies the one radio transaction. Wait for it to yield.
+            if 'AT_ERROR' in lines and time.monotonic() < deadline:
+                time.sleep(0.4)
+                continue
             raise RuntimeError('Command failed: '+text)
-        return response
     port.write(b'\r\n')
     read_for(0.2)
     command('AT')
@@ -39,7 +52,26 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
     role = f'NODE{args.node}' if node else 'CENTRAL'
     if 'MS_RADIO='+role+';READY=1;FREQ=915000000;' not in response:
         raise RuntimeError('Wrong firmware role or radio initialization failed')
-    if args.action == 'poll_last':
+    if args.action == 'faults':
+        command('ATC+FAULTS=?')
+    elif args.action == 'roster':
+        command('ATC+ROSTER=?')
+    elif args.action == 'auction-clear':
+        result = command('ATC+AUCTION=CLEAR')
+        terminal = re.compile(r'MS_RECONCILE_DONE=NEW_AUCTION;FAULTS=(\d+);')
+        end = time.monotonic() + 3600
+        while not terminal.search(result) and time.monotonic() < end:
+            more = read_for(0.2)
+            if more:
+                print(more.strip(), flush=True)
+                result += more
+        match = terminal.search(result)
+        if not match:
+            raise RuntimeError('New-auction clearing is not confirmed complete')
+        if int(match[1]):
+            raise RuntimeError(f'New auction saved, but {match[1]} nodes remain unconfirmed; inspect controller faults')
+        print('PASS: new-auction OFF confirmed for configured nodes', flush=True)
+    elif args.action == 'poll_last':
         command(f'ATC+POLL_LAST={args.node}')
     elif args.action == 'poll_all_last':
         result = command('ATC+POLL_ALL_LAST=?')
@@ -58,7 +90,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         all_nodes = args.action == 'poll_all'
         result = command(f'ATC+POLL_ALL={token}' if all_nodes else f'ATC+POLL={token}:{args.node}')
         terminal = re.compile(r'MS_POLL_ALL=DONE;OK=(\d+);FAILED=(\d+);COUNT=50' if all_nodes else
-            r'MS_POLL_NODE='+str(args.node)+r';TOKEN='+str(token)+r';RESULT=(OK|TIMEOUT);')
+            r'MS_POLL_NODE='+str(args.node)+r';TOKEN='+str(token)+r';RESULT=(OK|TIMEOUT|BOOTING);')
         end = time.monotonic() + (480 if all_nodes else 10)
         while not terminal.search(result) and time.monotonic() < end:
             more = read_for(0.2)

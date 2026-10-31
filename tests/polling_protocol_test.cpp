@@ -14,5 +14,16 @@ int main(){
   q.state=bench::ACTIVE;bench::encode(q,wire);assert(!bench::decode(wire,sizeof wire,r));
   q.state=bench::OFF;q.result=bench::EXPIRED;bench::encode(q,wire);assert(!bench::decode(wire,sizeof wire,r));
  }
+ bench::Frame q={bench::QUERY,2,bench::OFF,bench::APPLIED,33},d;
+ uint8_t wire[bench::SIZE];
+ bench::Frame boot={bench::STATUS,2,bench::ACTIVE,bench::BOOTING,33};
+ bench::encode(boot,wire);assert(bench::decode(wire,sizeof wire,d) && bench::matchesStatus(d,q));
+ bench::Frame reboot={bench::REBOOT,2,bench::OFF,bench::APPLIED,34};
+ bench::Frame ack={bench::REBOOT_ACK,2,bench::OFF,bench::APPLIED,34};
+ bench::encode(reboot,wire);assert(bench::decode(wire,sizeof wire,d) && bench::forNode(d,2));
+ bench::encode(ack,wire);assert(bench::decode(wire,sizeof wire,d) && bench::matchesReboot(d,reboot));
+ assert(!bench::matchesAck(d,reboot) && !bench::matchesStatus(d,q));
+ ack.state=bench::ACTIVE;bench::encode(ack,wire);assert(!bench::decode(wire,sizeof wire,d));
+ boot.type=bench::ACK;bench::encode(boot,wire);assert(!bench::decode(wire,sizeof wire,d));
  std::cout<<"PASS: QUERY/STATUS codec, address isolation, every current state, invalid query fields\n";
 }

@@ -1,0 +1,49 @@
+{
+  "version": "0.6.0",
+  "status": "prepared_not_flashed",
+  "images": [
+    {
+      "target": "controller",
+      "expected_uid": "0027001c4b33501220333734",
+      "file": "build/releases/0.6.0/controller-0.6.0.bin",
+      "size_bytes": 181312,
+      "sha256": "dd8210f5df4bbd341ec2dd913be577cdb0ee644b965ea9f5b3185dfb46d5b310",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node1",
+      "expected_uid": "003300455233500d20303938",
+      "file": "build/releases/0.6.0/node1-0.6.0.bin",
+      "size_bytes": 176256,
+      "sha256": "a71795bf57fa44348beeb3a884111168cb4b386962f7c2863ed7fabc95ddf1af",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node2",
+      "expected_uid": "003300265233500d20303938",
+      "file": "build/releases/0.6.0/node2-0.6.0.bin",
+      "size_bytes": 176248,
+      "sha256": "921523de28a90229121b02c8cdcd67c1a4dc33628e388add16e8be456ddf2255",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node3",
+      "expected_uid": "003400345233500d20303938",
+      "file": "build/releases/0.6.0/node3-0.6.0.bin",
+      "size_bytes": 176256,
+      "sha256": "2e26a13fde9660464c3b31ee6f2978b086d802bcbd1e3c0486cb5b2fe082e79d",
+      "application_address": "0x08006000"
+    }
+  ],
+  "source_sha256": {
+    "firmware/radio_central/radio_central.ino": "22d3d06650ed111e263d7c82fe5dbb33d778110b4ea923e145be4508c4c36671",
+    "firmware/radio_node/radio_node.ino": "ddeb7dbca564e4348a23a4f933c22ee5b31a8fcde0d0761f7f289cbd0045c701",
+    "libraries/MarketSysBench/src/BenchAddress.h": "2850439da4c5449be227041d6031a6af57931d782772f79865b7e75cd701a528",
+    "libraries/MarketSysBench/src/BenchPattern.h": "d906ca4e1b1c362b8d8278d377b6eb309e6a099e15edb842703ef2243ebfceaf",
+    "libraries/MarketSysBench/src/BenchProtocol.h": "99ae2b7e9ff91d436da54fe7c764ea9b6cf5f211b41c58ae36c8e24d1db25903",
+    "libraries/MarketSysBench/src/BenchRadio.h": "53b84a2777358b4bf8f5a805cc817972374972640ce84754b83fcfefa5546927",
+    "libraries/MarketSysBench/src/BootLightTest.h": "45d55973eda9656777385dfbae75310fc087e4eb5fa5ec0709b40f7e31c194a3",
+    "libraries/MarketSysBench/src/RoutingStore.h": "63cc7f6725f5e1a040fc6357793989dfdb2a2a012ea677015901bc74b3a7096f"
+  },
+  "hardware_validation": "Pending backup, upload, full readback, UART, LoRa and visual checks"
+}
