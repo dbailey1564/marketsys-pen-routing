@@ -346,3 +346,23 @@ Fifteen seconds is the nominal sequence duration, not a new exact wall-clock
 deadline independent of radio/setup time. The readiness/restoration handshake
 and exceptional OFF/other commands during startup remain implementation or
 policy details to settle. No firmware change or flash accompanies this record.
+
+## New-auction clear and failed-OFF reboot requirement — October 31
+
+User requested an explicit operation to clear all states and records at the
+beginning of a new auction. This is distinct from ordinary reconnect/restart
+recovery, which preserves routing. User explicitly confirmed that the
+controller should attempt to reboot a node that fails to acknowledge OFF
+during this new-auction operation. Remote reboot is now requested behavior,
+not an implemented command. No node was rebooted or flashed in this exchange.
+
+Proposed reset scope discussed: all configured indicators OFF, clear active/last
+roles, FULL/FAULT intent and pending routing, and durably store the clean state.
+Preserving node configuration and a boundary rejecting prior-auction messages
+was recommended; exact record scope and old-event handling still require design.
+An unanswered OFF does not prove it was unapplied; an unanswered reboot does not
+prove reboot. An unreachable node may receive neither. Retry limits, reboot
+acknowledgment/identity, startup-test handling, reset-completion criteria and
+operator exclusion remain unresolved. Preserve the separately ratified startup
+light test; after recovery the intended new-auction state must be OFF, not a
+previous-auction indication. No permanent restart loop should be inferred.
