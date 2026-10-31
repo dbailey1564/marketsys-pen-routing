@@ -266,3 +266,14 @@ Explicit OFF and a live POLL confirmed final OFF. Node3 visual confirmation
 is pending. Logs: build/node3-060-bench.log and node3-060-bench-result.json.
 No restart-restoration test is established by these runs. All three nodes
 have saved desired OFF after their tests. No firmware or wiring changed.
+
+## All three post-upload visual passes confirmed — October 31
+
+User confirmed Node3 visual result passed. Nodes1/2/3 have now passed the
+observed five-indication sequences and persistence checks, with live reported
+ACTIVE after sixteen seconds without SET refresh and explicit final OFF
+confirmed by live poll. All three have saved desired OFF. This does not
+establish controller/node restart restoration, new-auction recovery/reboot,
+missing-node fault handling, cached/all-node polling or physical power-loss
+acceptance. Those hardware tests remain separate and pending. No firmware or
+wiring changed for this confirmation.
