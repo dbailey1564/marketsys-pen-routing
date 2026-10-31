@@ -1,6 +1,6 @@
 {
   "version": "0.6.0",
-  "status": "prepared_not_flashed",
+  "status": "controller_verified_nodes_pending",
   "images": [
     {
       "target": "controller",
@@ -45,5 +45,5 @@
     "libraries/MarketSysBench/src/BootLightTest.h": "45d55973eda9656777385dfbae75310fc087e4eb5fa5ec0709b40f7e31c194a3",
     "libraries/MarketSysBench/src/RoutingStore.h": "63cc7f6725f5e1a040fc6357793989dfdb2a2a012ea677015901bc74b3a7096f"
   },
-  "hardware_validation": "Pending backup, upload, full readback, UART, LoRa and visual checks"
+  "hardware_validation": "Controller UART/radio/storage readiness and full image/UID/bootloader readback pass; Nodes1/2/3 upload and system tests pending"
 }

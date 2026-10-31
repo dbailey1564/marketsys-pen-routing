@@ -416,3 +416,25 @@ implementation/limits: [indicator-revision-060.md](indicator-revision-060.md).
 Image/UID/source manifest: [firmware-release-060.json](firmware-release-060.json).
 At this preparation milestone no 0.6.0 board has been flashed; deployed baseline
 is still controller 0.4.2 and nodes 0.4.3.
+
+## Controller deployed and readback-verified — October 31
+
+Controller UID 0027001c4b33501220333734 was verified before upload. Fresh
+two matching 262144-byte private reads at prototype-01/20261031T212444.365038Z
+produced backup SHA256 02f63d8f13a1411b2703c46bc4d25e43f654ae0c89c0ac9783b22f29d062b484.
+Packaged reference bootloader code and activation marker matched; both new
+routing storage pages were blank. Frozen 181312-byte controller image
+SHA256 dd8210f5df4bbd341ec2dd913be577cdb0ee644b965ea9f5b3185dfb46d5b310
+was uploaded with the official RAK UART uploader. After restart, UART reports
+CENTRAL READY=1, FW=0.6.0, STORAGE=OK and automatic recovery active.
+
+Private readback verification record:
+prototype-01/20261031T212742.507941Z-post-addressed-upload/verification.json.
+UID matches, all application bytes match, and bootloader outside the reviewed
+update record is unchanged. Settings region changed as expected; settings
+preservation is not claimed. Readback SHA256:
+a5fafb7abadf1b165b333054357ffc1f7197df565046da53241e27a90f5377b1.
+Controller fault-query interface responds. No new-node optical, reboot-recovery
+or power-cycle recovery test is claimed yet. Nodes1/2/3 remain on 0.4.3 pending
+connection and individual backup/upload/readback; mixed old nodes do not support
+new polling/reboot types. Logs are in ignored build/controller-060-*.log.

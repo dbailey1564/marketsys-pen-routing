@@ -33,9 +33,9 @@ remain unchanged. TBD app framing, event identity, replies, reset recovery and
 flow integration are excluded. See [release scope and flash plan](docs/indicator-revision-050.md)
 and [checksums/board identities](docs/firmware-release-050.json).
 
-## Next upload: prepared 0.6.0
+## Recovery release 0.6.0 deployment in progress
 
-The unflashed 0.5.0 package is superseded by **0.6.0** for the requested upload.
+Controller **0.6.0** is uploaded and byte-for-byte readback-verified. Nodes 1–3 remain on **0.4.3** pending their individual uploads. The unflashed 0.5.0 package is superseded.
 This adds persistent indications, durable controller intent, boot-aware periodic
 restoration, new-auction clearing, bounded reboot recovery and per-node fault
 records, along with polling. Nine host test programs and all four builds pass.
