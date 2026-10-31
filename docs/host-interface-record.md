@@ -111,3 +111,13 @@ commit point still require design. The event identity decision is deferred
 for discussion with the application engineer. Specific rejection taxonomy
 and lost-reply retrieval were recommended in the discussion but not separately
 ratified by this yes. No firmware integration or flash accompanies this record.
+
+## Ratified durable acceptance — October 31
+
+User approved that application ACCEPTED means the controller has durably
+saved the event for recovery across power loss. Emit acceptance only after
+successful durable storage; failed storage must not produce acceptance.
+Acceptance is still distinct from completed radio delivery. Exact storage
+mechanism, atomicity/recovery implementation and encoded storage-error reply
+remain to be designed. Event identity remains deferred to the application
+engineer. No firmware implementation or flash accompanies this record.
