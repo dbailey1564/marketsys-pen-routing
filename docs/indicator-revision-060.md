@@ -217,3 +217,14 @@ preservation is not claimed. Snapshot SHA256 8230a75869faa16cc4af6889f190d03baf9
 Post-upload LoRa, persistent indication and controller-restoration checks remain
 pending until the programmer returns to the controller and nodes are powered.
 Logs: build/node3-pre-060-*.log and build/node3-060-*.log.
+
+## Post-upload live polling — October 31
+
+Programmer returned to the controller. UART reports CENTRAL READY=1, FW=0.6.0
+and STORAGE=OK. All three updated nodes responded to addressed read-only POLL
+on attempt 1 with reported state OFF. No SET/OFF command was used for these
+reachability checks. Transactions: Node1 token 4032471649, Node2 token 4116276667, Node3 token 894501700.
+Logs: build/node1-060-first-live-poll.log through node3. This establishes live
+query/response and reported state for all three addresses, not physical LED
+output, persistent-light duration or restart-restoration validation. Those
+hardware checks remain pending.
