@@ -294,3 +294,16 @@ Cleanup explicitly commanded OFF and a fresh live POLL confirmed OFF on attempt
 node1-060-recovery-after and node1-060-recovery-cleanup under ignored build/.
 Controller power-loss retention and new-auction failure/reboot/fault handling
 still need hardware acceptance tests. No firmware or wiring changed.
+
+## Node2 power-cycle restoration confirmed — October 31
+
+Node2 was explicitly commanded ACTIVE and live-polled ACTIVE; user confirmed
+green visible. After being asked to manually power-cycle only Node2 while the
+controller stayed powered, user confirmed solid green returned. A fresh live
+POLL confirmed ACTIVE. Cleanup OFF was acknowledged and another live POLL
+confirmed OFF. This establishes Node2 restoration to saved green, without
+separately claiming the user observed every startup step during this cycle.
+No remote reboot was sent. Logs: build/node2-060-recovery-before.log,
+node2-060-recovery-after.log and node2-060-recovery-cleanup.log. Node2 saved
+desired state is now OFF. No firmware or wiring changed. Controller power-loss
+and new-auction recovery/fault tests remain pending.
