@@ -141,3 +141,18 @@ Polling/reconciliation without generating a new head event is the proposed
 recovery approach. The surrounding proposals for application recovery and
 node-dark startup were not separately ratified by this yes. No firmware
 implementation, build change or flash accompanies this decision record.
+
+## Ratified node startup and restoration — October 31
+
+User retained the automatic node startup light test and directed restoration
+to the controller's intended state after the startup sequence, referring to
+the existing approximately fifteen-second startup. Preserve the initial
+five-second window plus initialization and the ten-second light test. Restore
+the retained intended indication after test completion, without generating a
+new head event. Routine recovery must not interrupt the full startup light
+test. The current firmware can cancel the test on a SET command; recovery
+coordination must account for this before claiming the new behavior works.
+Fifteen seconds is the nominal sequence duration, not a new exact wall-clock
+deadline independent of radio/setup time. The readiness/restoration handshake
+and exceptional OFF/other commands during startup remain implementation or
+policy details to settle. No firmware change or flash accompanies this record.
