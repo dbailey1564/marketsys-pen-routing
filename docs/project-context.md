@@ -585,3 +585,18 @@ No remote reboot was sent. Logs: build/node2-060-recovery-before.log,
 node2-060-recovery-after.log and node2-060-recovery-cleanup.log. Node2 saved
 desired state is now OFF. No firmware or wiring changed. Controller power-loss
 and new-auction recovery/fault tests remain pending.
+
+## New-auction clear and controller-restart check — October 31
+
+Seed commands were acknowledged: Node1 ACTIVE, Node2 LAST, Node3 FULL.
+ATC+AUCTION=CLEAR durably advanced the local auction generation to 1 and
+completed with all three nodes confirmed OFF and zero faults. Controller
+then underwent an authorized-test software restart via UART ATZ. After
+restart it reported STORAGE=OK, AUCTION=1, ACTIVE=0, LAST=0 and recovery idle.
+Fresh live polls of Nodes1/2/3 each reported OFF on attempt 1; controller fault
+query showed all three desired OFF with no faults. Thus old seeded indications
+were not restored across this software restart. This is not a physical
+controller power-cut test, interrupted-clear test or failed-node reboot test.
+Logs: build/auction-060-seed.log, auction-060-clear.log,
+auction-060-controller-restart.log and auction-060-after-restart.log.
+All nodes remain intended/confirmed OFF. No firmware or wiring changed.
