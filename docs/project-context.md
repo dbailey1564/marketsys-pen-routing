@@ -318,3 +318,16 @@ not a finalized application command frame. FULL clearing, assignment to a
 FULL pen, interaction with active/last roles, and reply semantics still
 require decisions. Polling remains requested and is prepared in 0.5.0,
 not installed. No firmware change or flash accompanies this record.
+
+## Ratified controller routing retention — October 31
+
+User answered yes to retaining the controller routing record across power
+loss rather than depending on the application to rebuild it. The controller
+is therefore to retain routing intent across restart. Proposed record
+contents discussed: ACTIVE/LAST identities, other commanded states, and
+unfinished event information. Exact durable layout, atomic commit points,
+event deduplication retention and recovery handshake are still to be designed.
+Polling/reconciliation without generating a new head event is the proposed
+recovery approach. The surrounding proposals for application recovery and
+node-dark startup were not separately ratified by this yes. No firmware
+implementation, build change or flash accompanies this decision record.
