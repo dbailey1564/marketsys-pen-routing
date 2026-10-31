@@ -532,3 +532,15 @@ ACTIVE. Explicit OFF and a further live POLL confirmed OFF. Node2's radio and
 reported persistence checks pass; user optical confirmation is pending. Logs:
 build/node2-060-bench.log and node2-060-bench-result.json. No firmware or wiring
 changed. Both tested nodes have saved desired OFF at the end.
+
+## Node2 optical pass and Node3 radio/persistence test — October 31
+
+User confirmed Node2 passed the observed indication/persistence test. Node1
+and Node2 now have both radio and user-observed visual passes for this run.
+
+Node3 then acknowledged ACTIVE, LAST, HOLD_OPEN, FULL and FAULT. A further
+ACTIVE remained reported by live POLL after sixteen seconds without refresh.
+Explicit OFF and a live POLL confirmed final OFF. Node3 visual confirmation
+is pending. Logs: build/node3-060-bench.log and node3-060-bench-result.json.
+No restart-restoration test is established by these runs. All three nodes
+have saved desired OFF after their tests. No firmware or wiring changed.
