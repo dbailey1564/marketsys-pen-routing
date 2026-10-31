@@ -297,3 +297,14 @@ accessed, reset or flashed. Deployed versions remain controller 0.4.2 and nodes
 recorded identity/reply/recovery decisions. Exact scope, tests and flash steps:
 [indicator-revision-050.md](indicator-revision-050.md). Frozen image checksums,
 UIDs and source hashes: [firmware-release-050.json](firmware-release-050.json).
+
+## Ratified indication persistence — October 31
+
+User decision: "Indications stay until changed." Commanded indications are
+to remain in effect until superseded by a subsequent command; the ten-second
+bench automatic OFF is not the intended operating behavior. This settles the
+normal indication-duration question. Power-cycle recovery, startup testing,
+communication-failure policy and any explicit sleep/session-close operation
+remain separate decisions. This record changes no firmware: deployed nodes
+0.4.3 and prepared 0.5.0 images still contain the ten-second cutoff and must
+be updated before claiming persistent operation.

@@ -107,3 +107,14 @@ The subsequent controller 0.4.2 upload adds addressed diagnostic control,
 not business flow; see indicator-revision-042.md. Node1 is also verified
 on 0.4.2, as are Node2 and Node3. All requested uploads are complete;
 0.4.2 over-air validation is pending.
+
+## Ratified indication persistence — October 31
+
+User decision: "Indications stay until changed." Commanded indications are
+to remain in effect until superseded by a subsequent command; the ten-second
+bench automatic OFF is not the intended operating behavior. This settles the
+normal indication-duration question. Power-cycle recovery, startup testing,
+communication-failure policy and any explicit sleep/session-close operation
+remain separate decisions. This record changes no firmware: deployed nodes
+0.4.3 and prepared 0.5.0 images still contain the ten-second cutoff and must
+be updated before claiming persistent operation.
