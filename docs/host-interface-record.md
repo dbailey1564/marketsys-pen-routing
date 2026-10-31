@@ -11,6 +11,15 @@ enters the penning alley after sale. The new full frame review proposal is
 byte layout is not yet frozen or implemented. The current draft removes the
 payload-length field and splits destination into numeric and alpha bytes.
 
+## October 31 implementation update
+
+Revision 0.5.0 is prepared, not flashed: POLL/POLL_LAST/POLL_ALL/POLL_ALL_LAST
+now have implementations in the existing bench AT interface and read-only
+QUERY/STATUS radio transport. Their binary application message IDs and reply
+framing are still undecided. Earlier statements below about polling being
+unimplemented describe the October 24 milestone. See
+[indicator-revision-050.md](indicator-revision-050.md) for exact commands and limits.
+
 ## Recovered earlier packet proposal
 
 The first pass through local repository notes missed a concrete earlier host

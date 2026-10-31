@@ -284,3 +284,16 @@ No firmware change or flash was made. Node2 red hold was stopped; its shutdown
 OFF and a retry were unacknowledged, so no fresh radio OFF confirmation is
 claimed. The user subsequently reported the replacement test good, without
 specifying a new radio transaction or complete five-state visual pass.
+
+## Prepared polling firmware 0.5.0 — October 31
+
+User requested controller and node flash preparation for ratified commands,
+leaving TBD commands out while nodes are shut down for Node3 wiring. Prepared
+controller plus addressed Node1/2/3 images add live and cached one/all-node
+polling; six state commands and bench/boot timings remain unchanged. Seven
+C++ test programs pass and all four pinned RAK builds pass. No hardware was
+accessed, reset or flashed. Deployed versions remain controller 0.4.2 and nodes
+0.4.3. Binary app protocol and flow integration remain excluded pending the
+recorded identity/reply/recovery decisions. Exact scope, tests and flash steps:
+[indicator-revision-050.md](indicator-revision-050.md). Frozen image checksums,
+UIDs and source hashes: [firmware-release-050.json](firmware-release-050.json).

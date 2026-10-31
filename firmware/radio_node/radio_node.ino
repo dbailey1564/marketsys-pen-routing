@@ -67,7 +67,7 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.4.3");
+    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.5.0");
     Serial.printf("MS_NODE_ID=%u;MAX_NODES=50\r\n", nodeId);
     Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=%lu;PHASE_MS=%lu;BOOT_TEST=%d\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
@@ -89,7 +89,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.4.3");
+    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.5.0");
     bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     ready = commandReady && benchRadio::begin();
@@ -105,20 +105,24 @@ void loop() {
     if (!ready) { dark(); delay(5); return; }
     bench::Frame request;
     if (benchRadio::take(request) && bench::forNode(request, nodeId)) {
-        bench::Result result = dedup.classify(request, state);
-        if (result == bench::APPLIED) { apply(request.state); dedup.remember(request); }
-        acknowledgement = {bench::ACK, nodeId, state, uint8_t(result), request.token};
+        // QUERY is observational: never apply a state, cancel boot, refresh its
+        // timeout, or replace the SET deduplication token.
+        const bool query = request.type == bench::QUERY;
+        bench::Result result = query ? bench::APPLIED : dedup.classify(request, state);
+        if (!query && result == bench::APPLIED) { apply(request.state); dedup.remember(request); }
+        acknowledgement = {uint8_t(query ? bench::STATUS : bench::ACK), nodeId,
+            state, uint8_t(result), request.token};
         ackAt = millis() + 50; // Let central switch from TX to RX.
         ackTries = 0;
         ackPending = true;
         Serial.printf("MS_NODE_RX=%s;CURRENT=%s;TOKEN=%lu;RESULT=%u\r\n",
-            bench::name(request.state), bench::name(state), (unsigned long)request.token, result);
+            request.type == bench::QUERY ? "QUERY" : bench::name(request.state), bench::name(state), (unsigned long)request.token, result);
     }
     if (ackPending && int32_t(millis() - ackAt) >= 0) {
         // Refresh current state if the bench timeout elapsed during ACK delay.
         if (state != acknowledgement.state) {
             acknowledgement.state = state;
-            acknowledgement.result = bench::EXPIRED;
+            if (acknowledgement.type == bench::ACK) acknowledgement.result = bench::EXPIRED;
         }
         if (benchRadio::send(acknowledgement) || ++ackTries >= 3) ackPending = false;
         else ackAt = millis() + 100;

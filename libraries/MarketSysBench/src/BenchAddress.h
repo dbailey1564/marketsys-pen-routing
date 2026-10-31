@@ -33,17 +33,28 @@ inline bool parseSet(int argc, const char *const *argv, Frame &frame) {
     return false;
 }
 inline bool forNode(const Frame &frame, uint8_t node) {
-    return validNode(node) && frame.type == SET && frame.node == node;
+    return validNode(node) && (frame.type == SET || frame.type == QUERY) && frame.node == node;
 }
 inline bool matchesAck(const Frame &ack, const Frame &request) {
-    return ack.type == ACK && ack.node == request.node && ack.token == request.token;
+    return request.type == SET && ack.type == ACK && ack.node == request.node && ack.token == request.token;
+}
+inline bool matchesStatus(const Frame &reply, const Frame &request) {
+    return request.type == QUERY && reply.type == STATUS && reply.result == APPLIED &&
+        reply.node == request.node && reply.token == request.token;
+}
+inline bool parsePoll(int argc, const char *const *argv, Frame &frame) {
+    uint32_t token, node;
+    if (argc != 2 || !decimal(argv[0], UINT32_MAX, token) || !token ||
+        !decimal(argv[1], MAX_NODES, node) || !validNode(node)) return false;
+    frame = {QUERY, uint8_t(node), OFF, APPLIED, token};
+    return true;
 }
 struct Confirmation { bool known = false; uint8_t state = OFF; uint32_t at = 0; };
 struct Confirmations {
     Confirmation nodes[MAX_NODES + 1];
     const Confirmation &get(uint8_t node) const { return nodes[validNode(node) ? node : 0]; }
     void remember(const Frame &ack, uint32_t at) {
-        if (validNode(ack.node) && ack.type == ACK) {
+        if (validNode(ack.node) && (ack.type == ACK || ack.type == STATUS)) {
             nodes[ack.node].known = true; nodes[ack.node].state = ack.state; nodes[ack.node].at = at;
         }
     }

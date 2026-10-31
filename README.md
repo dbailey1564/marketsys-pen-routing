@@ -23,6 +23,16 @@ The boot light test starts after the existing five-second startup window and
 successful setup; there is no additional ten-second wait. The controller
 remains on compatible 0.4.2. No board was flashed during the rollback.
 
+## Prepared release 0.5.0 (October 31)
+
+Controller and three addressed node images are built, tested and frozen for the
+next flash session; **not yet flashed**. This adds read-only live/cache polling:
+POLL, POLL_LAST, POLL_ALL, POLL_ALL_LAST. Seven host test programs pass and all
+four RAK builds compile. The six state commands and existing bench timings
+remain unchanged. TBD app framing, event identity, replies, reset recovery and
+flow integration are excluded. See [release scope and flash plan](docs/indicator-revision-050.md)
+and [checksums/board identities](docs/firmware-release-050.json).
+
 ## Development workspace
 
 Open `/home/dbailey1564/Development/marketsys-pen-routing` through VS Code's
