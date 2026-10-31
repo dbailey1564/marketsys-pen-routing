@@ -160,3 +160,22 @@ Controller fault-query interface responds. No new-node optical, reboot-recovery
 or power-cycle recovery test is claimed yet. Nodes1/2/3 remain on 0.4.3 pending
 connection and individual backup/upload/readback; mixed old nodes do not support
 new polling/reboot types. Logs are in ignored build/controller-060-*.log.
+
+## Node1 deployed and readback-verified — October 31
+
+Node1 UID 003300455233500d20303938 matched. Fresh two-read private backup:
+proto-node1-v1/20261031T213120.554329Z, SHA256 874af3204735a5d6a0acc73cfdc580905e8769793e2d119c22bd5ef6a2165d75.
+Reference bootloader/activation marker and frozen image/source checksums passed.
+Official RAK UART uploader installed the 176256-byte 0.6.0 image
+SHA256 a71795bf57fa44348beeb3a884111168cb4b386962f7c2863ed7fabc95ddf1af. A subsequent UART restart observed all five boot steps
+in order and final OFF; runtime reports NODE1, READY=1, FW=0.6.0, address 1,
+LIMIT_MS=0, normal phase 500 ms, boot test complete and all three GPIO LOW.
+These are software/UART observations, not a user-confirmed optical pass.
+
+Private full readback verification: proto-node1-v1/20261031T213514.270218Z-post-addressed-upload/verification.json.
+Hardware identity, exact application bytes and preserved bootloader outside the
+reviewed update-record range pass. Settings region changed; full settings
+preservation is not claimed. Snapshot SHA256 2a8bf0962e52b6e3b3d2e3ee33b82f66f70875e53ce50ad2052c0e400345dcc8.
+Post-upload LoRa, persistent indication and controller-restoration checks remain
+pending until the programmer returns to the controller and nodes are powered.
+Logs: build/node1-pre-060-*.log and build/node1-060-*.log.
