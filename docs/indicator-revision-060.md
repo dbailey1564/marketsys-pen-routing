@@ -240,3 +240,17 @@ and final OFF, not physical illumination or restart restoration. User optical
 confirmation and hardware restart/restoration tests remain pending. Logs:
 build/node1-060-bench.log; machine result: build/node1-060-bench-result.json.
 The test altered no firmware or wiring and left Node1's saved desired state OFF.
+
+## Node1 optical confirmation and Node2 radio/persistence test — October 31
+
+User reported all Node1 tests good after the five-indication/persistence run,
+confirming physical colors/flashing and the tested light behavior. This does
+not establish a restart-restoration test, which has not yet been performed.
+
+At the user's request Node2 then acknowledged ACTIVE, LAST, HOLD_OPEN, FULL
+and FAULT, two seconds each after command completion. A fresh ACTIVE command
+was followed by sixteen seconds without refreshing SET; live POLL reported
+ACTIVE. Explicit OFF and a further live POLL confirmed OFF. Node2's radio and
+reported persistence checks pass; user optical confirmation is pending. Logs:
+build/node2-060-bench.log and node2-060-bench-result.json. No firmware or wiring
+changed. Both tested nodes have saved desired OFF at the end.
