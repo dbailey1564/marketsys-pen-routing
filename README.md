@@ -1,8 +1,9 @@
 # MarketSys pen routing
 
-Current controller firmware: **0.6.1**. Nodes **1, 2 and 3** remain on **0.6.0**.
+Current controller firmware: **0.6.2**. Nodes **1, 2 and 3** remain on **0.6.0**.
 The controller accepts a destination-only bench input and computes ACTIVE,
-LAST, HOLD_OPEN and older-LAST OFF. Durable progress supports restart/resume
+LAST, HOLD_OPEN and older-LAST OFF. Repeating the active destination now
+also clears the previous LAST to OFF and removes its role. Durable progress supports restart/resume
 and explicit retry of paused work. Application event identity, binary app
 input and application replies remain deferred.
 
@@ -12,14 +13,14 @@ routing user-data partition. The existing record loaded correctly; a newly
 saved record also survived controller software restart. Eleven host programs
 and the pinned controller build pass.
 
-The destination-only three-node walkthrough is initialized at step 0: all nodes
-live-confirmed OFF, ACTIVE/LAST empty. Actual destination advancement steps and
-their physical observations are waiting for the user's next-step request.
+The corrected HOLD_OPEN transitions have passed destination-only hardware
+checks by live polling; final state is all nodes OFF with ACTIVE/LAST empty.
+The full corrected video walkthrough can be repeated using the documented steps.
 Existing node startup, persistent indications, polling and new-auction recovery
 features remain available. This is prototype firmware.
 
-See [controller release/deployment evidence](docs/indicator-revision-061.md),
-[image and source manifest](docs/firmware-release-061.json), and the
+See [controller release/deployment evidence](docs/indicator-revision-062.md),
+[image and source manifest](docs/firmware-release-062.json), and the
 [three-node walkthrough](docs/three-node-flow-walkthrough.md).
 Private flash backups remain outside Git; frozen images are on Lin under
 ignored build/releases/. No wiring or diagram changes accompany this release.

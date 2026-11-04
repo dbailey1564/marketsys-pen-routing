@@ -1,7 +1,7 @@
 {
   "version": "0.6.2",
   "scope": "controller only; nodes remain 0.6.0",
-  "status": "prepared_not_flashed",
+  "status": "controller_uploaded_corrected_hold_open_verified",
   "images": [
     {
       "target": "controller",
@@ -22,5 +22,5 @@
     "libraries/MarketSysBench/src/PenFlow.h": "a8562789c2231c1dc046a9661d96eee54d12e5e94b94a9c65b39fa56c60b2555",
     "libraries/MarketSysBench/src/RoutingStore.h": "b75838086f5becdfbc4a2e5226d874664d05378d61f01e4be4bdad9003304ae9"
   },
-  "hardware_validation": "Pending fresh backup, upload/readback and destination-only advancement walkthrough"
+  "hardware_validation": "Controller UID/exact image/bootloader and routing-partition preservation pass. Destination-only 1,2,2,3,3 live-state verification proves prior LAST OFF and LAST=0 on HOLD_OPEN at Nodes2/3. Final all nodes OFF. Separate user optical confirmation pending."
 }

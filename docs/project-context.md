@@ -864,3 +864,33 @@ OFF with LAST identity cleared. Implemented planner plus actual OFF delivery;
 updated walkthrough, all 2450 active/last combinations and failed-OFF restart/
 retry regression. Eleven host programs and controller build pass. Nodes remain
 0.6.0. See indicator-revision-062.md. Hardware deployment still pending.
+
+## Installed and hardware-verified correction — November 4
+
+Fresh controller backup: prototype-01/20261104T152630.976714Z; two matching
+full reads, SHA256 3694e5895afbeecb41a48a2e0ee2be5b801f5ebc44f3c2116192b32732f780b6.
+Controller UID matched; old application matched verified 0.6.1, valid saved
+MSR2 records and reference bootloader passed. Official RAK uploader installed
+182960-byte 0.6.2 image SHA256
+d0cb198976d681074efeedf0c6ecd3b78da11aa11d046dd1ea180544f8930441.
+UART reports CENTRAL READY=1, FW=0.6.2, STORAGE=OK and FLOW IDLE.
+
+Private readback: prototype-01/20261104T152855.484298Z-post-addressed-upload/verification.json.
+UID, exact application and checked bootloader match. Entire saved routing
+user-data partition matches the fresh backup byte for byte before testing.
+Full readback SHA256 5e34aaa1fe1abc749ca1befa263467a7d6fb4de2519ddae7544a93b144aecadd.
+
+The first verification attempt stopped on an assertion over a printed diagnostic
+line split by host chunk printing; controller ACKs and progression were valid.
+Cleanup confirmed all OFF. Host logging now preserves received chunks instead
+of inserting artificial newlines. No second firmware flash was required.
+Retained first log: build/flow-062-hold-clear-attempt1.log.
+
+Repeated hardware verification used destination-only inputs 1,2,2,3,3 at
+eight-second start spacing. Fresh FLOW status and all-node live polls verified:
+1 ACTIVE/OFF/OFF; 2 LAST/ACTIVE/OFF; repeated 2 OFF/HOLD_OPEN/OFF with LAST=0;
+3 OFF/LAST/ACTIVE; repeated 3 OFF/OFF/HOLD_OPEN with LAST=0. Explicit final
+new-auction clear and live polls confirmed all OFF. This verifies reported
+node states and controller role clearing; a separate user optical pass is
+not claimed. Logs: build/controller-062-*.log and flow-062-hold-clear-test.log;
+structured results: build/flow-062-hold-clear-result.json. Nodes remain 0.6.0.

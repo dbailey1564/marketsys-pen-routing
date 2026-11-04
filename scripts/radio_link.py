@@ -35,7 +35,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
                 lines = [line.strip() for line in response.splitlines()]
                 if 'OK' in lines or any(line.startswith('AT_') and 'ERROR' in line for line in lines):
                     break
-            print(response.strip(), flush=True)
+            print(response, end="", flush=True)
             lines = [line.strip() for line in response.splitlines()]
             if 'OK' in lines:
                 return response
@@ -63,7 +63,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         while not terminal.search(result) and time.monotonic() < end:
             more = read_for(0.2)
             if more:
-                print(more.strip(), flush=True)
+                print(more, end="", flush=True)
                 result += more
         match = terminal.search(result)
         if not match or match[1] != 'DONE':
@@ -80,7 +80,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         while not terminal.search(result) and time.monotonic() < end:
             more = read_for(0.2)
             if more:
-                print(more.strip(), flush=True)
+                print(more, end="", flush=True)
                 result += more
         match = terminal.search(result)
         if not match:
@@ -96,7 +96,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         while 'MS_CACHE_ALL=DONE;COUNT=50' not in result and time.monotonic() < end:
             more = read_for(0.2)
             if more:
-                print(more.strip(), flush=True)
+                print(more, end="", flush=True)
                 result += more
         if 'MS_CACHE_ALL=DONE;COUNT=50' not in result:
             raise RuntimeError('Incomplete cached-state report')
@@ -112,7 +112,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         while not terminal.search(result) and time.monotonic() < end:
             more = read_for(0.2)
             if more:
-                print(more.strip(), flush=True)
+                print(more, end="", flush=True)
                 result += more
         match = terminal.search(result)
         if not match:
@@ -133,7 +133,7 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         while not terminal.search(result) and time.monotonic() < end:
             more = read_for(0.2)
             if more:
-                print(more.strip(), flush=True)
+                print(more, end="", flush=True)
                 result += more
         match = terminal.search(result)
         if not match or match[1] != 'ACK':
