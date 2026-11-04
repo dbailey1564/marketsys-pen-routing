@@ -255,3 +255,14 @@ walkthrough. Capture is closed. Controller UART RX connection must be restored
 to controller PA2 before issuing test controls. No advancement step has yet
 been run; initial test state remains step 0 pending hardware reconnection and
 a fresh explicit all-OFF initialization. No firmware or diagram changes.
+
+## Live advancement walkthrough: first destination — November 4
+
+Controller UART restored and user confirmed readiness. Walkthrough start
+completed an explicit new-auction clear (generation 5), all three OFF. Step 1
+sent destination 1 only through ATC+DEST=1; the controller completed flow with
+ACTIVE=1/LAST=0. Subsequent live polls verified Node1 ACTIVE, Node2 OFF and
+Node3 OFF. The host did not send individual state commands for this assignment.
+Holding at step 1 pending the user's next step; current optical observation
+is not yet separately confirmed. Logs: build/flow-061-ready.log, flow-061-start.log
+and flow-061-step1.log. No firmware or wiring changed in this test step.
