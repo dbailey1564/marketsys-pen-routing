@@ -1,7 +1,7 @@
 {
   "version": "0.6.1",
   "scope": "controller only; nodes remain 0.6.0",
-  "status": "prepared_not_flashed",
+  "status": "controller_verified_walkthrough_initialized",
   "images": [
     {
       "target": "controller",
@@ -22,5 +22,5 @@
     "libraries/MarketSysBench/src/PenFlow.h": "93b79217228e2e4942f210e256da3c4f9a4ffeb33afb204a582f23e710ecd3a3",
     "libraries/MarketSysBench/src/RoutingStore.h": "b75838086f5becdfbc4a2e5226d874664d05378d61f01e4be4bdad9003304ae9"
   },
-  "hardware_validation": "Pending fresh backup, upload/readback and destination-only advancement walkthrough"
+  "hardware_validation": "Controller UID/image/bootloader readback and whole routing user-partition preservation pass; legacy record loads, new saved format survives controller software restart; all three nodes live OFF, walkthrough step 0. Actual destination advancement/visual walkthrough still pending."
 }

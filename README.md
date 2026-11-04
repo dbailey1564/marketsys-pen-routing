@@ -1,39 +1,28 @@
 # MarketSys pen routing
 
-Firmware for a central controller and addressed LoRa pen indicators.
+Current controller firmware: **0.6.1**. Nodes **1, 2 and 3** remain on **0.6.0**.
+The controller accepts a destination-only bench input and computes ACTIVE,
+LAST, HOLD_OPEN and older-LAST OFF. Durable progress supports restart/resume
+and explicit retry of paused work. Application event identity, binary app
+input and application replies remain deferred.
 
-Current deployed firmware: **0.6.0** on the controller and Nodes **1, 2 and 3**.
-All four uploads have matching hardware identities, exact application readback
-and preserved checked bootloader regions. Each node's full startup sequence
-was observed through UART, ending OFF with all three output GPIO LOW. These
-checks do not establish a physical optical pass.
+The controller upload has exact application readback, matching hardware UID,
+checked bootloader preservation and byte-for-byte preservation of the saved
+routing user-data partition. The existing record loaded correctly; a newly
+saved record also survived controller software restart. Eleven host programs
+and the pinned controller build pass.
 
-The release includes six persistent indications, four live/cache polling
-controls, saved controller intent, startup-aware restoration, explicit
-new-auction clearing, bounded reboot attempts and durable node fault flags.
-The normal ten-second automatic OFF is removed. The startup light test remains
-five indications, two seconds each, with 250 ms flash phases after the initial
-five-second window plus setup. Addresses 1–50 are supported; the default
-configured prototype roster is 1–3.
+The destination-only three-node walkthrough is initialized at step 0: all nodes
+live-confirmed OFF, ACTIVE/LAST empty. Actual destination advancement steps and
+their physical observations are waiting for the user's next-step request.
+Existing node startup, persistent indications, polling and new-auction recovery
+features remain available. This is prototype firmware.
 
-Application event identity, binary app input/replies and automatic head-entry
-flow integration remain deferred. This is prototype firmware. Post-upload
-LoRa polling, persistent-light, real restart/recovery and optical checks remain
-pending until the programmer returns to the controller and nodes are powered.
-
-See [release behavior and deployment evidence](docs/indicator-revision-060.md)
-and [image/board manifest](docs/firmware-release-060.json). Private full-flash
-backups remain outside Git; generated images are frozen on Lin under the
-ignored build/releases/0.6.0 directory.
-
-## Prepared controller advancement update
-
-Controller 0.6.1 is built and tested, pending hardware connection/backup/upload.
-It adds controller-owned destination advancement through the bench input, with
-durable progress and explicit failure retry. Nodes remain on 0.6.0. Application
-event identity and binary app input/replies remain deferred. See
-[advancement release](docs/indicator-revision-061.md) and the
-[destination-only walkthrough](docs/three-node-flow-walkthrough.md).
+See [controller release/deployment evidence](docs/indicator-revision-061.md),
+[image and source manifest](docs/firmware-release-061.json), and the
+[three-node walkthrough](docs/three-node-flow-walkthrough.md).
+Private flash backups remain outside Git; frozen images are on Lin under
+ignored build/releases/. No wiring or diagram changes accompany this release.
 
 ## Development workspace
 

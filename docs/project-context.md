@@ -675,3 +675,31 @@ and the walkthrough now sends destinations only. Frozen package and exact scope:
 indicator-revision-061.md and firmware-release-061.json. No 0.6.1 flash yet.
 Lin is reachable; initial UART check did not answer, so physical connection is
 being checked before any backup/upload. No wiring graphic changes.
+
+## Controller deployed; destination walkthrough initialized — November 4
+
+Fresh two-read controller backup: prototype-01/20261104T132721.649898Z, SHA256
+d2cae0433e075ad09787aed381106100fba136e4951e1a560b66ed2988cd12c1.
+SWD UID matched 0027001c4b33501220333734. Backup application matched deployed
+0.6.0, and both saved MSR1 routing records were valid (sequences 41/42, local
+auction 3, active/last empty, configured 1–3, desired OFF). Initial UART was
+unresponsive/garbled; one controlled debugger restart restored valid replies.
+A brief USB re-enumeration interrupted a readiness check before programming;
+readiness was reverified before the upload.
+
+Official RAK UART uploader installed the frozen 182952-byte controller 0.6.1
+image, SHA256 4fda241965498c05cba923015a9ed3347472dbcebd3160aff00e47b0e8dc734c.
+Private verification: prototype-01/20261104T133219.666041Z-post-addressed-upload/verification.json.
+UID, exact application bytes and checked bootloader preservation pass. Entire
+user-data partition 0x08037800..0x0803dfff matched the fresh backup byte for byte
+before any new routing operation. Snapshot SHA256
+c8fbfa708613193764dfbc357d3723b59d0bc74488c6cbf8dfe0414c78c67b5a.
+
+Walkthrough start explicitly cleared the three-node setup: auction 4, desired
+OFF and live OFF on all three, ACTIVE/LAST empty. A subsequent controller UART
+restart loaded the new saved record successfully: FW=0.6.1, STORAGE=OK and FLOW
+IDLE with auction 4. Local walkthrough is step 0, all OFF, waiting for the user
+to request the first destination. No DEST advancement step has yet been sent
+on hardware. Nodes remain on 0.6.0; no node flash or wiring/graphic change.
+Logs: build/controller-061-*.log, controller-pre-061-*.log, flow-061-start.log;
+storage preservation evidence: build/controller-061-storage-preservation.json.
