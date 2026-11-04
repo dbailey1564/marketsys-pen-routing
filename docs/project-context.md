@@ -726,3 +726,22 @@ a continuous repeating loop is not reported. The passive capture so far has
 shown normal OFF status, not a newly captured boot. A synchronized fresh
 power-on observation is still required before claiming a second MCU reset
 or assigning a cause.
+
+## Captured power-on follow-up — November 4
+
+After user reported power applied, capture showed Node1 temporarily missing
+queries/SET OFF during normal RECOVERY, producing a latched controller fault
+for unconfirmed delivery. It also captured Node2 BOOTING through LAST,
+HOLD_OPEN, FULL, FAULT then ready OFF. Subsequently Node1 reported BOOTING
+in FULL and FAULT, then ready OFF repeatedly. No MS_REBOOT_NODE transaction
+was recorded. This is evidence of startup timing/availability, not a reset-cause
+measurement or complete capture of both user-observed Node1 sequences.
+
+Current desired states remain OFF; Node1's fault is latched at 1, Nodes2/3 at 0.
+The sweep's current failure count can be zero while an older fault stays latched.
+No new-auction clear or state/reboot command was issued for this diagnosis.
+Physical power scope needs clarification because Node2 also reported startup.
+Logs: build/node1-fresh-power-on.log, node1-startup-followup.log and
+node1-startup-followup-status.log. Firmware and wiring unchanged; walkthrough
+remains paused at step 0. Direct node startup/reset evidence is still needed
+to distinguish an actual second MCU reset from other observed light behavior.
