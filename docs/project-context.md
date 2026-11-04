@@ -762,3 +762,31 @@ After the leads returned, controller UART was verified: FW=0.6.1, READY=1,
 STORAGE=OK, FLOW IDLE, ACTIVE/LAST empty, auction 4. No destination advancement,
 firmware update, reset command or light command was issued during the direct
 UART attempt. Startup diagnosis remains open; walkthrough remains at step 0.
+
+## Node1 same-image reflash verified — November 4
+
+User reported Node1 again repeated its visible startup with UART disconnected
+and explicitly requested reflashing. After user connected Node1 to the programmer
+with bench power off, UART reported NODE1/0.6.0 and hardware UID matched. Fresh
+two-read backup: proto-node1-v1/20261104T141332.389499Z, SHA256
+2a8bf0962e52b6e3b3d2e3ee33b82f66f70875e53ce50ad2052c0e400345dcc8.
+Preflight found the existing application already identical to the verified
+0.6.0 Node1 image. Node source and its direct header dependencies matched the
+frozen release; unrelated controller source changes were excluded from this check.
+
+Official RAK uploader rewrote the same 176256-byte Node1 image, SHA256
+a71795bf57fa44348beeb3a884111168cb4b386962f7c2863ed7fabc95ddf1af.
+After a deliberate UART restart, all five startup steps and final OFF were
+observed once in the fresh UART verification; NODE1 READY=1, address 1,
+LIMIT_MS=0, normal phase 500 ms and all output GPIO LOW. Bench driver power
+remained off, so this does not reproduce the original loaded bench cold-start.
+
+Full readback verification: proto-node1-v1/20261104T141655.464868Z-post-addressed-upload/verification.json.
+UID, exact application and checked bootloader pass; settings region unchanged.
+Entire main-flash readback hash equals the fresh pre-flash backup hash above.
+Thus no firmware-data difference or application corruption was found; the
+intermittent twice-only visible startup remains unexplained pending bench-power
+retest. No controller/Node2/Node3 firmware or wiring diagram changes.
+Logs: build/node1-reflash-pre-uart.log, node1-reflash-backup.log,
+node1-reflash-preflight.json, node1-reflash-upload.log, node1-reflash-runtime.log
+and node1-reflash-readback.log. Programmer remains on Node1 until moved by user.
