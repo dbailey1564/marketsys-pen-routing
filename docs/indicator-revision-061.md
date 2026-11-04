@@ -174,3 +174,20 @@ Logs: build/node1-fresh-power-on.log, node1-startup-followup.log and
 node1-startup-followup-status.log. Firmware and wiring unchanged; walkthrough
 remains paused at step 0. Direct node startup/reset evidence is still needed
 to distinguish an actual second MCU reset from other observed light behavior.
+
+## Shared supply clarified; direct UART attempt not captured — November 4
+
+User confirmed cycling the bench supply, explaining startup on multiple nodes.
+User then moved UART leads to Node1 for direct observation. Initial capture
+failed when DAPLink disappeared from USB. On reconnect, bench power was applied
+before the replacement capture was armed. That capture received no UART bytes
+before the user unplugged USB to return the leads to the controller; it ended
+with the expected port-disconnect error. No usable direct startup log or reset
+cause was obtained. User observed only one startup sequence on this attempt,
+so the earlier twice-only symptom remains intermittent/unexplained. Do not
+claim the direct log verified one boot or fixed the issue.
+
+After the leads returned, controller UART was verified: FW=0.6.1, READY=1,
+STORAGE=OK, FLOW IDLE, ACTIVE/LAST empty, auction 4. No destination advancement,
+firmware update, reset command or light command was issued during the direct
+UART attempt. Startup diagnosis remains open; walkthrough remains at step 0.
