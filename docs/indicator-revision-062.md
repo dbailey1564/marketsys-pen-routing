@@ -71,3 +71,19 @@ new-auction clear and live polls confirmed all OFF. This verifies reported
 node states and controller role clearing; a separate user optical pass is
 not claimed. Logs: build/controller-062-*.log and flow-062-hold-clear-test.log;
 structured results: build/flow-062-hold-clear-result.json. Nodes remain 0.6.0.
+
+## Full corrected paced walkthrough completed — November 4
+
+User requested proceeding with the full corrected sequence. Start initialization and steps 1–9 completed; all three states were live-polled at every step. Eight-second start scheduling was used, with actual relative starts recorded in build/flow-062-paced-result.json. Both HOLD_OPEN cases cleared the previous LAST to OFF. Final state is all three confirmed OFF, ACTIVE/LAST empty. User optical confirmation is not separately claimed. Logs: build/flow-062-step0.log through step9.log. No firmware or wiring changes.
+
+| Step | Start seconds | Node1 | Node2 | Node3 |
+| --- | --- | --- | --- | --- |
+| 1 | 0.0 | ACTIVE | OFF | OFF |
+| 2 | 8.0 | HOLD_OPEN | OFF | OFF |
+| 3 | 16.0 | LAST | ACTIVE | OFF |
+| 4 | 24.0 | OFF | HOLD_OPEN | OFF |
+| 5 | 32.0 | OFF | LAST | ACTIVE |
+| 6 | 40.0 | OFF | OFF | HOLD_OPEN |
+| 7 | 48.01 | OFF | ACTIVE | LAST |
+| 8 | 56.01 | ACTIVE | LAST | OFF |
+| 9 | 64.01 | OFF | OFF | OFF |
