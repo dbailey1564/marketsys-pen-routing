@@ -790,3 +790,22 @@ retest. No controller/Node2/Node3 firmware or wiring diagram changes.
 Logs: build/node1-reflash-pre-uart.log, node1-reflash-backup.log,
 node1-reflash-preflight.json, node1-reflash-upload.log, node1-reflash-runtime.log
 and node1-reflash-readback.log. Programmer remains on Node1 until moved by user.
+
+## Double visible startup persists after Node1 reflash — November 4
+
+After returning the programmer to the controller, readiness was verified and
+a passive radio capture was armed before bench power. User reported Node1
+again ran its lights twice. Thus the requested same-image reflash did not
+remove the observed symptom. Capture recorded no controller reboot messages.
+It showed Node2 BOOTING through its sequence and ready OFF; Node1 was reported
+OFF in the sampled frames. Sequential controller queries did not provide a
+complete Node1 startup trace or reset-cause evidence. Unconfirmed faults were
+logged while bench power was off/startup; these must not be called the cause
+of a reset. All final sampled node states were OFF. Capture:
+build/node1-post-reflash-bench-startup.log.
+
+A receive-only direct UART capture under normal bench supply is the next
+proposed check: programmer RX to Node1 PA2 and common ground, without wiring
+programmer TX or 3V3 to Node1. Capture must be armed before applying bench
+power. This has not yet been performed. No additional firmware changes or
+reflash are warranted without new evidence.
