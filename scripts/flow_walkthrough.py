@@ -11,10 +11,10 @@ STEPS=[
  ('New head to Node1',1,['ACTIVE','OFF','OFF']),
  ('Another head to Node1: HOLD_OPEN',1,['HOLD_OPEN','OFF','OFF']),
  ('New head to Node2',2,['LAST','ACTIVE','OFF']),
- ('Another head to Node2: HOLD_OPEN',2,['LAST','HOLD_OPEN','OFF']),
+ ('Another head to Node2: HOLD_OPEN, previous LAST off',2,['OFF','HOLD_OPEN','OFF']),
  ('New head to Node3; older LAST off',3,['OFF','LAST','ACTIVE']),
- ('Another head to Node3: HOLD_OPEN',3,['OFF','LAST','HOLD_OPEN']),
- ('Return to Node2, previously LAST',2,['OFF','ACTIVE','LAST']),
+ ('Another head to Node3: HOLD_OPEN, previous LAST off',3,['OFF','OFF','HOLD_OPEN']),
+ ('Return to Node2',2,['OFF','ACTIVE','LAST']),
  ('Return to Node1; older LAST off',1,['ACTIVE','LAST','OFF']),
  ('Finish all OFF',None,['OFF','OFF','OFF']),
 ]

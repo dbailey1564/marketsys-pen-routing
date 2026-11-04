@@ -855,3 +855,12 @@ User requested automatic continuation with eight-second spacing while recording.
 | 9 | OFF | OFF | OFF |
 
 Final state: all three live-confirmed OFF, walkthrough complete at step 9. Logs: build/flow-061-step3.log through step9.log; structured results: build/flow-061-paced-result.json. No firmware or wiring changes during the walkthrough.
+
+## Ratified HOLD_OPEN history advancement and prepared 0.6.2 — November 4
+
+User corrected and confirmed: every new head advances the sequence. On a
+repeated active destination, HOLD_OPEN applies and the previous LAST becomes
+OFF with LAST identity cleared. Implemented planner plus actual OFF delivery;
+updated walkthrough, all 2450 active/last combinations and failed-OFF restart/
+retry regression. Eleven host programs and controller build pass. Nodes remain
+0.6.0. See indicator-revision-062.md. Hardware deployment still pending.

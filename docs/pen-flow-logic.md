@@ -1,5 +1,9 @@
 # Controller-owned pen flow: decisions and open questions
 
+Current correction, November 4: a repeated active destination produces HOLD_OPEN,
+turns the previous LAST OFF and clears its LAST identity. This supersedes older
+notes below that kept LAST unchanged during HOLD_OPEN. See indicator-revision-062.md.
+
 October 24, 2026. This records the user's flow correction after the verified
 0.4.0 six-state indicator milestone. It changes the intended application
 contract; no new flow firmware or host packet format is implemented yet.

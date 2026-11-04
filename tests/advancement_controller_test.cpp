@@ -23,6 +23,18 @@ int main(){
  drive();assert(hardware[1]==bench::ACTIVE && !routingRecord.flowPending);
  assert(call("DEST",{"1"})==AT_OK);drive();assert(hardware[1]==bench::HOLD_OPEN);
  assert(call("DEST",{"2"})==AT_OK);drive();assert(hardware[1]==bench::LAST && hardware[2]==bench::ACTIVE);
+ // HOLD_OPEN must deliver OFF to the old blue pen, not merely clear its role.
+ assert(call("DEST",{"2"})==AT_OK);drive(1);
+ assert(routingRecord.flowPending && routingRecord.flowFailed && routingRecord.last==0);
+ assert(routingRecord.desired[1]==bench::OFF && hardware[1]==bench::LAST && hardware[2]==bench::HOLD_OPEN);
+ assert(call("DEST",{"3"})==AT_ERROR);
+ assert(disk.load(saved) && saved.flowFailed && saved.last==0 && saved.flowStep==1);
+ pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();
+ assert(routingRecord.flowFailed && routingRecord.last==0);
+ assert(call("FLOW",{"RETRY"})==AT_OK);drive();
+ assert(hardware[1]==bench::OFF && hardware[2]==bench::HOLD_OPEN && !routingRecord.flowPending);
+ assert(call("DEST",{"2"})==AT_OK);drive();
+ assert(routingRecord.last==0 && hardware[1]==bench::OFF && hardware[2]==bench::HOLD_OPEN);
  auto before=benchRadio::outgoing.size();
  assert(call("DEST",{"3"})==AT_OK);drive(3);
  assert(routingRecord.flowFailed && routingRecord.flowPending && routingRecord.faults[3]);
