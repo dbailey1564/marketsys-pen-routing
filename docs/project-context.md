@@ -837,3 +837,5 @@ Node3 OFF. The host did not send individual state commands for this assignment.
 Holding at step 1 pending the user's next step; current optical observation
 is not yet separately confirmed. Logs: build/flow-061-ready.log, flow-061-start.log
 and flow-061-step1.log. No firmware or wiring changed in this test step.
+
+Walkthrough step 2 (November 4): user requested next; a second deliberate destination 1 input produced Node1 HOLD_OPEN, Nodes2/3 OFF, all live-polled. Controller retained ACTIVE identity 1 and LAST 0. Holding for observation/next; no separate physical confirmation claimed. Log: build/flow-061-step2.log.
