@@ -147,3 +147,11 @@ Logs: build/node1-startup-loop-controller.log and
 node1-startup-loop-observation.log. Do not attribute this to a brownout, wiring
 or firmware reset without further evidence. Advancement walkthrough remains
 at step 0; all reported node states OFF.
+
+### Startup symptom clarification
+
+User clarified that Node1 shows the startup sequence twice only, then stops;
+a continuous repeating loop is not reported. The passive capture so far has
+shown normal OFF status, not a newly captured boot. A synchronized fresh
+power-on observation is still required before claiming a second MCU reset
+or assigning a cause.
