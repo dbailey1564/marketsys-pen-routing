@@ -20,5 +20,14 @@ int main(){
  // Every single bit corruption in a serialized record is detected.
  uint8_t b[routing::RECORD_BYTES];routing::encode(got,b);
  for(size_t bit=0;bit<sizeof(b)*8;++bit){b[bit/8]^=1<<(bit%8);assert(!routing::decode(b,r));b[bit/8]^=1<<(bit%8);}
+ FlashMock legacy;uint8_t old[routing::RECORD_BYTES];routing::Record initial;
+ initial.sequence=77;initial.auction=3;initial.configured[1]=1;
+ routing::encode(initial,old);memcpy(old,"MSR1",4);
+ auto check=bench::crc(old,174);old[174]=uint8_t(check);old[175]=uint8_t(check>>8);
+ assert(legacy.set(0,old,sizeof old));routing::Store<FlashMock> migration(legacy);
+ assert(migration.load(r) && r.sequence==77 && r.auction==3 && !r.flowPending);
+ r.flowPending=true;r.active=1;r.flowOldActive=0;r.flowStep=0;
+ assert(migration.save(r));routing::Store<FlashMock> v2(legacy);
+ assert(v2.load(got) && got.flowPending && got.active==1);
  std::cout<<"PASS: two-page durable state, cold load, torn write, pending clear, fault retention, corrupt/unknown refusal, all bit flips\n";
 }

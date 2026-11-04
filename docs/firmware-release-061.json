@@ -1,0 +1,26 @@
+{
+  "version": "0.6.1",
+  "scope": "controller only; nodes remain 0.6.0",
+  "status": "prepared_not_flashed",
+  "images": [
+    {
+      "target": "controller",
+      "expected_uid": "0027001c4b33501220333734",
+      "file": "build/releases/0.6.1/controller-0.6.1.bin",
+      "size_bytes": 182952,
+      "sha256": "4fda241965498c05cba923015a9ed3347472dbcebd3160aff00e47b0e8dc734c",
+      "application_address": "0x08006000"
+    }
+  ],
+  "source_sha256": {
+    "firmware/radio_central/radio_central.ino": "e907111f7109398d70c334a398f56f408b4069f75ac03cd631dd96876f5e7e0f",
+    "libraries/MarketSysBench/src/BenchAddress.h": "2850439da4c5449be227041d6031a6af57931d782772f79865b7e75cd701a528",
+    "libraries/MarketSysBench/src/BenchPattern.h": "d906ca4e1b1c362b8d8278d377b6eb309e6a099e15edb842703ef2243ebfceaf",
+    "libraries/MarketSysBench/src/BenchProtocol.h": "99ae2b7e9ff91d436da54fe7c764ea9b6cf5f211b41c58ae36c8e24d1db25903",
+    "libraries/MarketSysBench/src/BenchRadio.h": "53b84a2777358b4bf8f5a805cc817972374972640ce84754b83fcfefa5546927",
+    "libraries/MarketSysBench/src/BootLightTest.h": "45d55973eda9656777385dfbae75310fc087e4eb5fa5ec0709b40f7e31c194a3",
+    "libraries/MarketSysBench/src/PenFlow.h": "93b79217228e2e4942f210e256da3c4f9a4ffeb33afb204a582f23e710ecd3a3",
+    "libraries/MarketSysBench/src/RoutingStore.h": "b75838086f5becdfbc4a2e5226d874664d05378d61f01e4be4bdad9003304ae9"
+  },
+  "hardware_validation": "Pending fresh backup, upload/readback and destination-only advancement walkthrough"
+}

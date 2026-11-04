@@ -661,3 +661,17 @@ Logs: build/node3-060-remote-reboot.log and node3-060-remote-reboot-final.log;
 structured result: build/node3-060-remote-reboot-result.json. All nodes remain
 intended OFF with no controller faults. Physical controller power-cut and
 interrupted-clear acceptance remain separate unperformed tests.
+
+## Prepared controller advancement 0.6.1 — November 4
+
+Resumed after the prior automatic approval review was interrupted by account
+usage limits. Implemented controller-owned destination advancement independent
+of the deferred app protocol: DEST supplies one bench destination, controller
+computes ACTIVE/LAST/HOLD_OPEN/OFF. Durable progress supports restart/resume;
+unconfirmed steps pause until explicit retry or new-auction clear. Existing
+MSR1 records load without clearing intent; new saves use MSR2. Nodes remain on
+0.6.0. Eleven host programs and the controller build pass; host controls compile
+and the walkthrough now sends destinations only. Frozen package and exact scope:
+indicator-revision-061.md and firmware-release-061.json. No 0.6.1 flash yet.
+Lin is reachable; initial UART check did not answer, so physical connection is
+being checked before any backup/upload. No wiring graphic changes.

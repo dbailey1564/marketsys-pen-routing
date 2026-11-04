@@ -8,7 +8,7 @@ import serial
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action', choices=['node-status', 'central-status', 'off', 'active',
-    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last', 'auction-clear', 'faults', 'roster'])
+    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last', 'auction-clear', 'faults', 'roster', 'destination', 'flow-status', 'flow-retry'])
 parser.add_argument('--node', type=int, choices=range(1, 51), default=1, metavar='1..50')
 parser.add_argument('--token', type=int, help='Explicit transaction token for duplicate tests')
 args = parser.parse_args()
@@ -52,7 +52,24 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
     role = f'NODE{args.node}' if node else 'CENTRAL'
     if 'MS_RADIO='+role+';READY=1;FREQ=915000000;' not in response:
         raise RuntimeError('Wrong firmware role or radio initialization failed')
-    if args.action == 'faults':
+    if args.action == 'flow-status':
+        command('ATC+FLOW=?')
+    elif args.action in ('destination', 'flow-retry'):
+        # An accepted DEST is a new bench head. Never automatically resend it
+        # after a lost/ambiguous reply; query FLOW instead.
+        result = command(f'ATC+DEST={args.node}' if args.action == 'destination' else 'ATC+FLOW=RETRY')
+        terminal = re.compile(r'MS_FLOW=(DONE|PAUSED);')
+        end = time.monotonic() + 180
+        while not terminal.search(result) and time.monotonic() < end:
+            more = read_for(0.2)
+            if more:
+                print(more.strip(), flush=True)
+                result += more
+        match = terminal.search(result)
+        if not match or match[1] != 'DONE':
+            raise RuntimeError('Flow is unresolved; query FLOW, do not repeat destination as a retry')
+        print('PASS: controller-owned advancement complete', flush=True)
+    elif args.action == 'faults':
         command('ATC+FAULTS=?')
     elif args.action == 'roster':
         command('ATC+ROSTER=?')

@@ -26,6 +26,15 @@ and [image/board manifest](docs/firmware-release-060.json). Private full-flash
 backups remain outside Git; generated images are frozen on Lin under the
 ignored build/releases/0.6.0 directory.
 
+## Prepared controller advancement update
+
+Controller 0.6.1 is built and tested, pending hardware connection/backup/upload.
+It adds controller-owned destination advancement through the bench input, with
+durable progress and explicit failure retry. Nodes remain on 0.6.0. Application
+event identity and binary app input/replies remain deferred. See
+[advancement release](docs/indicator-revision-061.md) and the
+[destination-only walkthrough](docs/three-node-flow-walkthrough.md).
+
 ## Development workspace
 
 Open `/home/dbailey1564/Development/marketsys-pen-routing` through VS Code's
