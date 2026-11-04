@@ -238,3 +238,20 @@ proposed check: programmer RX to Node1 PA2 and common ground, without wiring
 programmer TX or 3V3 to Node1. Capture must be armed before applying bench
 power. This has not yet been performed. No additional firmware changes or
 reflash are warranted without new evidence.
+
+## Receive-only Node1 boot captured; resume advancement test — November 4
+
+Receive-only UART was armed before bench power with DAPLink RX at Node1 PA2
+and common ground, no programmer TX or 3V3 connected to Node1. The completed
+five-minute capture recorded NODE1/0.6.0, exactly one START, all five boot steps
+in the intended order and one DONE/OFF, with zero transmitted bytes. User
+clarified the latest differences across nodes were starting times. No repeated
+Node1 boot was recorded in this run; the earlier twice-only report is not
+explained or retroactively disproven. Capture files are referenced by ignored
+build/node1-rx-only-current.txt, with timestamped raw log, chunks and summary.
+
+User requested proceeding with the prepared destination-only advancement
+walkthrough. Capture is closed. Controller UART RX connection must be restored
+to controller PA2 before issuing test controls. No advancement step has yet
+been run; initial test state remains step 0 pending hardware reconnection and
+a fresh explicit all-OFF initialization. No firmware or diagram changes.
