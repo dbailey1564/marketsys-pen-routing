@@ -132,3 +132,18 @@ to request the first destination. No DEST advancement step has yet been sent
 on hardware. Nodes remain on 0.6.0; no node flash or wiring/graphic change.
 Logs: build/controller-061-*.log, controller-pre-061-*.log, flow-061-start.log;
 storage preservation evidence: build/controller-061-storage-preservation.json.
+
+## Node1 reported repeated startup near final red step — November 4
+
+User reported Node1 appears to restart its startup sequence near the final
+flashing-red step, unlike Nodes2/3. Controller status showed firmware 0.6.1,
+STORAGE=OK, normal recovery idle, desired OFF and no faults on all three nodes.
+A forty-second passive UART capture of existing controller traffic contained
+multiple valid Node1 STATUS frames reporting OFF/APPLIED, matching Nodes2/3.
+No controller reboot or fault messages appeared in that interval. No state or
+reboot commands were sent for this observation. The symptom was not reproduced
+during that interval; actual reset cause and repeat count remain unknown.
+Logs: build/node1-startup-loop-controller.log and
+node1-startup-loop-observation.log. Do not attribute this to a brownout, wiring
+or firmware reset without further evidence. Advancement walkthrough remains
+at step 0; all reported node states OFF.
