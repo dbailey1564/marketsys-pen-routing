@@ -268,3 +268,19 @@ is not yet separately confirmed. Logs: build/flow-061-ready.log, flow-061-start.
 and flow-061-step1.log. No firmware or wiring changed in this test step.
 
 Walkthrough step 2 (November 4): user requested next; a second deliberate destination 1 input produced Node1 HOLD_OPEN, Nodes2/3 OFF, all live-polled. Controller retained ACTIVE identity 1 and LAST 0. Holding for observation/next; no separate physical confirmation claimed. Log: build/flow-061-step2.log.
+
+## Automatic paced advancement walkthrough completed — November 4
+
+User requested automatic continuation with eight-second spacing while recording. Steps 3–9 ran on an eight-second start schedule (radio delivery/verification can add delay). Each step completed and all three live states matched expectations. Steps 3–8 sent destinations only; final step 9 explicitly cleared all OFF. Controller-owned advancement, repeated-head HOLD_OPEN, older-LAST clearing and return to the LAST destination all passed this radio/state walkthrough. Physical optical confirmation is not separately claimed from the recording request.
+
+| Step | Node1 | Node2 | Node3 |
+| --- | --- | --- | --- |
+| 3 | LAST | ACTIVE | OFF |
+| 4 | LAST | HOLD_OPEN | OFF |
+| 5 | OFF | LAST | ACTIVE |
+| 6 | OFF | LAST | HOLD_OPEN |
+| 7 | OFF | ACTIVE | LAST |
+| 8 | ACTIVE | LAST | OFF |
+| 9 | OFF | OFF | OFF |
+
+Final state: all three live-confirmed OFF, walkthrough complete at step 9. Logs: build/flow-061-step3.log through step9.log; structured results: build/flow-061-paced-result.json. No firmware or wiring changes during the walkthrough.
