@@ -28,8 +28,8 @@ int main() {
     for (int field : {2, 3, 4, 5, 6, 7}) {
         uint8_t invalid[bench::SIZE]; memcpy(invalid, wire, sizeof(wire));
         invalid[field] = field == 4 ? 0 : 255;
-        uint16_t crc = bench::crc(invalid, 12);
-        invalid[12] = uint8_t(crc); invalid[13] = uint8_t(crc >> 8);
+        uint16_t crc = bench::crc(invalid, bench::SIZE-2);
+        invalid[bench::SIZE-2] = uint8_t(crc); invalid[bench::SIZE-1] = uint8_t(crc >> 8);
         assert(!bench::decode(invalid, sizeof(invalid), decoded));
     }
     bench::Dedup cache;

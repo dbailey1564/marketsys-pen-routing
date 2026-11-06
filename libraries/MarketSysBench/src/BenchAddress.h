@@ -36,10 +36,10 @@ inline bool forNode(const Frame &frame, uint8_t node) {
     return validNode(node) && (frame.type == SET || frame.type == QUERY || frame.type == REBOOT) && frame.node == node;
 }
 inline bool matchesAck(const Frame &ack, const Frame &request) {
-    return request.type == SET && ack.type == ACK && ack.node == request.node && ack.token == request.token;
+    return request.type == SET && ack.type == ACK && ack.node == request.node && ack.token == request.token && (ack.auction == request.auction || ack.result == STORAGE_ERROR);
 }
 inline bool matchesStatus(const Frame &reply, const Frame &request) {
-    return request.type == QUERY && reply.type == STATUS && (reply.result == APPLIED || reply.result == BOOTING) &&
+    return request.type == QUERY && reply.type == STATUS && (reply.result == APPLIED || reply.result == BOOTING || reply.result == STORAGE_ERROR) &&
         reply.node == request.node && reply.token == request.token;
 }
 inline bool matchesReboot(const Frame &reply, const Frame &request) {

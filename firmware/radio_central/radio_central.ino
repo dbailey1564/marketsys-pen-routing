@@ -4,6 +4,7 @@
 #include <BenchRadio.h>
 #include <RoutingStore.h>
 #include <PenFlow.h>
+#include <NodeHistory.h>
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
@@ -17,7 +18,11 @@ static bool storageOk=false;
 static bool maintenanceEnabled=true;
 static uint32_t maintenanceAt=0;
 // Recovery and new-auction work share the existing single radio transaction.
-enum Task { NO_TASK, RECOVERY, NEW_AUCTION, FLOW };
+enum Task { NO_TASK, RECOVERY, NEW_AUCTION, FLOW, STARTUP };
+static startup::Assessment startupAssessment;
+static startup::Decision startupDecision=startup::COLLECTING;
+static uint32_t startupUntil=0;
+static bool startupBlocked(){return startupDecision!=startup::RESUME && startupDecision!=startup::NEW_AUCTION;}
 enum Stage { NEED_QUERY, NEED_SET, NEED_REBOOT, WAIT_REBOOT, VERIFY_QUERY, VERIFY_SET, WAIT_BOOT };
 static Task task=NO_TASK;
 static Stage stage=NEED_QUERY, afterBoot=NEED_QUERY;
@@ -49,8 +54,9 @@ static const char *result = "IDLE";
 static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 
 static void report() {
+    Serial.printf("MS_STARTUP=%u;RESPONDED=%u;SURVIVORS=%u\r\n",startupDecision,startupAssessment.replies,startupAssessment.survivors);
     const auto &confirmation = confirmations.get(request.node);
-    benchRadio::printConfig("CENTRAL", ready, "0.6.2");
+    benchRadio::printConfig("CENTRAL", ready, "0.7.0");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, request.type == bench::QUERY ? "UNCHANGED" : bench::name(request.state),
         confirmation.known ? bench::name(confirmation.state) : "UNKNOWN", attempts,
@@ -76,7 +82,7 @@ int penCommand(SERIAL_PORT, char *, stParam *p) {
     for (int i = 0; i < p->argc; ++i) arguments[i] = p->argv[i];
     bench::Frame parsed;
     if (!bench::parseSet(p->argc, arguments, parsed)) return AT_PARAM_ERROR;
-    if(!storageOk || routingRecord.flowPending)return AT_ERROR;
+    if(!storageOk || startupBlocked() || routingRecord.flowPending)return AT_ERROR;
     routing::Record before=routingRecord;
     routingRecord.configured[parsed.node]=1;
     routingRecord.desired[parsed.node]=parsed.state;
@@ -87,7 +93,7 @@ int penCommand(SERIAL_PORT, char *, stParam *p) {
         if(routingRecord.last==parsed.node)routingRecord.last=0;
     }
     if(!persist()){routingRecord=before;return AT_ERROR;}
-    request = parsed;
+    request = parsed;request.auction=routingRecord.auction;
     auto &desired = commanded.nodes[request.node];
     desired.known = true; desired.state = request.state; desired.at = millis();
     pending = true; transmitting = false; attempts = 0;
@@ -187,6 +193,15 @@ static void finishNode(bool ok){
 }
 static void taskResult(bool ok,const bench::Frame*reply){
     taskInFlight=false;
+    if(task==STARTUP){
+        if(ok && reply && reply->result==bench::BOOTING && int32_t(millis()-startupUntil)<0){taskAt=millis()+1000;return;}
+        if(ok && reply && reply->result!=bench::BOOTING)startupAssessment.observe(*reply,routingRecord.auction,routingRecord.desired[taskNode]);
+        else if(ok && reply)startupAssessment.conflict=true;
+        Serial.printf("MS_STARTUP_NODE=%u;RESULT=%s;BOOT_ID=%lu;UPTIME_MS=%lu;AUCTION=%lu;LAST_TOKEN=%lu;STATE=%s;FLAGS=%u\r\n",
+            taskNode,ok?"REPLY":"TIMEOUT",reply?(unsigned long)reply->bootId:0UL,reply?(unsigned long)reply->uptime:0UL,
+            reply?(unsigned long)reply->auction:0UL,reply?(unsigned long)reply->lastToken:0UL,reply?bench::name(reply->state):"UNKNOWN",reply?reply->flags:0);
+        ++taskNode;taskAt=millis();return;
+    }
     if(request.type==bench::REBOOT){
         // A reboot ACK means queued, never proof that restart or OFF happened.
         Serial.printf("MS_REBOOT_NODE=%u;QUEUED_ACK=%d\r\n",taskNode,ok);
@@ -198,7 +213,7 @@ static void taskResult(bool ok,const bench::Frame*reply){
             if(int32_t(millis()-bootDeadline)>=0){finishNode(false);return;}
             afterBoot=stage;stage=WAIT_BOOT;taskAt=millis()+1000;return;
         }
-        if(ok && confirmations.get(taskNode).state==routingRecord.desired[taskNode]){finishNode(true);return;}
+        if(ok && reply && reply->result==bench::APPLIED && (reply->flags&bench::APPLIED_THIS_BOOT) && reply->auction==routingRecord.auction && confirmations.get(taskNode).state==routingRecord.desired[taskNode]){finishNode(true);return;}
         if(stage==VERIFY_QUERY && !ok){finishNode(false);return;}
         stage=stage==VERIFY_QUERY?VERIFY_SET:NEED_SET;taskAt=millis();return;
     }
@@ -206,9 +221,11 @@ static void taskResult(bool ok,const bench::Frame*reply){
     if(task==NEW_AUCTION && !rebootTried){stage=NEED_REBOOT;taskAt=millis();return;}
     finishNode(false);
 }
+static bool beginNewAuction();
 static void maintain(){
     if(!maintenanceEnabled || !storageOk || pending || scanning)return;
     if(task==NO_TASK){
+        if(startupBlocked())return;
         if(routingRecord.flowPending){
             if(routingRecord.flowFailed)return;
             task=FLOW;stage=NEED_QUERY;taskAt=millis();bootDeadline=0;
@@ -223,6 +240,18 @@ static void maintain(){
         if(routingRecord.flowStep>=count){routingRecord.flowPending=false;persist();task=NO_TASK;return;}
         taskNode=nodes[routingRecord.flowStep];
     } else while(taskNode<=bench::MAX_NODES && !routingRecord.configured[taskNode])++taskNode;
+    if(task==STARTUP && taskNode>bench::MAX_NODES){
+        task=NO_TASK;startupDecision=startupAssessment.decision();
+        // An interrupted, durably recorded clear must finish without incrementing auction again.
+        if(routingRecord.pendingReset && startupAssessment.replies && !startupAssessment.storageFault)startupDecision=startup::RESUME;
+        Serial.printf("MS_STARTUP_DECISION=%s;RESPONDED=%u;SURVIVORS=%u\r\n",startupDecision==startup::RESUME?"RESUME":startupDecision==startup::NEW_AUCTION?"NEW_AUCTION":startupDecision==startup::CONFLICT?"CONFLICT":"NO_RESPONSE",startupAssessment.replies,startupAssessment.survivors);
+        if(startupDecision==startup::NEW_AUCTION){if(!beginNewAuction())startupDecision=startup::CONFLICT;}
+        else if(startupBlocked()){
+            for(uint8_t n=1;n<=bench::MAX_NODES;++n)if(routingRecord.configured[n])routingRecord.faults[n]=1;
+            persist();Serial.println("MS_STARTUP=BLOCKED;ACTION=CHECK_RECORDS_OR_EXPLICIT_AUCTION_CLEAR");
+        }
+        return;
+    }
     if(task!=FLOW && taskNode>bench::MAX_NODES){
         Serial.printf("MS_RECONCILE_DONE=%s;FAULTS=%u;AUCTION=%lu\r\n",
             task==NEW_AUCTION?"NEW_AUCTION":"RECOVERY",taskFaults,(unsigned long)routingRecord.auction);
@@ -234,27 +263,32 @@ static void maintain(){
     bench::Frame f={bench::QUERY,taskNode,bench::OFF,bench::APPLIED,nextToken()};
     if(stage==NEED_REBOOT){f.type=bench::REBOOT;rebootTried=true;}
     else if(stage==NEED_SET || stage==VERIFY_SET){f.type=bench::SET;f.state=routingRecord.desired[taskNode];}
-    startPoll(f);taskInFlight=true;
+    f.auction=routingRecord.auction;startPoll(f);taskInFlight=true;
 }
-int auctionCommand(SERIAL_PORT,char*,stParam*p){
-    if(p->argc==1 && !strcmp(p->argv[0],"?")){report();return AT_OK;}
-    if(p->argc!=1 || strcmp(p->argv[0],"CLEAR"))return AT_PARAM_ERROR;
-    if(!ready || busy() || !storageOk)return AT_ERROR;
+static bool beginNewAuction(){
+    const uint32_t base=routingRecord.auction>startupAssessment.maxAuction?routingRecord.auction:startupAssessment.maxAuction;
+    if(base==UINT32_MAX){Serial.println("MS_AUCTION=EXHAUSTED");return false;}
     routing::Record before=routingRecord;
     routingRecord.pendingReset=true;
     routingRecord.flowPending=routingRecord.flowFailed=false;
     routingRecord.flowOldActive=routingRecord.flowOldLast=routingRecord.flowStep=0;
-    routingRecord.auction++;routingRecord.active=routingRecord.last=0;
+    routingRecord.auction=base+1;routingRecord.active=routingRecord.last=0;
     memset(routingRecord.desired,0,sizeof routingRecord.desired);
     memset(routingRecord.faults,0,sizeof routingRecord.faults);
-    if(!persist()){routingRecord=before;return AT_ERROR;}
+    if(!persist()){routingRecord=before;return false;}
     for(uint8_t n=1;n<=bench::MAX_NODES;++n){
         commanded.nodes[n].known=routingRecord.configured[n];commanded.nodes[n].state=bench::OFF;
         confirmations.nodes[n].known=false;
     }
     task=NEW_AUCTION;taskNode=1;stage=NEED_SET;taskAt=millis();taskFaults=0;rebootTried=false;bootDeadline=0;
     Serial.printf("MS_NEW_AUCTION=SAVED;AUCTION=%lu\r\n",(unsigned long)routingRecord.auction);
-    return AT_OK;
+    startupDecision=startup::NEW_AUCTION;return true;
+}
+int auctionCommand(SERIAL_PORT,char*,stParam*p){
+    if(p->argc==1 && !strcmp(p->argv[0],"?")){report();return AT_OK;}
+    if(p->argc!=1 || strcmp(p->argv[0],"CLEAR"))return AT_PARAM_ERROR;
+    if(!ready || busy() || !storageOk)return AT_ERROR;
+    return beginNewAuction()?AT_OK:AT_ERROR;
 }
 int faultsCommand(SERIAL_PORT,char*,stParam*p){
     if(p->argc!=1 || strcmp(p->argv[0],"?"))return AT_PARAM_ERROR;
@@ -272,7 +306,7 @@ int rosterCommand(SERIAL_PORT,char*,stParam*p){
     uint32_t node,value;
     if(p->argc!=2 || !bench::decimal(p->argv[0],50,node) || !bench::validNode(node) ||
         !bench::decimal(p->argv[1],1,value))return AT_PARAM_ERROR;
-    if(busy() || !storageOk || routingRecord.flowPending)return AT_ERROR;
+    if(busy() || startupBlocked() || !storageOk || routingRecord.flowPending)return AT_ERROR;
     routing::Record before=routingRecord;routingRecord.configured[node]=value;
     if(!persist()){routingRecord=before;return AT_ERROR;}return AT_OK;
 }
@@ -282,7 +316,7 @@ int destinationCommand(SERIAL_PORT,char*,stParam*p){
     uint32_t destination;
     if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
     if(p->argc!=1 || !bench::decimal(p->argv[0],50,destination) || !bench::validNode(destination))return AT_PARAM_ERROR;
-    if(!ready || busy() || !storageOk || routingRecord.flowPending)return AT_ERROR;
+    if(!ready || busy() || startupBlocked() || !storageOk || routingRecord.flowPending)return AT_ERROR;
     routing::Record before=routingRecord,next;
     if(!routing::plan(before,uint8_t(destination),next)){
         Serial.println("MS_FLOW=REJECTED;REASON=UNSUPPORTED_DESTINATION_OR_BASELINE");return AT_PARAM_ERROR;
@@ -296,7 +330,7 @@ int destinationCommand(SERIAL_PORT,char*,stParam*p){
 int flowCommand(SERIAL_PORT,char*,stParam*p){
     if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
     if(p->argc!=1 || strcmp(p->argv[0],"RETRY"))return AT_PARAM_ERROR;
-    if(!ready || busy() || !storageOk || !routingRecord.flowPending || !routingRecord.flowFailed)return AT_ERROR;
+    if(!ready || busy() || startupBlocked() || !storageOk || !routingRecord.flowPending || !routingRecord.flowFailed)return AT_ERROR;
     routingRecord.flowFailed=false;
     if(!persist()){routingRecord.flowFailed=true;return AT_ERROR;}
     task=FLOW;stage=NEED_QUERY;taskAt=millis();bootDeadline=0;taskInFlight=false;
@@ -307,7 +341,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.6.2");
+    api.system.firmwareVersion.set("MS-Central-RF-0.7.0");
     bool commandReady = api.system.atMode.add((char *)"PEN",
         (char *)"Bench token:node(1-50):OFF|ACTIVE|LAST|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
@@ -331,6 +365,9 @@ void setup() {
     generatedToken=routingRecord.sequence*1000UL+millis();
     for(uint8_t n=1;n<=bench::MAX_NODES;++n){commanded.nodes[n].known=routingRecord.configured[n];commanded.nodes[n].state=routingRecord.desired[n];}
     maintenanceAt=millis()+1000;
+    startupAssessment=startup::Assessment();startupDecision=startup::COLLECTING;
+    task=STARTUP;taskNode=1;stage=NEED_QUERY;taskAt=millis()+16000;startupUntil=millis()+60000;
+    taskInFlight=false;pending=transmitting=scanning=false;
     ready = commandReady && testReady && pollReady && recoveryReady && benchRadio::begin();
     report();
 }

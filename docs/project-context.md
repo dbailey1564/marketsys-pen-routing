@@ -910,3 +910,12 @@ User requested proceeding with the full corrected sequence. Start initialization
 | 7 | 48.01 | OFF | ACTIVE | LAST |
 | 8 | 56.01 | ACTIVE | LAST | OFF |
 | 9 | 64.01 | OFF | OFF | OFF |
+
+## Prepared startup assessment — November 6, 2026
+
+Daniel approved polling configured nodes before restoration, using node history
+to identify continuing operation and biasing all-fresh responding nodes toward
+a new auction. Firmware 0.7.0 is prepared, not flashed; controller and all nodes
+require its radio version 2. Conflicts/no replies block automatic changes.
+See [startup-recovery-070.md](startup-recovery-070.md) and firmware-release-070.json.
+Existing installed firmware and live indications were not changed by this work.

@@ -1,5 +1,8 @@
 # First controller-to-Node1 radio link
 
+> Current prepared radio protocol: firmware 0.7.0 uses version 2, 34-byte frames.
+> See [startup-recovery-070.md](startup-recovery-070.md). The first-link record below is historical.
+
 October 24, 2026. This follows completed physical and visual verification of
 all seven Node1 indicator states. One DAPLink is available, currently on Node1.
 

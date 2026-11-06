@@ -3,16 +3,16 @@
 #include "../firmware/radio_central/radio_central.ino"
 static int call(const char *name,std::initializer_list<const char*>args){stParam p{};for(auto a:args)p.argv[p.argc++]=const_cast<char*>(a);return api.system.atMode.handlers.at(name)(0,nullptr,&p);}
 static void response(uint8_t state,uint8_t status=bench::APPLIED){
- benchRadio::inject({uint8_t(request.type==bench::QUERY?bench::STATUS:request.type==bench::REBOOT?bench::REBOOT_ACK:bench::ACK),request.node,state,status,request.token});loop();
+ bench::Frame reply={uint8_t(request.type==bench::QUERY?bench::STATUS:request.type==bench::REBOOT?bench::REBOOT_ACK:bench::ACK),request.node,state,status,request.token};reply.auction=request.auction;reply.flags=bench::APPLIED_THIS_BOOT;benchRadio::inject(reply);loop();
 }
 int main(){
- setup();maintenanceEnabled=false;
+ setup();task=NO_TASK;startupDecision=startup::RESUME;maintenanceEnabled=false;
  assert(storageOk && call("PEN",{"80","1","ACTIVE"})==AT_OK);loop();response(bench::ACTIVE);
  assert(routingRecord.desired[1]==bench::ACTIVE && routingRecord.active==1);
  routing::Store<FlashMock> reload(api.system.flash);routing::Record disk;assert(reload.load(disk) && disk.desired[1]==bench::ACTIVE);
  // Simulate controller startup state: no cached confirmations, but retained intent.
  confirmations=bench::Confirmations();commanded=bench::Confirmations();routingRecord=routing::Record();
- setup();maintenanceEnabled=true;fakeNow=maintenanceAt;loop();loop();
+ setup();task=NO_TASK;startupDecision=startup::RESUME;maintenanceEnabled=true;fakeNow=maintenanceAt;loop();loop();
  assert(task==RECOVERY && request.node==1 && request.type==bench::QUERY);
  response(bench::ACTIVE,bench::BOOTING);assert(stage==WAIT_BOOT);
  fakeNow=taskAt;loop();loop();response(bench::OFF);assert(stage==NEED_SET);

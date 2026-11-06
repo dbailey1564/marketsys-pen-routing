@@ -16,7 +16,7 @@ static void drive(uint8_t missing=0){
  assert(count<1000);
 }
 int main(){
- setup();maintenanceAt=fakeNow+1000000;
+ setup();task=NO_TASK;startupDecision=startup::RESUME;maintenanceAt=fakeNow+1000000;
  assert(call("DEST",{"1"})==AT_OK && routingRecord.flowPending);
  routing::Store<FlashMock> disk(api.system.flash);routing::Record saved;
  assert(disk.load(saved) && saved.flowPending && saved.active==1);
@@ -29,7 +29,7 @@ int main(){
  assert(routingRecord.desired[1]==bench::OFF && hardware[1]==bench::LAST && hardware[2]==bench::HOLD_OPEN);
  assert(call("DEST",{"3"})==AT_ERROR);
  assert(disk.load(saved) && saved.flowFailed && saved.last==0 && saved.flowStep==1);
- pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();
+ pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();task=NO_TASK;startupDecision=startup::RESUME;
  assert(routingRecord.flowFailed && routingRecord.last==0);
  assert(call("FLOW",{"RETRY"})==AT_OK);drive();
  assert(hardware[1]==bench::OFF && hardware[2]==bench::HOLD_OPEN && !routingRecord.flowPending);
@@ -43,7 +43,7 @@ int main(){
  assert(benchRadio::outgoing.size()==total); // ordinary maintenance cannot bypass pause.
  assert(call("DEST",{"1"})==AT_ERROR);
  // Restart loads a paused operation, never treats it as another head.
- pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();
+ pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();task=NO_TASK;startupDecision=startup::RESUME;
  assert(routingRecord.flowPending && routingRecord.flowFailed);
  loop();assert(!pending);
  assert(call("FLOW",{"RETRY"})==AT_OK);drive();
@@ -61,7 +61,7 @@ int main(){
   fakeNow+=10;
  }
  assert(guard<100 && routingRecord.flowPending && routingRecord.flowStep==1);
- pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();
+ pending=false;task=NO_TASK;taskInFlight=false;routingRecord=routing::Record();setup();task=NO_TASK;startupDecision=startup::RESUME;
  assert(routingRecord.flowPending && !routingRecord.flowFailed && routingRecord.flowStep==1);
  drive();assert(hardware[2]==bench::ACTIVE && hardware[3]==bench::LAST);
  int writes=api.system.flash.writes;

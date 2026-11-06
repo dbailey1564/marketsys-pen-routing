@@ -10,6 +10,7 @@ static_assert(MARKETSYS_NODE_ID >= 1 && MARKETSYS_NODE_ID <= bench::MAX_NODES, "
 static const uint8_t nodeId = MARKETSYS_NODE_ID;
 #include <BenchPattern.h>
 #include <BootLightTest.h>
+#include <NodeHistory.h>
 #include <BenchRadio.h>
 #include <cstring>
 
@@ -25,6 +26,13 @@ static uint32_t rebootAt=0;
 static bench::Frame acknowledgement;
 static bench::Dedup dedup;
 static indicator::BootLightTest bootTest;
+static startup::History history;
+static startup::HistoryStore<decltype(api.system.flash)> historyStore(api.system.flash);
+static bool historyOk=false,appliedThisBoot=false;
+static void attachHistory(bench::Frame&f){
+ f.auction=history.auction;f.lastToken=history.token;f.lastState=history.state;f.bootId=history.bootId;f.uptime=millis();
+ f.flags=(history.valid?bench::HISTORY_VALID:0)|(appliedThisBoot?bench::APPLIED_THIS_BOOT:0)|(historyOk?bench::HISTORY_STORAGE_OK:0);
+}
 
 static void dark() {
     for (uint32_t pin : pins) digitalWrite(pin, LOW);
@@ -70,7 +78,7 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.6.0");
+    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.7.0");
     Serial.printf("MS_NODE_ID=%u;MAX_NODES=50\r\n", nodeId);
     Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=%lu;PHASE_MS=%lu;BOOT_TEST=%d\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
@@ -92,10 +100,12 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.6.0");
+    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.7.0");
     bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
+    historyOk=historyStore.boot(history,nodeId);
     ready = commandReady && benchRadio::begin();
+    Serial.printf("MS_HISTORY=%s;BOOT_ID=%lu;AUCTION=%lu;LAST_TOKEN=%lu;LAST_STATE=%s\r\n",historyOk?"OK":"FAILED",(unsigned long)history.bootId,(unsigned long)history.auction,(unsigned long)history.token,bench::name(history.state));
     report();
     if (ready) {
         Serial.println("MS_BOOT_TEST=START;PHASE_MS=250;STEP_MS=2000;TOTAL_MS=10000");
@@ -108,6 +118,7 @@ void loop() {
     if (!ready) { dark(); delay(5); return; }
     bench::Frame request;
     if (benchRadio::take(request) && bench::forNode(request, nodeId)) {
+        if(history.valid && request.type!=bench::QUERY && request.auction<history.auction){delay(5);return;}
         if (request.type == bench::REBOOT) {
             acknowledgement = {bench::REBOOT_ACK, nodeId, bench::OFF, bench::APPLIED, request.token};
             ackAt = millis()+50; ackTries=0; ackPending=true;
@@ -121,9 +132,14 @@ void loop() {
         // timeout, or replace the SET deduplication token.
         const bool query = request.type == bench::QUERY;
         bench::Result result = query ? bench::APPLIED : dedup.classify(request, state);
-        if (!query && result == bench::APPLIED) { apply(request.state); dedup.remember(request); }
+        if(!historyOk)result=bench::STORAGE_ERROR;
+        if (!query && result == bench::APPLIED) {
+            startup::History next=history;next.auction=request.auction;next.token=request.token;next.state=request.state;next.valid=true;
+            if(!historyStore.save(next)){historyOk=false;result=bench::STORAGE_ERROR;}
+            else {history=next;apply(request.state);dedup.remember(request);appliedThisBoot=true;}
+        }
         acknowledgement = {uint8_t(query ? bench::STATUS : bench::ACK), nodeId,
-            state, uint8_t(query && bootTest.running() ? bench::BOOTING : result), request.token};
+            state, uint8_t(query && bootTest.running() && historyOk ? bench::BOOTING : result), request.token};
         ackAt = millis() + 50; // Let central switch from TX to RX.
         ackTries = 0;
         ackPending = true;
@@ -135,11 +151,12 @@ void loop() {
         // Refresh current state if the bench timeout elapsed during ACK delay.
         if (acknowledgement.type == bench::STATUS) {
             acknowledgement.state=state;
-            acknowledgement.result=bootTest.running()?bench::BOOTING:bench::APPLIED;
+            acknowledgement.result=!historyOk?bench::STORAGE_ERROR:bootTest.running()?bench::BOOTING:bench::APPLIED;
         } else if (acknowledgement.type == bench::ACK && state != acknowledgement.state) {
             acknowledgement.state = state;
             if (acknowledgement.type == bench::ACK) acknowledgement.result = bench::EXPIRED;
         }
+        attachHistory(acknowledgement);
         if (benchRadio::send(acknowledgement) || ++ackTries >= 3) ackPending = false;
         else ackAt = millis() + 100;
     }

@@ -1,0 +1,55 @@
+{
+  "version": "0.7.0",
+  "radio_wire_version": 2,
+  "status": "prepared_not_flashed",
+  "images": [
+    {
+      "target": "controller",
+      "expected_uid": "0027001c4b33501220333734",
+      "file": "build/releases/0.7.0/controller-0.7.0.bin",
+      "size_bytes": 184504,
+      "sha256": "184a9cce09a363d6ce710bdb340395bec81dfcbe2d1a474a3a26c7693be65c0d",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node1",
+      "expected_uid": "003300455233500d20303938",
+      "file": "build/releases/0.7.0/node1-0.7.0.bin",
+      "size_bytes": 177824,
+      "sha256": "4bc620f57912ed4e5e0441bae71bbb14ba20067055c72c91a2d090aea1935ffb",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node2",
+      "expected_uid": "003300265233500d20303938",
+      "file": "build/releases/0.7.0/node2-0.7.0.bin",
+      "size_bytes": 177848,
+      "sha256": "c8c6fe5526b4076524c77c7d0278172f5646a6855b73f42961d248fb1e62f278",
+      "application_address": "0x08006000"
+    },
+    {
+      "target": "node3",
+      "expected_uid": "003400345233500d20303938",
+      "file": "build/releases/0.7.0/node3-0.7.0.bin",
+      "size_bytes": 177824,
+      "sha256": "c7eaea57f328f6cfed182bdcbbcfef493c461adbc880ebbc01de551cdef0399e",
+      "application_address": "0x08006000"
+    }
+  ],
+  "source_sha256": {
+    "firmware/radio_central/radio_central.ino": "3029fa2de938c665e8416533f7bfb3b5f380add49a13856680519cdbfe547486",
+    "firmware/radio_node/radio_node.ino": "74cf87ebc93a3a16919214ee0679f5f46ef3d6d9c029622f5208c1832f67362f",
+    "libraries/MarketSysBench/library.properties": "2b5af35ee04cc2c6043781a0ecfd31c1a5922e807d0c21dcc78e5ca4039f2af1",
+    "libraries/MarketSysBench/src/BenchAddress.h": "0dfbdf4918213c4f7d7df60dc4fbae0b321b8f28c9a81f89f337ebabd68c79fa",
+    "libraries/MarketSysBench/src/BenchPattern.h": "d906ca4e1b1c362b8d8278d377b6eb309e6a099e15edb842703ef2243ebfceaf",
+    "libraries/MarketSysBench/src/BenchProtocol.h": "2681d80b7719f11f16dcc56bb45d403dd1f2c541133dd018152fff62232c135c",
+    "libraries/MarketSysBench/src/BenchRadio.h": "53b84a2777358b4bf8f5a805cc817972374972640ce84754b83fcfefa5546927",
+    "libraries/MarketSysBench/src/BootLightTest.h": "45d55973eda9656777385dfbae75310fc087e4eb5fa5ec0709b40f7e31c194a3",
+    "libraries/MarketSysBench/src/NodeHistory.h": "da2e94166ef275e760a74a52ebea3d398843ad725e3641f5470476cb77897a02",
+    "libraries/MarketSysBench/src/PenFlow.h": "a8562789c2231c1dc046a9661d96eee54d12e5e94b94a9c65b39fa56c60b2555",
+    "libraries/MarketSysBench/src/RoutingStore.h": "b75838086f5becdfbc4a2e5226d874664d05378d61f01e4be4bdad9003304ae9"
+  },
+  "host_validation": "14 host tests pass with C++11; all four target builds pass",
+  "hardware_validation": "Pending backups, identities, all-board upload/readback and startup classification/power-cut tests",
+  "notes": "All boards require radio version 2. Application events/replies remain deferred. Existing controller routing format retained."
+}
