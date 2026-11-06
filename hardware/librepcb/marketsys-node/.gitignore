@@ -1,0 +1,6 @@
+.autosave/
+.backup/
+user/
+*.user.lp
+.lock
+*~
