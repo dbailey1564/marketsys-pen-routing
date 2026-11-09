@@ -34,3 +34,19 @@ The prior manual-state walkthrough was prepared but never started; this version
 is intended to validate actual controller-owned advancement after upload.
 
 Current rule correction (November 4): HOLD_OPEN clears the previous LAST to OFF and clears its role. Each new head advances that history; blue is not reserved across repeats.
+
+## Automatic demo
+
+On Lin, from the project directory, run:
+
+```sh
+python3 scripts/flow_walkthrough.py auto --interval 15 --passes 4
+```
+
+Start on an idle bench system. The runner clears the auction at the start of the demo and
+at the end of every pass. Each verified
+row is held for 15 seconds before issuing the next destination or clear. Four
+passes take at least nine minutes, plus radio verification. No operator input
+is needed between rows. The runner stops if delivery or live polling fails.
+After an interruption or failure, use `python3 scripts/flow_walkthrough.py stop`
+to request and verify OFF.
