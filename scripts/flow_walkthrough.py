@@ -7,16 +7,21 @@ ROOT=Path(__file__).resolve().parents[1]
 PYTHON=ROOT.parent/'Tools/marketsys-uart-venv/bin/python'
 # Only destinations are sent. All resulting states are computed by the controller.
 STEPS=[
- ('All OFF',None,['OFF','OFF','OFF']),
- ('New head to Node1',1,['ACTIVE','OFF','OFF']),
- ('Another head to Node1: HOLD_OPEN',1,['HOLD_OPEN','OFF','OFF']),
- ('New head to Node2',2,['LAST','ACTIVE','OFF']),
- ('Another head to Node2: HOLD_OPEN, previous LAST off',2,['OFF','HOLD_OPEN','OFF']),
- ('New head to Node3; older LAST off',3,['OFF','LAST','ACTIVE']),
- ('Another head to Node3: HOLD_OPEN, previous LAST off',3,['OFF','OFF','HOLD_OPEN']),
- ('Return to Node2',2,['OFF','ACTIVE','LAST']),
- ('Return to Node1; older LAST off',1,['ACTIVE','LAST','OFF']),
- ('Finish all OFF',None,['OFF','OFF','OFF']),
+ ("All OFF",None,["OFF","OFF","OFF"]),
+ ("Destination P1",1,["ACTIVE","OFF","OFF"]),
+ ("Destination P2",2,["LAST","ACTIVE","OFF"]),
+ ("Destination P3",3,["OFF","LAST","ACTIVE"]),
+ ("Destination P3 (repeat, HOLD_OPEN)",3,["OFF","OFF","HOLD_OPEN"]),
+ ("Destination P2",2,["OFF","ACTIVE","LAST"]),
+ ("Destination P1",1,["ACTIVE","LAST","OFF"]),
+ ("Destination P3",3,["LAST","OFF","ACTIVE"]),
+ ("Destination P2",2,["OFF","ACTIVE","LAST"]),
+ ("Destination P2 (repeat, HOLD_OPEN)",2,["OFF","HOLD_OPEN","OFF"]),
+ ("Destination P1",1,["ACTIVE","LAST","OFF"]),
+ ("Destination P1 (repeat, HOLD_OPEN)",1,["HOLD_OPEN","OFF","OFF"]),
+ ("Destination P2",2,["LAST","ACTIVE","OFF"]),
+ ("Destination P3",3,["OFF","LAST","ACTIVE"]),
+ ("Finish all OFF",None,["OFF","OFF","OFF"]),
 ]
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action',choices=['plan','start','next','stop','status','auto'])

@@ -7,20 +7,25 @@ identity/replies remain deferred; this is a deliberate bench invocation per head
 
 | Step | Input/event | Node1 | Node2 | Node3 |
 | --- | --- | --- | --- | --- |
-| 0 | Initialize new auction | OFF | OFF | OFF |
-| 1 | Destination 1 | ACTIVE | OFF | OFF |
-| 2 | Destination 1 again | HOLD_OPEN | OFF | OFF |
-| 3 | Destination 2 | LAST | ACTIVE | OFF |
-| 4 | Destination 2 again | OFF | HOLD_OPEN | OFF |
-| 5 | Destination 3 | OFF | LAST | ACTIVE |
-| 6 | Destination 3 again | OFF | OFF | HOLD_OPEN |
-| 7 | Destination 2 again | OFF | ACTIVE | LAST |
-| 8 | Destination 1 | ACTIVE | LAST | OFF |
-| 9 | Finish/new-auction clear | OFF | OFF | OFF |
+| 0 | All OFF | OFF | OFF | OFF |
+| 1 | Destination P1 | ACTIVE | OFF | OFF |
+| 2 | Destination P2 | LAST | ACTIVE | OFF |
+| 3 | Destination P3 | OFF | LAST | ACTIVE |
+| 4 | Destination P3 (repeat, HOLD_OPEN) | OFF | OFF | HOLD_OPEN |
+| 5 | Destination P2 | OFF | ACTIVE | LAST |
+| 6 | Destination P1 | ACTIVE | LAST | OFF |
+| 7 | Destination P3 | LAST | OFF | ACTIVE |
+| 8 | Destination P2 | OFF | ACTIVE | LAST |
+| 9 | Destination P2 (repeat, HOLD_OPEN) | OFF | HOLD_OPEN | OFF |
+| 10 | Destination P1 | ACTIVE | LAST | OFF |
+| 11 | Destination P1 (repeat, HOLD_OPEN) | HOLD_OPEN | OFF | OFF |
+| 12 | Destination P2 | LAST | ACTIVE | OFF |
+| 13 | Destination P3 | OFF | LAST | ACTIVE |
+| 14 | Finish all OFF | OFF | OFF | OFF |
 
 ACTIVE = solid green; LAST = solid blue; HOLD_OPEN = flashing green. Each row
 holds until the user requests `next`. `start` initializes OFF and `stop` performs
-explicit new-auction clearing. No timer advances the test. No light state is
+explicit new-auction clearing. Manual mode waits for the next command. No light state is
 sent by the host on a destination row. Live polls verify all three expected
 states after each operation; the user supplies physical color/flashing confirmation.
 
@@ -46,7 +51,7 @@ python3 scripts/flow_walkthrough.py auto --interval 15 --passes 4
 Start on an idle bench system. The runner clears the auction at the start of the demo and
 at the end of every pass. Each verified
 row is held for 15 seconds before issuing the next destination or clear. Four
-passes take at least nine minutes, plus radio verification. No operator input
+passes take at least fourteen minutes, plus radio verification. No operator input
 is needed between rows. The runner stops if delivery or live polling fails.
 After an interruption or failure, use `python3 scripts/flow_walkthrough.py stop`
 to request and verify OFF.
