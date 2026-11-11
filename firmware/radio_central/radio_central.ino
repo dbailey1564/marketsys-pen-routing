@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <HostDestination.h>
 #include <BenchProtocol.h>
 #include <BenchAddress.h>
 #include <BenchRadio.h>
@@ -59,7 +60,7 @@ static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 static void report() {
     Serial.printf("MS_STARTUP=%u;RESPONDED=%u;SURVIVORS=%u\r\n",startupDecision,startupAssessment.replies,startupAssessment.survivors);
     const auto &confirmation = confirmations.get(request.node);
-    benchRadio::printConfig("CENTRAL", ready, "0.7.2");
+    benchRadio::printConfig("CENTRAL", ready, "0.7.3");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, request.type == bench::QUERY ? "UNCHANGED" : bench::name(request.state),
         confirmation.known ? bench::name(confirmation.state) : "UNKNOWN", attempts,
@@ -336,21 +337,82 @@ int rosterCommand(SERIAL_PORT,char*,stParam*p){
 }
 
 
-int destinationCommand(SERIAL_PORT,char*,stParam*p){
-    uint32_t destination;
-    if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
-    if(p->argc!=1 || !bench::decimal(p->argv[0],50,destination) || !bench::validNode(destination))return AT_PARAM_ERROR;
+static int startDestination(uint8_t destination,const host::Destination *event=nullptr){
     if(!ready || busy() || startupBlocked() || !storageOk || routingRecord.flowPending)return AT_ERROR;
     if (asleep[destination]) return AT_ERROR;
     routing::Record before=routingRecord,next;
     if(!routing::plan(before,uint8_t(destination),next)){
         Serial.println("MS_FLOW=REJECTED;REASON=UNSUPPORTED_DESTINATION_OR_BASELINE");return AT_PARAM_ERROR;
     }
+    if(event){next.hostTransaction=event->transaction;next.hostPen=destination;}
     routingRecord=next;
     if(!persist()){routingRecord=before;return AT_ERROR;}
     for(uint8_t n=1;n<=bench::MAX_NODES;++n){commanded.nodes[n].known=routingRecord.configured[n];commanded.nodes[n].state=routingRecord.desired[n];}
     task=FLOW;stage=NEED_QUERY;taskAt=millis();bootDeadline=0;taskInFlight=false;
-    flowReport();return AT_OK;
+    if(!event)flowReport();
+    return AT_OK;
+}
+int destinationCommand(SERIAL_PORT,char*,stParam*p){
+    uint32_t destination;
+    if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
+    if(p->argc!=1 || !bench::decimal(p->argv[0],50,destination) || !bench::validNode(destination))return AT_PARAM_ERROR;
+    return startDestination(uint8_t(destination));
+}
+static host::Receiver hostReceiver;
+static bool hostRaw=false, hostSwitchPending=false;
+static uint32_t hostSwitchAt=0;
+int hostCommand(SERIAL_PORT,char*,stParam*p){
+    uint32_t session;
+    if(p->argc!=1 || !bench::decimal(p->argv[0],UINT32_MAX,session) || !session)return AT_PARAM_ERROR;
+    if(!ready || busy() || startupBlocked() || !storageOk || routingRecord.pendingReset ||
+       routingRecord.flowPending || hostSwitchPending)return AT_ERROR;
+    if(routingRecord.hostSession==session && routingRecord.hostAuction!=routingRecord.auction)return AT_ERROR;
+    if(routingRecord.hostSession!=session){
+        if((routingRecord.hostSession && routingRecord.hostAuction==routingRecord.auction) ||
+           routingRecord.active || routingRecord.last)return AT_ERROR;
+        routing::Record before=routingRecord;
+        routingRecord.hostSession=session;
+        routingRecord.hostAuction=routingRecord.auction;
+        routingRecord.hostTransaction=0;
+        routingRecord.hostPen=0;
+        if(!persist()){routingRecord=before;return AT_ERROR;}
+    }
+    hostSwitchAt=millis()+250;
+    hostSwitchPending=true;
+    return AT_OK;
+}
+static void handleHost(const host::Destination &event){
+    const char *reply;
+    if(!event.session || event.session!=routingRecord.hostSession ||
+       routingRecord.hostAuction!=routingRecord.auction)reply="SESSION";
+    else if(!event.transaction || event.alpha || !bench::validNode(event.pen))reply="DESTINATION_OR_ID";
+    else if(event.transaction<routingRecord.hostTransaction)reply="STALE";
+    else if(event.transaction==routingRecord.hostTransaction)
+        reply=event.pen==routingRecord.hostPen?"DUPLICATE":"CONFLICT";
+    else {
+        int result=startDestination(event.pen,&event);
+        reply=result==AT_OK?"ACCEPTED":result==AT_PARAM_ERROR?"DESTINATION":"BUSY_OR_STORAGE";
+    }
+    Serial.printf("MS_HOST=%s;SESSION=%lu;TRANSACTION=%lu;PEN=%u\r\n",reply,
+        (unsigned long)event.session,(unsigned long)event.transaction,unsigned(event.pen));
+}
+static void serviceHost(){
+    if(hostSwitchPending && int32_t(millis()-hostSwitchAt)>=0){
+        hostSwitchPending=false;
+        Serial.end();
+        Serial.begin(115200, RAK_CUSTOM_MODE);
+        hostRaw=true;
+        Serial.println("MS_HOST=READY");
+    }
+    if(!hostRaw)return;
+    for(unsigned count=0;count<64 && Serial.available()>0;++count){
+        int byte=Serial.read();
+        if(byte<0)break;
+        host::Destination event;
+        auto result=hostReceiver.feed(uint8_t(byte),event);
+        if(result==host::Receiver::VALID)handleHost(event);
+        else if(result==host::Receiver::INVALID)Serial.println("MS_HOST=BAD_FRAME");
+    }
 }
 int flowCommand(SERIAL_PORT,char*,stParam*p){
     if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
@@ -366,7 +428,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.7.2");
+    api.system.firmwareVersion.set("MS-Central-RF-0.7.3");
     bool commandReady = api.system.atMode.add((char *)"PEN",
         (char *)"Bench token:node(1-50):OFF|ACTIVE|LAST|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
@@ -388,6 +450,8 @@ void setup() {
     recoveryReady=api.system.atMode.add((char*)"FLOW",(char*)"? status; RETRY paused flow",(char*)"FLOW",flowCommand,RAK_ATCMD_PERM_READ|RAK_ATCMD_PERM_WRITE)&&recoveryReady;
     recoveryReady=api.system.atMode.add((char*)"POWER",(char*)"token:node:SLEEP or token:node:WAKE",
         (char*)"POWER",powerCommand,RAK_ATCMD_PERM_WRITE)&&recoveryReady;
+    recoveryReady=api.system.atMode.add((char*)"HOST",(char*)"Session ID then switch UART to raw host frames",
+        (char*)"HOST",hostCommand,RAK_ATCMD_PERM_WRITE)&&recoveryReady;
     storageOk=routingStore.load(routingRecord);
     generatedToken=routingRecord.sequence*1000UL+millis();
     for(uint8_t n=1;n<=bench::MAX_NODES;++n){commanded.nodes[n].known=routingRecord.configured[n];commanded.nodes[n].state=routingRecord.desired[n];}
@@ -400,6 +464,7 @@ void setup() {
 }
 void loop() {
     if (!ready) { delay(5); return; }
+    serviceHost();
     bench::Frame ack;
     if (benchRadio::take(ack) && pending && (bench::matchesAck(ack, request) || bench::matchesStatus(ack, request) || bench::matchesReboot(ack,request) || bench::matchesPower(ack,request))) {
         if (bench::powerRequest(request.type)) {
