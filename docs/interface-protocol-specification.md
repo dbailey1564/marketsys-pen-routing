@@ -2,7 +2,7 @@
 
 Review proposal — October 24, 2026. This document defines the proposed
 app-to-controller interface. Firmware does not yet implement this host protocol.
-Session versus persistent event identity remains an engineer decision. The
+The application assigns a new session ID for each auction and progressive transaction IDs per head within that session. The
 CRC procedure below is exact for the current draft; changing frame fields
 requires regenerating the frame examples, not changing the CRC algorithm.
 
@@ -24,8 +24,8 @@ HEAD_DESTINATION frame is 16 bytes:
 | 0-1 | 1-2 | 2 | SYNC | AA 55 |
 | 2 | 3 | 1 | VERSION | 02 |
 | 3 | 4 | 1 | TYPE | 10 = HEAD_DESTINATION |
-| 4-7 | 5-8 | 4 | SESSION_ID | Proposed event-stream identity; review pending |
-| 8-11 | 9-12 | 4 | TRANSACTION_ID | Proposed per-head event number |
+| 4-7 | 5-8 | 4 | SESSION_ID | New ID for each auction |
+| 8-11 | 9-12 | 4 | TRANSACTION_ID | Increasing per-head event number within the auction |
 | 12 | 13 | 1 | DESTINATION_NUMBER | Numeric pen number, up to 255 |
 | 13 | 14 | 1 | ALPHA_DESIGNATION | Reserved for letter designation |
 | 14-15 | 15-16 | 2 | CRC16 | Low byte, then high byte |
@@ -37,8 +37,7 @@ and whether number 0 is reserved still need final agreement.
 
 Session/transaction integers use little-endian byte order in this draft.
 If the engineer selects another event-identity structure, update offsets,
-frame length and CRC test vectors before implementation. The session field
-is proposed and remains subject to review.
+frame length and CRC test vectors before implementation. The pair (SESSION_ID, TRANSACTION_ID) identifies one head event. A retry must reuse both IDs and the original destination. A new head receives a new transaction ID even when its destination repeats. An application restart during the same auction must preserve the session and resume its transaction sequence.
 
 ## 3. Exact CRC definition
 
