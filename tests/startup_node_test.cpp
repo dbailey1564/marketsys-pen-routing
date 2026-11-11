@@ -8,6 +8,11 @@ int main(){
  fakeNow=16000;loop();assert(!bootTest.running());
  auto initial=exchange({bench::QUERY,1,bench::OFF,bench::APPLIED,1});
  assert(initial.flags==bench::HISTORY_STORAGE_OK&&initial.state==bench::OFF);
+ assert(initial.supplyMv==3275);
+ uint8_t wire[bench::SIZE];
+ bench::encode(initial,wire);
+ bench::Frame decoded;
+ assert(bench::decode(wire,sizeof wire,decoded)&&decoded.supplyMv==3275);
  bench::Frame set={bench::SET,1,bench::ACTIVE,bench::APPLIED,25};set.auction=7;
  auto ack=exchange(set);assert(ack.result==bench::APPLIED&&ack.auction==7&&ack.lastToken==25&&ack.lastState==bench::ACTIVE&&ack.flags==7);
  int writes=api.system.flash.writes;auto duplicate=exchange(set);

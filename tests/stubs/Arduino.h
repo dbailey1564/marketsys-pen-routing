@@ -38,6 +38,6 @@ struct FlashMock {
   memcpy(bytes+offset,b,n);return true;
  }
 };
-struct { struct {SetMock firmwareVersion; struct {bool set(uint8_t){return true;}} lpm; struct {bool set(uint8_t){return true;} uint8_t get(){return 1;}} lpmlvl; struct {uint32_t duration=0; void all(uint32_t ms){duration=ms;}} sleep; AtMock atMode;FlashMock flash;int rebootCount=0;
+struct { struct {SetMock firmwareVersion; struct {float get(){return 3.275f;}} bat; struct {bool set(uint8_t){return true;}} lpm; struct {bool set(uint8_t){return true;} uint8_t get(){return 1;}} lpmlvl; struct {uint32_t duration=0; void all(uint32_t ms){duration=ms;}} sleep; AtMock atMode;FlashMock flash;int rebootCount=0;
  void reboot(){++rebootCount;}
  } system;} api;

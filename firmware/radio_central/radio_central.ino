@@ -59,7 +59,7 @@ static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 static void report() {
     Serial.printf("MS_STARTUP=%u;RESPONDED=%u;SURVIVORS=%u\r\n",startupDecision,startupAssessment.replies,startupAssessment.survivors);
     const auto &confirmation = confirmations.get(request.node);
-    benchRadio::printConfig("CENTRAL", ready, "0.7.1");
+    benchRadio::printConfig("CENTRAL", ready, "0.7.2");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, request.type == bench::QUERY ? "UNCHANGED" : bench::name(request.state),
         confirmation.known ? bench::name(confirmation.state) : "UNKNOWN", attempts,
@@ -163,10 +163,10 @@ int pollAllCommand(SERIAL_PORT, char *, stParam *p) {
     Serial.println("MS_POLL_ALL=START;COUNT=50");
     return AT_OK;
 }
-static void finishPoll(bool success,bool booting=false) {
-    Serial.printf("MS_POLL_NODE=%u;TOKEN=%lu;RESULT=%s;STATE=%s;ATTEMPTS=%u;SOURCE=LIVE\r\n",
+static void finishPoll(bool success,bool booting=false,uint16_t supplyMv=0) {
+    Serial.printf("MS_POLL_NODE=%u;TOKEN=%lu;RESULT=%s;STATE=%s;ATTEMPTS=%u;SOURCE=LIVE;VDD_MV=%u\r\n",
         request.node, (unsigned long)request.token, success ? "OK" : (booting ? "BOOTING" : "TIMEOUT"),
-        success ? bench::name(confirmations.get(request.node).state) : "UNKNOWN", attempts);
+        success ? bench::name(confirmations.get(request.node).state) : "UNKNOWN", attempts, unsigned(supplyMv));
     if (!scanning) return;
     if (success) ++scanOk; else ++scanFailed;
     if (request.node == bench::MAX_NODES) {
@@ -366,7 +366,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.7.1");
+    api.system.firmwareVersion.set("MS-Central-RF-0.7.2");
     bool commandReady = api.system.atMode.add((char *)"PEN",
         (char *)"Bench token:node(1-50):OFF|ACTIVE|LAST|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
@@ -431,7 +431,7 @@ void loop() {
             benchRadio::lastRssi, benchRadio::lastSnr);
         report();
         if(taskInFlight){taskResult(!strcmp(result,"ACK"),&ack);return;}
-        if (request.type == bench::QUERY) { finishPoll(ack.result!=bench::BOOTING,ack.result==bench::BOOTING); return; }
+        if (request.type == bench::QUERY) { finishPoll(ack.result!=bench::BOOTING,ack.result==bench::BOOTING,ack.supplyMv); return; }
     }
     if (transmitting && benchRadio::sent) {
         transmitting = false;

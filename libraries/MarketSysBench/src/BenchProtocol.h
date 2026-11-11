@@ -9,7 +9,7 @@ inline bool validState(uint8_t state) { return state <= FAULT && state != 3; }
 enum Type { SET = 1, ACK = 2, QUERY = 3, STATUS = 4, REBOOT = 5, REBOOT_ACK = 6, SLEEP = 7, WAKE = 8, POWER_ACK = 9 };
 enum Result { APPLIED, DUPLICATE, EXPIRED, CONFLICT, BOOTING, STORAGE_ERROR };
 static const size_t SIZE = 34;
-struct Frame { uint8_t type, node, state, result; uint32_t token; uint32_t auction=0, lastToken=0, bootId=0, uptime=0; uint8_t lastState=OFF, flags=0;
+struct Frame { uint8_t type, node, state, result; uint32_t token; uint32_t auction=0, lastToken=0, bootId=0, uptime=0; uint8_t lastState=OFF, flags=0; uint16_t supplyMv=0;
  Frame(uint8_t t=0,uint8_t n=0,uint8_t s=OFF,uint8_t r=APPLIED,uint32_t k=0):type(t),node(n),state(s),result(r),token(k){}
 };
 enum HistoryFlags { HISTORY_VALID=1, APPLIED_THIS_BOOT=2, HISTORY_STORAGE_OK=4, SLEEP_ENABLED=8 };
@@ -40,7 +40,7 @@ inline void encode(const Frame &f, uint8_t *data) {
     for (int i = 0; i < 4; ++i) data[8+i] = uint8_t(f.token >> (8*i));
     const uint32_t extra[]={f.auction,f.lastToken,f.bootId,f.uptime};
     for(int k=0;k<4;++k)for(int i=0;i<4;++i)data[12+4*k+i]=uint8_t(extra[k]>>(8*i));
-    data[28]=f.lastState;data[29]=f.flags;data[30]=data[31]=0;
+    data[28]=f.lastState;data[29]=f.flags;data[30]=uint8_t(f.supplyMv);data[31]=uint8_t(f.supplyMv>>8);
     uint16_t check = crc(data, SIZE-2);
     data[SIZE-2] = uint8_t(check); data[SIZE-1] = uint8_t(check >> 8);
 }
@@ -50,7 +50,7 @@ inline bool decode(const uint8_t *data, size_t length, Frame &f) {
         data[6] > STORAGE_ERROR || (data[3] == ACK && data[6] > CONFLICT && data[6] != STORAGE_ERROR) || data[7] != 0 || ((data[3] == SET || data[3] == QUERY || data[3] == REBOOT || data[3] == REBOOT_ACK) && data[6] != APPLIED) ||
         ((data[3] == QUERY || data[3] == REBOOT || data[3] == REBOOT_ACK) && data[5] != OFF) ||
         (data[3] == STATUS && data[6] != APPLIED && data[6] != BOOTING && data[6] != STORAGE_ERROR) ||
-        (!validState(data[28]) || (data[29]&~15) || data[30] || data[31]) ||
+        (!validState(data[28]) || (data[29]&~15) || (data[3]!=STATUS && (data[30] || data[31]))) ||
         ((powerRequest(data[3]) || data[3] == POWER_ACK) && (data[5] != OFF ||
          (powerRequest(data[3]) && data[6] != APPLIED) ||
          (data[3] == POWER_ACK && data[6] != APPLIED && data[6] != CONFLICT))) ||
@@ -60,7 +60,7 @@ inline bool decode(const uint8_t *data, size_t length, Frame &f) {
     for (int i = 0; i < 4; ++i) f.token |= uint32_t(data[8+i]) << (8*i);
     uint32_t *extra[]={&f.auction,&f.lastToken,&f.bootId,&f.uptime};
     for(int k=0;k<4;++k){*extra[k]=0;for(int i=0;i<4;++i)*extra[k]|=uint32_t(data[12+4*k+i])<<(8*i);}
-    f.lastState=data[28];f.flags=data[29];
+    f.lastState=data[28];f.flags=data[29];f.supplyMv=uint16_t(data[30] | uint16_t(data[31])<<8);
     return f.token != 0;
 }
 struct Dedup {

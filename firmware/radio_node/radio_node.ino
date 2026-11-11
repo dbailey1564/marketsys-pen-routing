@@ -132,7 +132,7 @@ static void apply(uint8_t requested) {
 }
 static void report() {
     update();
-    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.7.1");
+    benchRadio::printConfig("NODE" MS_STRING(MARKETSYS_NODE_ID), ready, "0.7.2");
     Serial.printf("MS_NODE_ID=%u;MAX_NODES=50\r\n", nodeId);
     Serial.printf("MS_NODE_STATE=%s;PB3=%d;PB4=%d;PB5=%d;TOKEN=%lu;LIMIT_MS=%lu;PHASE_MS=%lu;BOOT_TEST=%d\r\n",
         bench::name(state), digitalRead(PB3), digitalRead(PB4), digitalRead(PB5),
@@ -154,7 +154,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.7.1");
+    api.system.firmwareVersion.set("MS-Node" MS_STRING(MARKETSYS_NODE_ID) "-RF-0.7.2");
     bool commandReady = api.system.atMode.add((char *)"NODE", (char *)"Node radio status or OFF",
         (char *)"NODE", nodeCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
     historyOk=historyStore.boot(history,nodeId);
@@ -221,6 +221,11 @@ void loop() {
         } else if (acknowledgement.type == bench::ACK && state != acknowledgement.state) {
             acknowledgement.state = state;
             if (acknowledgement.type == bench::ACK) acknowledgement.result = bench::EXPIRED;
+        }
+        if (acknowledgement.type == bench::STATUS) {
+            const float volts = api.system.bat.get();
+            acknowledgement.supplyMv = volts >= 1.0f && volts <= 5.0f
+                ? uint16_t(volts * 1000.0f + 0.5f) : 0;
         }
         attachHistory(acknowledgement);
         if (benchRadio::send(acknowledgement)) {

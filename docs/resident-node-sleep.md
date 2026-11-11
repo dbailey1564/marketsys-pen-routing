@@ -36,3 +36,15 @@ start-to-start timing and the usable RF window, and test wake after missing
 one complete window. The timeout is a reporting deadline. Successful delivery
 depends on RF reception. The installed 0.6.x fleet uses a different radio
 frame version. Update the controller and participating nodes together.
+
+## RAK supply voltage (0.7.2)
+
+A live poll includes `VDD_MV`, the node's RUI3 internal-reference estimate
+of the RAK 3.3 V supply in millivolts. Zero means unavailable. No extra
+sense wire is needed. Compare the reading with a meter during bench testing.
+Use matching 0.7.2 images because older 0.7.x receivers reject nonzero values
+in the previously reserved status bytes.
+
+```sh
+../Tools/marketsys-uart-venv/bin/python scripts/radio_link.py poll --node 1
+```
