@@ -9,6 +9,9 @@
 #include <cstdlib>
 #include <cerrno>
 
+// Treat an unconfirmed sleep command as potentially applied until a WAKE ACK.
+static bool asleep[bench::MAX_NODES+1];
+static uint32_t wakeUntil=0;
 static bool ready = false, pending = false, transmitting = false;
 static bench::Confirmations confirmations;
 static bench::Confirmations commanded;
@@ -48,7 +51,7 @@ static void cached(uint8_t node) {
         c.known ? (unsigned long)(millis()-c.at) : 0UL);
 }
 static bool dropArmed = false, dropThisTransaction = false;
-static uint8_t attempts = 0;
+static uint16_t attempts = 0;
 static uint32_t deadline = 0;
 static const char *result = "IDLE";
 static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
@@ -56,7 +59,7 @@ static bench::Frame request = {bench::SET, 1, bench::OFF, bench::APPLIED, 0};
 static void report() {
     Serial.printf("MS_STARTUP=%u;RESPONDED=%u;SURVIVORS=%u\r\n",startupDecision,startupAssessment.replies,startupAssessment.survivors);
     const auto &confirmation = confirmations.get(request.node);
-    benchRadio::printConfig("CENTRAL", ready, "0.7.0");
+    benchRadio::printConfig("CENTRAL", ready, "0.7.1");
     Serial.printf("MS_LINK=%s;TOKEN=%lu;COMMANDED=%s;CONFIRMED=%s;ATTEMPTS=%u;AGE_MS=%lu\r\n",
         result, (unsigned long)request.token, request.type == bench::QUERY ? "UNCHANGED" : bench::name(request.state),
         confirmation.known ? bench::name(confirmation.state) : "UNKNOWN", attempts,
@@ -83,6 +86,7 @@ int penCommand(SERIAL_PORT, char *, stParam *p) {
     bench::Frame parsed;
     if (!bench::parseSet(p->argc, arguments, parsed)) return AT_PARAM_ERROR;
     if(!storageOk || startupBlocked() || routingRecord.flowPending)return AT_ERROR;
+    if (asleep[parsed.node]) return AT_ERROR;
     routing::Record before=routingRecord;
     routingRecord.configured[parsed.node]=1;
     routingRecord.desired[parsed.node]=parsed.state;
@@ -107,6 +111,26 @@ static void startPoll(const bench::Frame &frame) {
     pending = true; transmitting = false; attempts = 0;
     dropThisTransaction = false;
     deadline = millis(); result = "PENDING";
+}
+int powerCommand(SERIAL_PORT, char *, stParam *p) {
+    uint32_t token, node;
+    if (p->argc != 3 || !bench::decimal(p->argv[0],UINT32_MAX,token) || !token ||
+        !bench::decimal(p->argv[1],bench::MAX_NODES,node) || !bench::validNode(node))
+        return AT_PARAM_ERROR;
+    bool enable = !strcmp(p->argv[2],"SLEEP");
+    if (!enable && strcmp(p->argv[2],"WAKE")) return AT_PARAM_ERROR;
+    if (!ready || pending || scanning || (task!=NO_TASK && task!=STARTUP) ||
+        !storageOk || !routingRecord.configured[node]) return AT_ERROR;
+    if (enable && (startupBlocked() || routingRecord.flowPending ||
+        routingRecord.desired[node]!=bench::OFF)) return AT_ERROR;
+    bench::Frame frame={uint8_t(enable?bench::SLEEP:bench::WAKE),uint8_t(node),
+        bench::OFF,bench::APPLIED,token};
+    frame.auction=routingRecord.auction;
+    if (enable) asleep[node]=true;
+    wakeUntil=millis()+bench::WAKE_LIMIT_MS;
+    startPoll(frame);
+    report();
+    return AT_OK;
 }
 int pollCommand(SERIAL_PORT, char *, stParam *p) {
     const char *args[2] = {nullptr, nullptr};
@@ -239,7 +263,7 @@ static void maintain(){
         uint8_t nodes[3];uint8_t count=routing::flowNodes(routingRecord,nodes);
         if(routingRecord.flowStep>=count){routingRecord.flowPending=false;persist();task=NO_TASK;return;}
         taskNode=nodes[routingRecord.flowStep];
-    } else while(taskNode<=bench::MAX_NODES && !routingRecord.configured[taskNode])++taskNode;
+    } else while(taskNode<=bench::MAX_NODES && (!routingRecord.configured[taskNode] || asleep[taskNode]))++taskNode;
     if(task==STARTUP && taskNode>bench::MAX_NODES){
         task=NO_TASK;startupDecision=startupAssessment.decision();
         // An interrupted, durably recorded clear must finish without incrementing auction again.
@@ -306,7 +330,7 @@ int rosterCommand(SERIAL_PORT,char*,stParam*p){
     uint32_t node,value;
     if(p->argc!=2 || !bench::decimal(p->argv[0],50,node) || !bench::validNode(node) ||
         !bench::decimal(p->argv[1],1,value))return AT_PARAM_ERROR;
-    if(busy() || startupBlocked() || !storageOk || routingRecord.flowPending)return AT_ERROR;
+    if(busy() || startupBlocked() || !storageOk || routingRecord.flowPending || asleep[node])return AT_ERROR;
     routing::Record before=routingRecord;routingRecord.configured[node]=value;
     if(!persist()){routingRecord=before;return AT_ERROR;}return AT_OK;
 }
@@ -317,6 +341,7 @@ int destinationCommand(SERIAL_PORT,char*,stParam*p){
     if(p->argc==1 && !strcmp(p->argv[0],"?")){flowReport();return AT_OK;}
     if(p->argc!=1 || !bench::decimal(p->argv[0],50,destination) || !bench::validNode(destination))return AT_PARAM_ERROR;
     if(!ready || busy() || startupBlocked() || !storageOk || routingRecord.flowPending)return AT_ERROR;
+    if (asleep[destination]) return AT_ERROR;
     routing::Record before=routingRecord,next;
     if(!routing::plan(before,uint8_t(destination),next)){
         Serial.println("MS_FLOW=REJECTED;REASON=UNSUPPORTED_DESTINATION_OR_BASELINE");return AT_PARAM_ERROR;
@@ -341,7 +366,7 @@ void setup() {
     Serial.begin(115200, RAK_AT_MODE);
     delay(5000);
     api.system.lpm.set(0);
-    api.system.firmwareVersion.set("MS-Central-RF-0.7.0");
+    api.system.firmwareVersion.set("MS-Central-RF-0.7.1");
     bool commandReady = api.system.atMode.add((char *)"PEN",
         (char *)"Bench token:node(1-50):OFF|ACTIVE|LAST|HOLD_OPEN|FULL|FAULT",
         (char *)"PEN", penCommand, RAK_ATCMD_PERM_READ | RAK_ATCMD_PERM_WRITE);
@@ -361,6 +386,8 @@ void setup() {
     recoveryReady=api.system.atMode.add((char*)"ROSTER",(char*)"? or node:1 add / node:0 exclude",(char*)"ROSTER",rosterCommand,RAK_ATCMD_PERM_READ|RAK_ATCMD_PERM_WRITE)&&recoveryReady;
     recoveryReady=api.system.atMode.add((char*)"DEST",(char*)"Bench new-head destination 1..50; ? status",(char*)"DEST",destinationCommand,RAK_ATCMD_PERM_READ|RAK_ATCMD_PERM_WRITE)&&recoveryReady;
     recoveryReady=api.system.atMode.add((char*)"FLOW",(char*)"? status; RETRY paused flow",(char*)"FLOW",flowCommand,RAK_ATCMD_PERM_READ|RAK_ATCMD_PERM_WRITE)&&recoveryReady;
+    recoveryReady=api.system.atMode.add((char*)"POWER",(char*)"token:node:SLEEP or token:node:WAKE",
+        (char*)"POWER",powerCommand,RAK_ATCMD_PERM_WRITE)&&recoveryReady;
     storageOk=routingStore.load(routingRecord);
     generatedToken=routingRecord.sequence*1000UL+millis();
     for(uint8_t n=1;n<=bench::MAX_NODES;++n){commanded.nodes[n].known=routingRecord.configured[n];commanded.nodes[n].state=routingRecord.desired[n];}
@@ -374,7 +401,19 @@ void setup() {
 void loop() {
     if (!ready) { delay(5); return; }
     bench::Frame ack;
-    if (benchRadio::take(ack) && pending && (bench::matchesAck(ack, request) || bench::matchesStatus(ack, request) || bench::matchesReboot(ack,request))) {
+    if (benchRadio::take(ack) && pending && (bench::matchesAck(ack, request) || bench::matchesStatus(ack, request) || bench::matchesReboot(ack,request) || bench::matchesPower(ack,request))) {
+        if (bench::powerRequest(request.type)) {
+            if (request.type == bench::WAKE && int32_t(millis()-wakeUntil)>=0) return;
+            const bool sleepFlag = (ack.flags & bench::SLEEP_ENABLED) != 0;
+            const bool ok = ack.result == bench::APPLIED && sleepFlag == (request.type == bench::SLEEP);
+            asleep[request.node] = sleepFlag;
+            pending = transmitting = false;
+            result = ok ? "ACK" : "REJECTED";
+            Serial.printf("MS_POWER_NODE=%u;TOKEN=%lu;RESULT=%s;MODE=%s\r\n",
+                request.node,(unsigned long)request.token,result,sleepFlag?"SLEEP":"AWAKE");
+            report();
+            return;
+        }
         const auto &confirmation = confirmations.get(request.node);
         if (request.type == bench::SET && dropThisTransaction && ack.state == request.state && ack.result <= bench::DUPLICATE) {
             dropThisTransaction = false;
@@ -396,19 +435,22 @@ void loop() {
     }
     if (transmitting && benchRadio::sent) {
         transmitting = false;
-        deadline = millis() + 1000;
+        if (request.type != bench::WAKE) deadline = millis() + 1000;
     }
     if (pending && int32_t(millis() - deadline) >= 0) {
-        if (attempts >= 3) {
+        if (request.type == bench::WAKE ? int32_t(millis()-wakeUntil)>=0 : attempts>=3) {
             pending = false; transmitting = false; dropThisTransaction = false;
             result = "FAILED"; report();
+            if (bench::powerRequest(request.type))
+                Serial.printf("MS_POWER_NODE=%u;TOKEN=%lu;RESULT=FAILED;MODE=UNKNOWN\r\n",request.node,(unsigned long)request.token);
             if(taskInFlight){taskResult(false,nullptr);return;}
             if (request.type == bench::QUERY) { finishPoll(false); return; }
         } else {
             ++attempts;
             transmitting = benchRadio::send(request);
             // Bound a missing TX callback as well as missing acknowledgements.
-            deadline = millis() + (transmitting ? 2000 : 1000);
+            deadline = millis() + (request.type == bench::WAKE ? bench::WAKE_RETRY_MS :
+                (transmitting ? 2000 : 1000));
             Serial.printf("MS_TX_ATTEMPT=%u;TOKEN=%lu;QUEUED=%d\r\n",
                 attempts, (unsigned long)request.token, transmitting);
         }

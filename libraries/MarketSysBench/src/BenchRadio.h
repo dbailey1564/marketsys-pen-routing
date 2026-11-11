@@ -4,12 +4,13 @@
 #include "BenchProtocol.h"
 
 namespace benchRadio {
-static volatile bool received = false, sent = false;
+static volatile bool received = false, sent = false, receiveEnded = false;
 static uint8_t inbox[bench::SIZE];
 static uint8_t outbox[bench::SIZE];
 static int16_t lastRssi = 0;
 static int8_t lastSnr = 0;
 static void rx(rui_lora_p2p_recv_t data) {
+    receiveEnded = true;
     if (data.Status != LORA_P2P_RXDONE || data.BufferSize != bench::SIZE || received) return;
     memcpy(inbox, data.Buffer, bench::SIZE);
     lastRssi = data.Rssi; lastSnr = data.Snr;
@@ -31,6 +32,10 @@ inline bool begin() {
     ok = api.lora.registerPRecvCallback(rx) && ok;
     ok = api.lora.registerPSendCallback(tx) && ok;
     return ok && api.lora.precv(65533); // Continuous RX, TX allowed.
+}
+inline bool receive(uint32_t duration) {
+    receiveEnded = false;
+    return api.lora.precv(duration);
 }
 inline bool take(bench::Frame &frame) {
     if (!received) return false;

@@ -8,7 +8,7 @@ import serial
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('action', choices=['node-status', 'central-status', 'off', 'active',
-    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last', 'auction-clear', 'faults', 'roster', 'destination', 'flow-status', 'flow-retry'])
+    'last', 'hold_open', 'full', 'fault', 'poll', 'poll_last', 'poll_all', 'poll_all_last', 'auction-clear', 'faults', 'roster', 'destination', 'flow-status', 'flow-retry', 'sleep', 'wake'])
 parser.add_argument('--node', type=int, choices=range(1, 51), default=1, metavar='1..50')
 parser.add_argument('--token', type=int, help='Explicit transaction token for duplicate tests')
 args = parser.parse_args()
@@ -69,6 +69,22 @@ with serial.Serial(str(ports[0]), 115200, timeout=0.05, exclusive=True) as port:
         if not match or match[1] != 'DONE':
             raise RuntimeError('Flow is unresolved; query FLOW, do not repeat destination as a retry')
         print('PASS: controller-owned advancement complete', flush=True)
+    elif args.action in ('sleep', 'wake'):
+        token = args.token if args.token is not None else secrets.randbelow(0xffffffff) + 1
+        if not 1 <= token <= 0xffffffff:
+            raise ValueError('Token must be 1..4294967295')
+        result = command(f'ATC+POWER={token}:{args.node}:{args.action.upper()}')
+        terminal = re.compile(rf'MS_POWER_NODE={args.node};TOKEN={token};RESULT=(ACK|REJECTED|FAILED);MODE=(SLEEP|AWAKE|UNKNOWN)')
+        end = time.monotonic() + (305 if args.action == 'wake' else 10)
+        while not terminal.search(result) and time.monotonic() < end:
+            more = read_for(0.2)
+            if more:
+                print(more, end='', flush=True)
+                result += more
+        match = terminal.search(result)
+        if not match or match[1] != 'ACK':
+            raise RuntimeError(f'Node{args.node} power change unconfirmed: ' + (match[1] if match else 'host timeout'))
+        print(f'PASS: Node{args.node} confirmed {match[2]}', flush=True)
     elif args.action == 'faults':
         command('ATC+FAULTS=?')
     elif args.action == 'roster':

@@ -10,7 +10,7 @@ static void answer(uint8_t state) {
  benchRadio::inject({bench::STATUS,f.node,state,bench::APPLIED,f.token});loop();
 }
 int main(){
- setup();task=NO_TASK;startupDecision=startup::RESUME; maintenanceEnabled=false; assert(ready && api.system.atMode.handlers.size()==11);
+ setup();task=NO_TASK;startupDecision=startup::RESUME; maintenanceEnabled=false; assert(ready && api.system.atMode.handlers.count("POLL")==1);
  assert(call("POLL_LAST",{"1"})==AT_OK);
  assert(Serial.out.find("CONFIRMED=UNKNOWN;KNOWN=0")!=std::string::npos);
  assert(call("POLL",{"0","1"})==AT_PARAM_ERROR);

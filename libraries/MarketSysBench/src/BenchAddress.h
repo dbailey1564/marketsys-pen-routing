@@ -33,7 +33,7 @@ inline bool parseSet(int argc, const char *const *argv, Frame &frame) {
     return false;
 }
 inline bool forNode(const Frame &frame, uint8_t node) {
-    return validNode(node) && (frame.type == SET || frame.type == QUERY || frame.type == REBOOT) && frame.node == node;
+    return validNode(node) && (frame.type == SET || frame.type == QUERY || frame.type == REBOOT || powerRequest(frame.type)) && frame.node == node;
 }
 inline bool matchesAck(const Frame &ack, const Frame &request) {
     return request.type == SET && ack.type == ACK && ack.node == request.node && ack.token == request.token && (ack.auction == request.auction || ack.result == STORAGE_ERROR);
@@ -45,6 +45,10 @@ inline bool matchesStatus(const Frame &reply, const Frame &request) {
 inline bool matchesReboot(const Frame &reply, const Frame &request) {
     return request.type == REBOOT && reply.type == REBOOT_ACK && reply.result == APPLIED &&
         reply.node == request.node && reply.token == request.token;
+}
+inline bool matchesPower(const Frame &ack, const Frame &request) {
+    return powerRequest(request.type) && ack.type == POWER_ACK &&
+        ack.node == request.node && ack.token == request.token;
 }
 inline bool parsePoll(int argc, const char *const *argv, Frame &frame) {
     uint32_t token, node;
